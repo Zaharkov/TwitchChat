@@ -1,4 +1,4 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.Code.Json.Objects
 {
     using System.Runtime.Serialization;
 
@@ -8,11 +8,11 @@
     [DataContract]
     public class TwitchServerResult
     {
-        [DataMember]
-        public string cluster;
-        [DataMember]
-        public string[] servers;
-        [DataMember]
-        public string[] websockets_servers;
+        [DataMember(Name = "cluster")]
+        public string Cluster;
+        [DataMember(Name = "servers")]
+        public string[] Servers;
+        [DataMember(Name = "websockets_servers")]
+        public string[] WebSocketsServers;
     }
 }

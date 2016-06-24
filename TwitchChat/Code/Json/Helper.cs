@@ -1,4 +1,4 @@
-﻿namespace TwitchChat.Json
+﻿namespace TwitchChat.Code.Json
 {
     using System.IO;
     using System.Runtime.Serialization.Json;

@@ -1,4 +1,4 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.Code
 {
     using System;
     using System.Collections.Generic;
@@ -49,7 +49,7 @@
             //  https://tools.ietf.org/html/rfc2812#section-3.7.2
             if (message.Command.Equals("PING")) _send("PONG :" + message.Parameters[0]);
 
-            if (Received != null) Received(this, new ReceivedEventArgs
+            Received?.Invoke(this, new ReceivedEventArgs
             {
                 Message = message
             });
@@ -57,7 +57,7 @@
 
         public virtual void OnSent(string message)
         {
-            if (Sent != null) Sent(this, new SentEventArgs
+            Sent?.Invoke(this, new SentEventArgs
             {
                 Message = message
             });
@@ -67,12 +67,12 @@
         {
             //  Reset Failed Attempts
             _failedAttempt = 1;
-            if (Connected != null) Connected(this, new EventArgs());
+            Connected?.Invoke(this, new EventArgs());
         }
 
         public virtual void OnReconnecting()
         {
-            if (Reconnecting != null) Reconnecting(this, new ReconnectingEventArgs()
+            Reconnecting?.Invoke(this, new ReconnectingEventArgs
             {
                 ConnectionAttempts = _failedAttempt
             });
@@ -88,23 +88,23 @@
                 _failedAttempt *= 2;
 
                 //Reconnect
-                State = IRCState.Reconnecting;
+                State = IrcState.Reconnecting;
                 OnReconnecting();
                 _connect(_nick, _user, _pass);
             }
             else if (!_planned)
             {
                 //  Stop trying to reconnect
-                State = IRCState.Closed;
+                State = IrcState.Closed;
                 _failedAttempt = 1;
                 Debug.WriteLine("Too many failed attempts");
             }
             else
             {
-                State = IRCState.Closed;
+                State = IrcState.Closed;
             }
 
-            if (Disconnected != null) Disconnected(this, new DisconnectEventArgs
+            Disconnected?.Invoke(this, new DisconnectEventArgs
             {
                 Planned = _planned
             });
@@ -118,11 +118,11 @@
         private StreamWriter _stream;
 
         //  Reconnection 
-        private bool _planned = false;
+        private bool _planned;
         private int _failedAttempt = 1;
 
         //  Channel management
-        private List<string> _channels = new List<string>();
+        private readonly List<string> _channels = new List<string>();
 
         //  Registration information
         private string _nick;
@@ -144,19 +144,14 @@
         /// <summary>
         /// See if thread is running
         /// </summary>
-        public bool IsRunning
-        {
-            get
-            {
-                return _thread != null && (_thread.ThreadState & (System.Threading.ThreadState.Stopped | System.Threading.ThreadState.Unstarted)) == 0;
-            }
-        }
+        public bool IsRunning => _thread != null && (_thread.ThreadState & (System.Threading.ThreadState.Stopped | System.Threading.ThreadState.Unstarted)) == 0;
+
         /// <summary>
         /// The maximum amount of retries after disconnectin unexpectedly
         /// </summary>
         public int MaxRetries { get; set; }
 
-        public enum IRCState
+        public enum IrcState
         {
             Closed,
             Connecting,
@@ -166,7 +161,7 @@
             Reconnecting,
             Error
         }
-        public IRCState State { get; set; }
+        public IrcState State { get; set; }
 
         #endregion
 
@@ -176,13 +171,13 @@
         {
             Server = server;
             Port = port;
-            State = IRCState.Closed;
+            State = IrcState.Closed;
             MaxRetries = 5;
         }
 
         public void Connect(string nick, string user, string pass)
         {
-            State = IRCState.Connecting;
+            State = IrcState.Connecting;
             _connect(nick, user, pass);
         }
 
@@ -192,8 +187,8 @@
 
             _nick = nick; _user = user; _pass = pass;
 
-            if (_thread != null) _thread.Join();
-            _thread = new Thread(new ThreadStart(this._run));
+            _thread?.Join();
+            _thread = new Thread(_run);
             _planned = false;
             _thread.Start();
         }
@@ -202,7 +197,7 @@
 
         private void _checkRegistration()
         {
-            if (State != IRCState.Registered) throw new Exception("Client must be registered to send IRC commands");
+            if (State != IrcState.Registered) throw new Exception("Client must be registered to send IRC commands");
         }
 
         /// <summary>
@@ -252,7 +247,7 @@
         {
             _checkRegistration();
 
-            _send(string.Format("PRIVMSG {0} :{1}", channel, message));
+            _send($"PRIVMSG {channel} :{message}");
         }
 
         /// <summary>
@@ -262,7 +257,7 @@
         {
             _checkRegistration();
 
-            State = IRCState.Closing;
+            State = IrcState.Closing;
             _send("QUIT");
             _planned = true;
             _thread.Abort();
@@ -350,7 +345,7 @@
                                 if (char.IsLetterOrDigit(c))
                                     command.Append(c);
                                 else
-                                    throw new FormatException(string.Format("Unexpected character in command {0}.", (int)c));
+                                    throw new FormatException($"Unexpected character in command {(int) c}.");
                                 break;
                         }
                         break;
@@ -359,12 +354,12 @@
                         {
                             case ' ':
                                 mode = MessageState.Start;
-                                tags.Add(key.ToString(), null);
+                                tags.Add(key.ToString(), "");
                                 key.Clear();
                                 break;
                             case ';':
                                 mode = MessageState.TagKey;
-                                tags.Add(key.ToString(), null);
+                                tags.Add(key.ToString(), "");
                                 key.Clear();
                                 break;
                             case '=':
@@ -378,7 +373,7 @@
                                 if (char.IsLetterOrDigit(c) || c == '-' || c == '.' || c == '/')
                                     key.Append(c);
                                 else
-                                    throw new FormatException(string.Format("Unexpected character {0} found.", (int)c));
+                                    throw new FormatException($"Unexpected character {(int) c} found.");
                                 break;
                         }
                         break;
@@ -418,7 +413,7 @@
                                         value.Append('\n');
                                         break;
                                     default:
-                                        throw new FormatException(string.Format("Unexpected escape sequence {0}.", (int)c));
+                                        throw new FormatException($"Unexpected escape sequence {(int) c}.");
                                 }
                                 break;
                             case '\r':
@@ -455,7 +450,7 @@
                                 if (char.IsLetterOrDigit(c))
                                     command.Append(c);
                                 else
-                                    throw new FormatException(string.Format("Unexpected character in command {0}.", (int)c));
+                                    throw new FormatException($"Unexpected character in command {(int) c}.");
                                 break;
                         }
                         break;
@@ -472,7 +467,7 @@
                                 break;
                             case '\n':
                             case '\0':
-                                throw new FormatException(string.Format("Unexpected character in parameter list {0}.", (int)c));
+                                throw new FormatException($"Unexpected character in parameter list {(int) c}.");
                             default:
                                 mode = MessageState.Parameter;
                                 parameter.Append(c);
@@ -532,8 +527,8 @@
 
                             return message;
                         }
-                        else
-                            throw new FormatException(string.Format("Found {0} instead of LF character.", (int)c));
+
+                        throw new FormatException($"Found {(int) c} instead of LF character.");
                 }
             } while (sr.Peek() != -1);
             throw new EndOfStreamException("Stream ended before a full message could be constructed");
@@ -549,7 +544,7 @@
             try
             {
                 //  Check parameters
-                if (string.IsNullOrWhiteSpace(_nick)) throw new ArgumentNullException("Nick is required.");
+                if (string.IsNullOrWhiteSpace(_nick)) throw new ArgumentNullException(nameof(_nick), @"Nick is required.");
 
                 //  Connect to server
                 irc.Connect(Server, Port);
@@ -562,7 +557,7 @@
 
                 //  Connection Registration
                 //  https://tools.ietf.org/html/rfc2812#section-3.1
-                State = IRCState.Registering;
+                State = IrcState.Registering;
 
                 //  https://tools.ietf.org/html/rfc2812#section-3.1.1
                 if (!string.IsNullOrWhiteSpace(_pass)) _send("PASS " + _pass);
@@ -579,7 +574,7 @@
                     if (_read(sr).Command != "001") throw new Exception("Registration Failed. Welcome message expected");
 
                     //  Raise connect event
-                    State = IRCState.Registered;
+                    State = IrcState.Registered;
                     OnConnect();
                     Debug.WriteLine("Connected thread: {0}", Thread.CurrentThread.ManagedThreadId);
 
@@ -588,17 +583,17 @@
             }
             catch (Exception e)
             {
-                State = IRCState.Error;
+                State = IrcState.Error;
                 Debug.WriteLine("Unhandled Exception: {0}", e.ToString());
             }
             finally
             {
                 //  Close TCP Client
                 _stream = null;
-                if (irc?.Connected ?? false) irc.Close();
+                if (irc.Connected) irc.Close();
 
                 //  Raise Disconnect on a new thread
-                new Thread(new ThreadStart(OnDisconnect)).Start();
+                new Thread(OnDisconnect).Start();
             }
         }
 
@@ -606,7 +601,7 @@
         {
             //  Make sure thread is closed
             _planned = true;
-            if (_thread != null) _thread.Abort();
+            _thread?.Abort();
         }
     }
 

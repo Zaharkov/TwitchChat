@@ -1,4 +1,4 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.ViewModel
 {
     using System;
     using System.Diagnostics;
@@ -9,8 +9,8 @@
     /// </summary>
     public class RelayCommand : ICommand
     {
-        readonly Action<object> execute;
-        readonly Predicate<object> canExecute;
+        readonly Action<object> _execute;
+        readonly Predicate<object> _canExecute;
 
         public RelayCommand(Action<object> execute)
             : this(execute, null)
@@ -18,13 +18,13 @@
         }
 
         public RelayCommand(Action execute, Func<bool> canExecute)
-            : this((s) => execute(), (s) => canExecute())
+            : this(s => execute(), s => canExecute())
         {
 
         }
 
         public RelayCommand(Action execute)
-            : this((s) => execute(), null)
+            : this(s => execute(), null)
         {
 
         }
@@ -32,16 +32,16 @@
         public RelayCommand(Action<object> execute, Predicate<object> canExecute)
         {
             if (execute == null)
-                throw new ArgumentNullException("execute");
+                throw new ArgumentNullException(nameof(execute));
 
-            this.execute = execute;
-            this.canExecute = canExecute;
+            _execute = execute;
+            _canExecute = canExecute;
         }
 
         [DebuggerStepThrough]
         public bool CanExecute(object parameter)
         {
-            return canExecute == null || canExecute(parameter);
+            return _canExecute == null || _canExecute(parameter);
         }
 
         public event EventHandler CanExecuteChanged
@@ -52,7 +52,7 @@
 
         public void Execute(object parameter)
         {
-            execute(parameter);
+            _execute(parameter);
         }
 
     }

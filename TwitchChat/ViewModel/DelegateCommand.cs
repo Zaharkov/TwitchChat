@@ -1,4 +1,4 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.ViewModel
 {
     using System;
     using System.Windows.Input;
@@ -8,36 +8,36 @@
     /// </summary>
     public class DelegateCommand : ICommand
     {
-        private readonly Action action;
-        private bool isEnabled;
+        private readonly Action _action;
+        private bool _isEnabled;
 
         public DelegateCommand(Action action)
         {
-            this.action = action;
-            isEnabled = true;
+            _action = action;
+            _isEnabled = true;
         }
 
         public void Execute(object parameter)
         {
-            action();
+            _action();
         }
 
         public bool CanExecute(object parameter)
         {
-            return isEnabled;
+            return _isEnabled;
         }
 
         public bool IsEnabled
         {
             get
             {
-                return isEnabled;
+                return _isEnabled;
             }
             set
             {
-                if (isEnabled != value)
+                if (_isEnabled != value)
                 {
-                    isEnabled = value;
+                    _isEnabled = value;
                     OnCanExecuteChanged();
                 }
             }
@@ -47,8 +47,7 @@
 
         protected virtual void OnCanExecuteChanged()
         {
-            EventHandler handler = CanExecuteChanged;
-            if (handler != null) handler(this, EventArgs.Empty);
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

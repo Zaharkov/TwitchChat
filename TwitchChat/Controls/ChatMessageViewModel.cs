@@ -1,4 +1,7 @@
-﻿namespace TwitchChat.Controls
+﻿using TwitchChat.Code;
+using TwitchChat.Code.Json.Objects;
+
+namespace TwitchChat.Controls
 {
     using System.Collections.ObjectModel;
 
@@ -12,19 +15,19 @@
             Badges = new ObservableCollection<string>();
 
             if (message.UserType == UserType.Admin)
-                Badges.Add(badges.admin.image);
+                Badges.Add(badges.Admin.Image);
             if (message.UserType == UserType.GlobalMod)
-                Badges.Add(badges.global_mod.image);
+                Badges.Add(badges.GlobalMod.Image);
             if (message.UserType == UserType.Staff)
-                Badges.Add(badges.staff.image);
+                Badges.Add(badges.Staff.Image);
             if (message.Subscriber)
-                Badges.Add(badges.subscriber.image);
+                Badges.Add(badges.Subscriber.Image);
             if (message.Mod || message.UserType == UserType.Mod)
-                Badges.Add(badges.mod.image);
+                Badges.Add(badges.Mod.Image);
             if (message.Turbo)
-                Badges.Add(badges.turbo.image);
+                Badges.Add(badges.Turbo.Image);
             if (message.Channel == message.User)
-                Badges.Add(badges.broadcaster.image);
+                Badges.Add(badges.Broadcaster.Image);
         }
     }
 }

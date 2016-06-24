@@ -1,4 +1,4 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.Code.Json.Objects
 {
     using System.Runtime.Serialization;
 
@@ -8,7 +8,7 @@
     [DataContract]
     public class TwitchUserResult
     {
-        [DataMember]
-        public string name;
+        [DataMember(Name = "name")]
+        public string Name;
     }
 }

@@ -1,10 +1,11 @@
-﻿namespace TwitchChat
-{
-    using System;
-    using System.Collections.Specialized;
-    using System.Linq;
-    using System.Net;
+﻿using TwitchChat.Code.Json.Objects;
+using System;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Net;
 
+namespace TwitchChat.Code
+{
     public class TwitchIrcClient : IrcClient
     {
         public string User { get; set; }
@@ -21,7 +22,7 @@
             using (var wc = new WebClient())
             {
                 var result = Json.Helper.Parse<TwitchServerResult>(wc.DownloadData("http://tmi.twitch.tv/servers?channel=twitch"));
-                var server = result.servers.First().Split(':');
+                var server = result.Servers.First().Split(':');
 
                 Server = server[0];
                 Port = int.Parse(server[1]);
@@ -45,23 +46,23 @@
         //  Whisper commands are sent to jtv channel
         public void Whisper(string user, string message)
         {
-            Message("jtv", string.Format("/w {0} {1}", user, message));
+            Message("jtv", $"/w {user} {message}");
         }
 
         //  Channels are prefixed with hashtags
         public override void Join(string channel)
         {
-            base.Join(string.Format("#{0}", channel));
+            base.Join($"#{channel}");
         }
 
         public override void Part(string channel)
         {
-            base.Part(string.Format("#{0}", channel));
+            base.Part($"#{channel}");
         }
 
         public override void Message(string channel, string message)
         {
-            base.Message(string.Format("#{0}", channel), message);
+            base.Message($"#{channel}", message);
         }
 
         #endregion
@@ -101,82 +102,60 @@
             {
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#names
                 case "353":
-                    if (NamesReceived != null)
+                    NamesReceived?.Invoke(this, new NamesReceivedEventArgs
                     {
-                        NamesReceived(this, new NamesReceivedEventArgs
-                        {
-                            Channel = message.Parameters[2].TrimStart('#'),
-                            Names = message.Parameters[3].Split(' ')
-                        });
-                    }
+                        Channel = message.Parameters[2].TrimStart('#'),
+                        Names = message.Parameters[3].Split(' ')
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#join
                 case "JOIN":
-                    if (UserJoined != null)
+                    UserJoined?.Invoke(this, new TwitchEventArgs
                     {
-                        UserJoined(this, new TwitchEventArgs
-                        {
-                            User = message.Prefix.Split('!')[0],
-                            Channel = message.Parameters[0].TrimStart('#')
-                        });
-                    }
+                        User = message.Prefix.Split('!')[0],
+                        Channel = message.Parameters[0].TrimStart('#')
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#part
                 case "PART":
-                    if (UserParted != null)
+                    UserParted?.Invoke(this, new TwitchEventArgs
                     {
-                        UserParted(this, new TwitchEventArgs
-                        {
-                            User = message.Prefix.Split('!')[0],
-                            Channel = message.Parameters[0].TrimStart('#')
-                        });
-                    }
+                        User = message.Prefix.Split('!')[0],
+                        Channel = message.Parameters[0].TrimStart('#')
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#mode
                 case "MODE":
-                    if (UserModStatusUpdated != null)
+                    UserModStatusUpdated?.Invoke(this, new UserModStatusEventArgs
                     {
-                        UserModStatusUpdated(this, new UserModStatusEventArgs
-                        {
-                            User = message.Parameters[2],
-                            Channel = message.Parameters[0].TrimStart('#'),
-                            On = (message.Parameters[1] == "+o")
-                        });
-                    }
+                        User = message.Parameters[2],
+                        Channel = message.Parameters[0].TrimStart('#'),
+                        On = (message.Parameters[1] == "+o")
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#notice
                 case "NOTICE":
-                    if (NoticeReceived != null)
+                    NoticeReceived?.Invoke(this, new NoticeEventArgs(message.Tags, message.Parameters[1])
                     {
-                        NoticeReceived(this, new NoticeEventArgs(message.Tags, message.Parameters[1])
-                        {
-                            Channel = message.Parameters[0].TrimStart('#')
-                        });
-                    }
+                        Channel = message.Parameters[0].TrimStart('#')
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#hosttarget
                 case "HOSTTARGET":
-                    if (UserHosted != null)
+                    UserHosted?.Invoke(this, new HostEventArgs
                     {
-                        var target = message.Parameters[1].Split(' ');
-                        UserHosted(this, new HostEventArgs
-                        {
-                            User = target[0],
-                            Channel = message.Parameters[0].TrimStart('#'),
-                            Number = int.Parse(target[1])
-                        });
-                    }
+                        User = message.Parameters[1].Split(' ')[0],
+                        Channel = message.Parameters[0].TrimStart('#'),
+                        Number = int.Parse(message.Parameters[1].Split(' ')[1])
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#clearchat
                 case "CLEARCHAT":
-                    if (ChatCleared != null)
+                    ChatCleared?.Invoke(this, new TwitchEventArgs
                     {
-                        ChatCleared(this, new TwitchEventArgs
-                        {
-                            User = message.Parameters[1],
-                            Channel = message.Parameters[0].TrimStart('#')
-                        });
-                    }
+                        User = message.Parameters[1],
+                        Channel = message.Parameters[0].TrimStart('#')
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#userstate
                 case "USERSTATE":
@@ -196,40 +175,28 @@
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#globaluserstate
                 case "GLOBALUSERSTATE":
-                    if (UserStateReceived != null)
-                    {
-                        UserStateReceived(this, new UserStateEventArgs(message.Tags));
-                    }
+                    UserStateReceived?.Invoke(this, new UserStateEventArgs(message.Tags));
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#roomstate-1
                 case "ROOMSTATE":
-                    if (RoomStateChanged != null)
+                    RoomStateChanged?.Invoke(null, new RoomStateEventArgs(message.Tags)
                     {
-                        RoomStateChanged(null, new RoomStateEventArgs(message.Tags)
-                        {
-                            Channel = message.Parameters[0].TrimStart('#')
-                        });
-                    }
+                        Channel = message.Parameters[0].TrimStart('#')
+                    });
                     break;
                 //  https://github.com/justintv/Twitch-API/blob/master/IRC.md#privmsg
                 case "PRIVMSG":
-                    if (MessageReceived != null)
+                    MessageReceived?.Invoke(null, new MessageEventArgs(message.Tags, message.Parameters[1])
                     {
-                        MessageReceived(null, new MessageEventArgs(message.Tags, message.Parameters[1])
-                        {
-                            User = message.Prefix.Split('!')[0],
-                            Channel = message.Parameters[0].TrimStart('#')
-                        });
-                    }
+                        User = message.Prefix.Split('!')[0],
+                        Channel = message.Parameters[0].TrimStart('#')
+                    });
                     break;
                 case "WHISPER":
-                    if (WhisperReceived != null)
+                    WhisperReceived?.Invoke(null, new MessageEventArgs(message.Tags, message.Parameters[1])
                     {
-                        WhisperReceived(null, new MessageEventArgs(message.Tags, message.Parameters[1])
-                        {
-                            User = message.Prefix.Split('!')[0]
-                        });
-                    }
+                        User = message.Prefix.Split('!')[0]
+                    });
                     break;
             }
 

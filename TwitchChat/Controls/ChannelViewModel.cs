@@ -1,4 +1,8 @@
-﻿namespace TwitchChat.Controls
+﻿using TwitchChat.Code;
+using TwitchChat.Code.Json.Objects;
+using TwitchChat.ViewModel;
+
+namespace TwitchChat.Controls
 {
     using System;
     using System.Collections.ObjectModel;
@@ -10,14 +14,14 @@
 
     public class ChannelViewModel : ViewModelBase
     {
-        private TwitchIrcClient _irc;
+        private readonly TwitchIrcClient _irc;
 
         //  Store channel specific status
         private bool _mod;
         private bool _subscriber;
 
         //  The badges that are taken from https://api.twitch.tv/kraken/chat/{0}/badges
-        private BadgesResult _badges;
+        private readonly BadgesResult _badges;
 
         //  Name of the channel
         private string _channelName;
@@ -74,7 +78,8 @@
 
             using (var wc = new WebClient())
             {
-                _badges = Json.Helper.Parse<BadgesResult>(wc.DownloadData(string.Format("https://api.twitch.tv/kraken/chat/{0}/badges", channelName)));
+                _badges = Code.Json.Helper.Parse<BadgesResult>(wc.DownloadData(
+                    $"https://api.twitch.tv/kraken/chat/{channelName}/badges"));
             }
         }
 
@@ -98,8 +103,8 @@
                 {
                     foreach (var name in e.Names)
                     {
-                        if (!ChatGroups.SelectMany(x => x.Members).Any(x => x.Name.ToLower() == name.ToLower()))
-                            group.Members.Add(new ChatMemberViewModel() { Name = name });
+                        if (ChatGroups.SelectMany(x => x.Members).All(x => x.Name.ToLower() != name.ToLower()))
+                            group.Members.Add(new ChatMemberViewModel { Name = name });
                     }
                 });
             }
@@ -148,7 +153,7 @@
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Messages.Add(new ChatMessageViewModel(e, _badges));
-                    if (Messages.Count > App.MAXMESSAGES)
+                    if (Messages.Count > App.Maxmessages)
                         Messages.RemoveAt(0);
                 });
             }
@@ -157,19 +162,25 @@
         void Send()
         {
             //  Populate a name value collection to fake a MessageEventArg
-            NameValueCollection nvc = new NameValueCollection();
-            nvc["color"] = _irc.Color;
-            nvc["display-name"] = _irc.DisplayName;
-            nvc["mod"] = _mod ? "1" : "0";
-            nvc["subscriber"] = _subscriber ? "1" : "0";
-            nvc["turbo"] = _irc.Turbo ? "1" : "0";
-            nvc["user-type"] = _irc.UserType == UserType.Mod ? "mod" :
-                _irc.UserType == UserType.GlobalMod ? "global_mod" :
-                _irc.UserType == UserType.Admin ? "admin" :
-                _irc.UserType == UserType.Staff ? "staff" :
-                "";
+            NameValueCollection nvc = new NameValueCollection
+            {
+                ["color"] = _irc.Color,
+                ["display-name"] = _irc.DisplayName,
+                ["mod"] = _mod ? "1" : "0",
+                ["subscriber"] = _subscriber ? "1" : "0",
+                ["turbo"] = _irc.Turbo ? "1" : "0",
+                ["user-type"] = _irc.UserType == UserType.Mod
+                    ? "mod"
+                    : _irc.UserType == UserType.GlobalMod
+                        ? "global_mod"
+                        : _irc.UserType == UserType.Admin
+                            ? "admin"
+                            : _irc.UserType == UserType.Staff
+                                ? "staff"
+                                : ""
+            };
             Messages.Add(new ChatMessageViewModel(new MessageEventArgs(nvc, Message) { User = _irc.User, Channel = ChannelName }, _badges));
-            if (Messages.Count > App.MAXMESSAGES)
+            if (Messages.Count > App.Maxmessages)
                 Messages.RemoveAt(0);
 
             _irc.Message(_channelName, Message);
@@ -180,7 +191,7 @@
         {
             _irc.Part(_channelName);
             //  Raise the event.  MainWindowViewModel uses this to remove from list of channels
-            if (Parted != null) Parted(this, EventArgs.Empty);
+            Parted?.Invoke(this, EventArgs.Empty);
         }
 
         #region Helpers

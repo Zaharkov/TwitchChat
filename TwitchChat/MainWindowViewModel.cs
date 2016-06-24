@@ -1,4 +1,8 @@
-﻿namespace TwitchChat
+﻿using TwitchChat.Code;
+using TwitchChat.Code.Json.Objects;
+using TwitchChat.ViewModel;
+
+namespace TwitchChat
 {
     using System;
     using System.Collections.ObjectModel;
@@ -11,7 +15,7 @@
     public class MainWindowViewModel : ViewModelBase
     {
         //  Main IRC client
-        private TwitchIrcClient _irc;
+        private readonly TwitchIrcClient _irc;
 
         //  New Channel name input
         private string _newChannelName;
@@ -40,10 +44,7 @@
             }
         }
 
-        public bool IsLoggedIn
-        {
-            get { return _irc?.State == IrcClient.IRCState.Registered; }
-        }
+        public bool IsLoggedIn => _irc?.State == IrcClient.IrcState.Registered;
 
         public ICommand LoginCommand { get; private set; }
         public ICommand LogoutCommand { get; private set; }
@@ -100,7 +101,7 @@
         //  Join a new channel
         void Join()
         {
-            if (!Channels.Any(x => x.ChannelName == NewChannelName))
+            if (Channels.All(x => x.ChannelName != NewChannelName))
             {
                 var vm = new Controls.ChannelViewModel(_irc, NewChannelName);
                 vm.Parted += OnParted;
@@ -122,7 +123,7 @@
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (!Whispers.Any(x => x.UserName.ToLower() == e.User.ToLower()))
+                if (Whispers.All(x => x.UserName.ToLower() != e.User.ToLower()))
                     Whispers.Add(new Dialog.WhisperWindowViewModel(_irc, e.User, e));
             });
         }
@@ -130,14 +131,14 @@
         //  Start a new private message
         void Whisper()
         {
-            if (!Whispers.Any(x => x.UserName.ToLower() == NewWhisperUserName.ToLower()))
+            if (Whispers.All(x => x.UserName.ToLower() != NewWhisperUserName.ToLower()))
             {
                 using (var wc = new WebClient())
                 {
                     try
                     {
-                        var result = Json.Helper.Parse<TwitchUserResult>(wc.DownloadData("https://api.twitch.tv/kraken/users/" + NewWhisperUserName.ToLower()));
-                        if (result.name.ToLower() == _irc.User.ToLower())
+                        var result = Code.Json.Helper.Parse<TwitchUserResult>(wc.DownloadData("https://api.twitch.tv/kraken/users/" + NewWhisperUserName.ToLower()));
+                        if (result.Name.ToLower() == _irc.User.ToLower())
                             MessageBox.Show("Unable to message self");
                         else
                             Whispers.Add(new Dialog.WhisperWindowViewModel(_irc, NewWhisperUserName));
@@ -164,9 +165,9 @@
                 {
                     wc.Headers.Add("Accept", "application/vnd.twitchtv.v3+json");
                     wc.Headers.Add("Authorization", "OAuth " + token);
-                    var result = Json.Helper.Parse<TwitchUserResult>(wc.DownloadData("https://api.twitch.tv/kraken/user"));
+                    var result = Code.Json.Helper.Parse<TwitchUserResult>(wc.DownloadData("https://api.twitch.tv/kraken/user"));
 
-                    _irc.Login(result.name, "oauth:" + token);
+                    _irc.Login(result.Name, "oauth:" + token);
                 }
             }
             catch (Exception ex)
@@ -178,7 +179,7 @@
         //  Logout from twitch
         public void Logout()
         {
-            if (_irc.State == IrcClient.IRCState.Registered) _irc.Quit();
+            if (_irc.State == IrcClient.IrcState.Registered) _irc.Quit();
         }
     }
 }

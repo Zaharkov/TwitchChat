@@ -1,4 +1,4 @@
-﻿namespace TwitchChat.Helpers
+﻿namespace TwitchChat.Code.Helpers
 {
     using System.Windows;
     using System.Windows.Controls;
@@ -21,9 +21,12 @@
 
         private static void AutoScrollPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var scrollViewer = d as ScrollViewer;
+            if (!(d is ScrollViewer))
+                return;
 
-            if (scrollViewer != null && (bool)e.NewValue)
+            var scrollViewer = (ScrollViewer) d;
+
+            if ((bool) e.NewValue)
             {
                 scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             }
@@ -35,7 +38,11 @@
 
         private static void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            var scrollViewer = sender as ScrollViewer;
+            if (!(sender is ScrollViewer))
+                return;
+
+            var scrollViewer = (ScrollViewer) sender;
+
             if (e.ExtentHeightChange > 0)
                 scrollViewer.ScrollToBottom();
         }

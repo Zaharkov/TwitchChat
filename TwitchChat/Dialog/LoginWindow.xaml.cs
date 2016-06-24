@@ -1,12 +1,11 @@
 ﻿namespace TwitchChat.Dialog
 {
-    using System.Windows;
     using System.Windows.Navigation;
 
     /// <summary>
     /// Interaction logic for Login.xaml
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class LoginWindow
     {
         public string Token { get; set; }
 
@@ -14,10 +13,8 @@
         {
             InitializeComponent();
             wbMain.Navigating += OnNavigating;
-            wbMain.Navigate(string.Format("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={0}&redirect_uri={1}&scope={2}", 
-                App.CLIENTID, 
-                "http://dummy", 
-                "chat_login user_read"));
+            wbMain.Navigate(
+                $"https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={App.ClientId}&redirect_uri={App.Url}&scope={"chat_login user_read"}");
         }
 
         void OnNavigating(object sender, NavigatingCancelEventArgs e)
@@ -27,7 +24,7 @@
                 var fragments = e.Uri.Fragment.TrimStart('#').Split('&');
                 foreach (var fragment in fragments)
                 {
-                    var values = fragment.Split(new char[] { '=' }, 2);
+                    var values = fragment.Split(new[] { '=' }, 2);
                     switch (values[0])
                     {
                         case "access_token":
@@ -36,7 +33,7 @@
                     }
                 }
                 wbMain.Navigating -= OnNavigating;
-                this.Close();
+                Close();
             }
         }
     }

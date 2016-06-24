@@ -1,4 +1,6 @@
-﻿namespace TwitchChat
+﻿using TwitchChat.Code;
+
+namespace TwitchChat
 {
     //  Our viewmodel to show messages
     public class MessageViewModel

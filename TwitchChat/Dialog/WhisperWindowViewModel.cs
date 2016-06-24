@@ -1,4 +1,7 @@
-﻿namespace TwitchChat.Dialog
+﻿using TwitchChat.Code;
+using TwitchChat.ViewModel;
+
+namespace TwitchChat.Dialog
 {
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
@@ -7,7 +10,7 @@
 
     public class WhisperWindowViewModel : ViewModelBase
     {
-        private TwitchIrcClient _irc;
+        private readonly TwitchIrcClient _irc;
 
         //  User viewmodel is for
         private string _userName;
@@ -58,7 +61,7 @@
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Messages.Add(new MessageViewModel(e));
-                    if (Messages.Count > App.MAXMESSAGES)
+                    if (Messages.Count > App.Maxmessages)
                         Messages.RemoveAt(0);
                 });
             }
@@ -68,12 +71,14 @@
         void Send()
         {
             //  Create NameValueCollection to fake a MessageEventArgs
-            NameValueCollection nvc = new NameValueCollection();
-            nvc["color"] = _irc.Color;
-            nvc["display-name"] = _irc.DisplayName;
+            NameValueCollection nvc = new NameValueCollection
+            {
+                ["color"] = _irc.Color,
+                ["display-name"] = _irc.DisplayName
+            };
 
             Messages.Add(new MessageViewModel(new MessageEventArgs(nvc, Message) { User = _irc.User }));
-            if (Messages.Count > App.MAXMESSAGES)
+            if (Messages.Count > App.Maxmessages)
                 Messages.RemoveAt(0);
 
             _irc.Whisper(_userName, Message);

@@ -1,4 +1,4 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.Code.Json.Objects
 {
     using System.Runtime.Serialization;
 
@@ -11,27 +11,27 @@
         [DataContract]
         public class BadgeFormat
         {
-            [DataMember]
-            public string alpha;
-            [DataMember]
-            public string image;
-            [DataMember]
-            public string svg;
+            [DataMember(Name = "aplha")]
+            public string Aplha;
+            [DataMember(Name = "image")]
+            public string Image;
+            [DataMember(Name = "svg")]
+            public string Svg;
         }
 
-        [DataMember]
-        public BadgeFormat admin;
-        [DataMember]
-        public BadgeFormat broadcaster;
-        [DataMember]
-        public BadgeFormat global_mod;
-        [DataMember]
-        public BadgeFormat mod;
-        [DataMember]
-        public BadgeFormat staff;
-        [DataMember]
-        public BadgeFormat subscriber;
-        [DataMember]
-        public BadgeFormat turbo;
+        [DataMember(Name = "admin")]
+        public BadgeFormat Admin;
+        [DataMember(Name = "broadcaster")]
+        public BadgeFormat Broadcaster;
+        [DataMember(Name = "global_mod")]
+        public BadgeFormat GlobalMod;
+        [DataMember(Name = "mod")]
+        public BadgeFormat Mod;
+        [DataMember(Name = "staff")]
+        public BadgeFormat Staff;
+        [DataMember(Name = "subscriber")]
+        public BadgeFormat Subscriber;
+        [DataMember(Name = "turbo")]
+        public BadgeFormat Turbo;
     }
 }

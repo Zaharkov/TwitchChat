@@ -1,7 +1,6 @@
-﻿namespace TwitchChat
+﻿namespace TwitchChat.ViewModel
 {
     using System.ComponentModel;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// View Model Based on example found h ere https://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged(v=vs.110).aspx
@@ -10,9 +9,9 @@
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        protected void NotifyPropertyChanged(string propertyName = "")
         {
-            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

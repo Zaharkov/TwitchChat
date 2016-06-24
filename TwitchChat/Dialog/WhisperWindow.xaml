@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TwitchChat.Dialog.WhisperWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:h="clr-namespace:TwitchChat.Helpers"
+        xmlns:h="clr-namespace:TwitchChat.Code.Helpers"
         Title="{Binding UserName, StringFormat=Whisper {0}}" Height="300" Width="300" MinHeight="300" MinWidth="300">
     <Grid>
         <Grid.RowDefinitions>
