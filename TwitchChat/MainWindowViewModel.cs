@@ -1,5 +1,6 @@
-﻿using TwitchChat.Code;
-using TwitchChat.Code.Json.Objects;
+﻿using TwitchApi;
+using TwitchApi.Utils;
+using TwitchChat.Code;
 using TwitchChat.ViewModel;
 
 namespace TwitchChat
@@ -133,20 +134,20 @@ namespace TwitchChat
         {
             if (Whispers.All(x => x.UserName.ToLower() != NewWhisperUserName.ToLower()))
             {
-                using (var wc = new WebClient())
+                try
                 {
-                    try
-                    {
-                        var result = Code.Json.Helper.Parse<TwitchUserResult>(wc.DownloadData("https://api.twitch.tv/kraken/users/" + NewWhisperUserName.ToLower()));
-                        if (result.Name.ToLower() == _irc.User.ToLower())
-                            MessageBox.Show("Unable to message self");
-                        else
-                            Whispers.Add(new Dialog.WhisperWindowViewModel(_irc, NewWhisperUserName));
-                    }
-                    catch
-                    {
+                    var result = TwitchApiClient.GetUserByName(NewWhisperUserName.ToLower());
+                    if (result.Name.ToLower() == _irc.User.ToLower())
+                        MessageBox.Show("Unable to message self");
+                    else
+                        Whispers.Add(new Dialog.WhisperWindowViewModel(_irc, NewWhisperUserName));
+                }
+                catch (ErrorResponseDataException ex)
+                {
+                    if(ex.Status == HttpStatusCode.NotFound)
                         MessageBox.Show("User not found");
-                    }
+
+                    throw;
                 }
             }
             NewWhisperUserName = string.Empty;
@@ -161,18 +162,12 @@ namespace TwitchChat
 
             try
             {
-                using (var wc = new WebClient())
-                {
-                    wc.Headers.Add("Accept", "application/vnd.twitchtv.v3+json");
-                    wc.Headers.Add("Authorization", "OAuth " + token);
-                    var result = Code.Json.Helper.Parse<TwitchUserResult>(wc.DownloadData("https://api.twitch.tv/kraken/user"));
-
-                    _irc.Login(result.Name, "oauth:" + token);
-                }
+                var user = TwitchApiClient.GetUserByToken(token);
+                _irc.Login(user.Name, "oauth:" + token);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Unhandled exception while logging in: {0}", args: ex);
+                Debug.WriteLine("Unhandled exception while logging in: {0}", ex);
             }
         }
 

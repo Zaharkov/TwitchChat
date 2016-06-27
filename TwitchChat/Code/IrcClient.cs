@@ -1,14 +1,14 @@
-﻿namespace TwitchChat.Code
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Net.Sockets;
-    using System.Text;
-    using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IO;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 
+namespace TwitchChat.Code
+{
     /// <summary>
     /// Class to store messages
     /// </summary>

@@ -1,8 +1,7 @@
-﻿using TwitchChat.Code.Json.Objects;
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Net;
+using TwitchApi;
 
 namespace TwitchChat.Code
 {
@@ -19,14 +18,10 @@ namespace TwitchChat.Code
         public TwitchIrcClient()
         {
             //  Get available servers and initialize IrcClient with the first one
-            using (var wc = new WebClient())
-            {
-                var result = Json.Helper.Parse<TwitchServerResult>(wc.DownloadData("http://tmi.twitch.tv/servers?channel=twitch"));
-                var server = result.Servers.First().Split(':');
+            var server = TwitchApiClient.GetServers().ServersList.First();
 
-                Server = server[0];
-                Port = int.Parse(server[1]);
-            }
+            Server = server.Host;
+            Port = server.Port;
         }
 
         /// <summary>

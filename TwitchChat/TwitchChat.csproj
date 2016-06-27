@@ -41,17 +41,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -65,7 +57,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
-    <Compile Include="Code\Json\Helper.cs" />
     <Compile Include="Controls\ChannelViewModel.cs" />
     <Compile Include="Controls\ChatGroupViewModel.cs" />
     <Compile Include="Controls\ChatMemberViewModel.cs" />
@@ -96,11 +87,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Code\Json\Objects\BadgesResult.cs" />
     <Compile Include="Code\IrcClient.cs" />
     <Compile Include="Code\TwitchIrcClient.cs" />
-    <Compile Include="Code\Json\Objects\TwitchServerResult.cs" />
-    <Compile Include="Code\Json\Objects\TwitchUserResult.cs" />
     <Compile Include="Controls\Channel.xaml.cs">
       <DependentUpon>Channel.xaml</DependentUpon>
     </Compile>
@@ -142,6 +130,13 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TwitchApi\TwitchApi.csproj">
+      <Project>{cf15d97a-d0b5-4c4f-8f15-9ab6bae5ec59}</Project>
+      <Name>TwitchApi</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

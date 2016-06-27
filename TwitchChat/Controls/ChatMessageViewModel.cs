@@ -1,16 +1,15 @@
-﻿using TwitchChat.Code;
-using TwitchChat.Code.Json.Objects;
+﻿using TwitchApi.Entities;
+using TwitchChat.Code;
+using System.Collections.ObjectModel;
 
 namespace TwitchChat.Controls
 {
-    using System.Collections.ObjectModel;
-
     //  Our viewmodel to display messages with badges
     public class ChatMessageViewModel : MessageViewModel
     {
         public ObservableCollection<string> Badges { get; set; }
 
-        public ChatMessageViewModel(MessageEventArgs message, BadgesResult badges) : base(message)
+        public ChatMessageViewModel(MessageEventArgs message, Badges badges) : base(message)
         {
             Badges = new ObservableCollection<string>();
 

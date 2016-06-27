@@ -1,8 +1,8 @@
-﻿namespace TwitchChat.Code.Helpers
-{
-    using System.Windows;
-    using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
+namespace TwitchChat.Code.Helpers
+{
     //  Helpers to add autoscrolling functionality to ScrollViewer control
     public static class ScrollViewerEx
     {

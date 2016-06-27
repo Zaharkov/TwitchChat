@@ -1,6 +1,4 @@
-﻿using System;
-using System.Configuration;
-
+﻿
 namespace TwitchChat
 {
     using System.Windows;
@@ -12,8 +10,6 @@ namespace TwitchChat
     public partial class App
     {
         //  Create a client id for twitch application that redirects to 
-        public static string ClientId = GetSetting("ClientId");
-        public static string Url = GetSetting("Url");
         public const int Maxmessages = 150;
 
         private MainWindowViewModel _vm;
@@ -46,16 +42,6 @@ namespace TwitchChat
         {
             //  Remove a whipser once the window is closed
             _vm.Whispers.Remove(sender as WhisperWindowViewModel);
-        }
-
-        private static string GetSetting(string name)
-        {
-            var value = ConfigurationManager.AppSettings.Get(name);
-
-            if(string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(name), @"Not exists");
-
-            return value;
         }
     }
 }

@@ -13,8 +13,7 @@
         {
             InitializeComponent();
             wbMain.Navigating += OnNavigating;
-            wbMain.Navigate(
-                $"https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={App.ClientId}&redirect_uri={App.Url}&scope={"chat_login user_read"}");
+            wbMain.Navigate(TwitchApi.TwitchApiClient.AuthorizeUrl);
         }
 
         void OnNavigating(object sender, NavigatingCancelEventArgs e)

@@ -1,17 +1,16 @@
-﻿using TwitchChat.Code;
-using TwitchChat.Code.Json.Objects;
+﻿using TwitchApi;
+using TwitchApi.Entities;
+using TwitchChat.Code;
 using TwitchChat.ViewModel;
+using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
 
 namespace TwitchChat.Controls
 {
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.Linq;
-    using System.Net;
-    using System.Windows;
-    using System.Windows.Input;
-
     public class ChannelViewModel : ViewModelBase
     {
         private readonly TwitchIrcClient _irc;
@@ -21,7 +20,7 @@ namespace TwitchChat.Controls
         private bool _subscriber;
 
         //  The badges that are taken from https://api.twitch.tv/kraken/chat/{0}/badges
-        private readonly BadgesResult _badges;
+        private readonly Badges _badges;
 
         //  Name of the channel
         private string _channelName;
@@ -76,11 +75,8 @@ namespace TwitchChat.Controls
             SendCommand = new DelegateCommand(Send);
             PartCommand = new DelegateCommand(Part);
 
-            using (var wc = new WebClient())
-            {
-                _badges = Code.Json.Helper.Parse<BadgesResult>(wc.DownloadData(
-                    $"https://api.twitch.tv/kraken/chat/{channelName}/badges"));
-            }
+
+            _badges = TwitchApiClient.GetBadges(channelName);
         }
 
         private void UserStateReceived(object sender, UserStateEventArgs e)
