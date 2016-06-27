@@ -1,7 +1,6 @@
 ﻿using RestClientHelper;
 using RestSharp;
 using TwitchApi.Entities;
-using ResponseChecker = TwitchApi.Utils.ResponseChecker;
 
 namespace TwitchApi
 {
@@ -76,7 +75,7 @@ namespace TwitchApi
         {
             var result = client.Execute<T>(request);
 
-            ResponseChecker.ValidateResponse(result);
+            Utils.ResponseChecker.ValidateResponse(result);
 
             return result.Data;
         }

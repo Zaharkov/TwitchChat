@@ -135,6 +135,10 @@
       <Project>{cf15d97a-d0b5-4c4f-8f15-9ab6bae5ec59}</Project>
       <Name>TwitchApi</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VkApi\VkApi.csproj">
+      <Project>{9e1c9ce7-e1ea-4644-9517-df4d06fa3f18}</Project>
+      <Name>VkApi</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

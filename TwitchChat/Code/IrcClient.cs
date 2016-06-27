@@ -524,6 +524,7 @@ namespace TwitchChat.Code
                             };
 
                             OnReceived(message);
+                            Thread.Sleep(100);
 
                             return message;
                         }

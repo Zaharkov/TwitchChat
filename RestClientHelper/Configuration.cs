@@ -10,7 +10,7 @@ namespace RestClientHelper
             var value = ConfigurationManager.AppSettings.Get(name);
 
             if (string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(name), @"Not exists");
+                throw new ArgumentNullException(name, @"Not exists");
 
             return value;
         }

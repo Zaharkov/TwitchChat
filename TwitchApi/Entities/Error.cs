@@ -8,9 +8,11 @@ namespace TwitchApi.Entities
     {
         [JsonProperty("error")]
         public string Error { get; set; }
+
         [JsonProperty("status")]
         [JsonConverter(typeof(StringEnumConverter))]
         public HttpStatusCode Status { get; set; }
+
         [JsonProperty("message")]
         public string Message { get; set; }
     }
