@@ -544,7 +544,8 @@ namespace TwitchChat.Code
             try
             {
                 //  Check parameters
-                if (string.IsNullOrWhiteSpace(_nick)) throw new ArgumentNullException(nameof(_nick), @"Nick is required.");
+                if (string.IsNullOrWhiteSpace(_nick))
+                    throw new ArgumentNullException(nameof(_nick), @"Nick is required.");
 
                 //  Connect to server
                 irc.Connect(Server, Port);

@@ -9,11 +9,7 @@ namespace TwitchApi.Utils
     {
         public static void ValidateResponse<T>(IRestResponse<T> response)
         {
-            if (response.ResponseStatus == ResponseStatus.Error)
-                throw new WebException(response.ErrorMessage, response.ErrorException);
-
-            if (response.Data == null)
-                throw new NullResponseDataException(response, typeof(T));
+            RestClientHelper.ResponseChecker.ValidateResponse(response);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {

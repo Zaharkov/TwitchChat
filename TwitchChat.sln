@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchChat", "TwitchChat\Tw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchApi", "TwitchApi\TwitchApi.csproj", "{CF15D97A-D0B5-4C4F-8F15-9AB6BAE5EC59}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkApi", "VkApi\VkApi.csproj", "{9E1C9CE7-E1EA-4644-9517-DF4D06FA3F18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestClientHelper", "RestClientHelper\RestClientHelper.csproj", "{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{CF15D97A-D0B5-4C4F-8F15-9AB6BAE5EC59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF15D97A-D0B5-4C4F-8F15-9AB6BAE5EC59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF15D97A-D0B5-4C4F-8F15-9AB6BAE5EC59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E1C9CE7-E1EA-4644-9517-DF4D06FA3F18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E1C9CE7-E1EA-4644-9517-DF4D06FA3F18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E1C9CE7-E1EA-4644-9517-DF4D06FA3F18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E1C9CE7-E1EA-4644-9517-DF4D06FA3F18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

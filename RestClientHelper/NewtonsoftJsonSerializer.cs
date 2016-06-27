@@ -6,7 +6,7 @@ using RestSharp.Deserializers;
 using RestSharp.Serializers;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace TwitchApi.Utils
+namespace RestClientHelper
 {
     internal class NewtonsoftJsonSerializer : ISerializer, IDeserializer
     {

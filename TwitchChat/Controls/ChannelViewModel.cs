@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -152,8 +153,18 @@ namespace TwitchChat.Controls
                     if (Messages.Count > App.Maxmessages)
                         Messages.RemoveAt(0);
                 });
+
+                if (e.Message == "!music")
+                {
+                    _irc.Message(ChannelName, "Kappa Keepo Kappa 1");
+                }
             }
         }
+
+        //private bool IsChatCommand(MessageEventArgs e)
+        //{
+        //    
+        //}
 
         void Send()
         {

@@ -1,6 +1,7 @@
-﻿using RestSharp;
+﻿using RestClientHelper;
+using RestSharp;
 using TwitchApi.Entities;
-using TwitchApi.Utils;
+using ResponseChecker = TwitchApi.Utils.ResponseChecker;
 
 namespace TwitchApi
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace TwitchApi.Utils
+namespace RestClientHelper
 {
     public class Configuration
     {

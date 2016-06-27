@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 using RestSharp;
 using RestMethod = RestSharp.Method;
 
-namespace TwitchApi.Utils
+namespace RestClientHelper
 {
     public class RestRequestBuilder
     {

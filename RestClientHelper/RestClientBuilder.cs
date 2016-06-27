@@ -1,7 +1,7 @@
 ﻿using System;
 using RestSharp;
 
-namespace TwitchApi.Utils
+namespace RestClientHelper
 {
     public class RestClientBuilder
     {
