@@ -158,7 +158,7 @@ namespace TwitchChat
         {
             var login = new Dialog.LoginWindow();
             login.ShowDialog();
-            var token = login.Token;
+            var token = login.TwitchAccessToken;
 
             try
             {

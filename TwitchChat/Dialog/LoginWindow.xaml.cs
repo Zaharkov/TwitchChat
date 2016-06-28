@@ -1,4 +1,6 @@
-﻿namespace TwitchChat.Dialog
+﻿using VkApi;
+
+namespace TwitchChat.Dialog
 {
     using System.Windows.Navigation;
 
@@ -7,16 +9,21 @@
     /// </summary>
     public partial class LoginWindow
     {
-        public string Token { get; set; }
+        public string TwitchAccessToken { get; set; }
+
+        public string VkAccessToken { get; set; }
 
         public LoginWindow()
         {
             InitializeComponent();
-            wbMain.Navigating += OnNavigating;
-            wbMain.Navigate(TwitchApi.TwitchApiClient.AuthorizeUrl);
+            //wbMain.Navigating += OnNavigatingTwitch;
+            //wbMain.Navigate(TwitchApi.TwitchApiClient.AuthorizeUrl);
+
+            wbMain.Navigating += OnNavigatingVk;
+            wbMain.Navigate(VkApiClient.AuthorizeUrl);
         }
 
-        void OnNavigating(object sender, NavigatingCancelEventArgs e)
+        void OnNavigatingTwitch(object sender, NavigatingCancelEventArgs e)
         {
             if (e.Uri.Fragment.StartsWith("#access_token"))
             {
@@ -27,11 +34,25 @@
                     switch (values[0])
                     {
                         case "access_token":
-                            Token = values[1];
+                            TwitchAccessToken = values[1];
                             break;
                     }
                 }
-                wbMain.Navigating -= OnNavigating;
+                wbMain.Navigating -= OnNavigatingTwitch;
+                Close();
+            }
+        }
+
+        void OnNavigatingVk(object sender, NavigatingCancelEventArgs e)
+        {
+            if (e.Uri.Query.StartsWith("?code"))
+            {
+                var fragments = e.Uri.Query.TrimStart('?').Split('=');
+                VkAccessToken = fragments[1];
+
+                var path = VkApiClient.GetTokenUrl + VkAccessToken;
+
+                wbMain.Navigating -= OnNavigatingVk;
                 Close();
             }
         }
