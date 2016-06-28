@@ -6,10 +6,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using VkApi;
+using TwitchChat.Code.Commands;
 
 namespace TwitchChat.Controls
 {
@@ -155,29 +154,20 @@ namespace TwitchChat.Controls
                         Messages.RemoveAt(0);
                 });
 
-                if (e.Message == "!music" && (e.User == "artemzaharkov" || e.User == "na_podhvate"))
+                if (IsChatCommand(e))
                 {
-                    Thread.Sleep(1000);
-                    var vkClient = new VkApiClient("6d54a52fb9186a55ea914a191971fecfced3ce86fd86b86224cb5a92b85da60d4af6201f030b5c8917b2c");
-                    var list = vkClient.GetBroadcastList();
+                    var result = CommandFactory.ExecuteCommand(e);
 
-                    var eva = list.FirstOrDefault(t => t.Name == "NAPODHVATE FP");
-
-                    string name;
-                    if (eva == null)
-                        name = "БОТ - Сейчас у Евы ничего не играет";
-                    else
-                        name = $"БОТ - Сейчас у Евы играет - '{eva.StatusAudio.Artist + " - " + eva.StatusAudio.Title}'";
-
-                    _irc.Message(ChannelName, name);
+                    if(string.IsNullOrEmpty(result))
+                        _irc.Message(ChannelName, result);
                 }
             }
         }
 
-        //private bool IsChatCommand(MessageEventArgs e)
-        //{
-        //    
-        //}
+        private static bool IsChatCommand(MessageEventArgs e)
+        {
+            return e.Message.StartsWith("!");
+        }
 
         void Send()
         {

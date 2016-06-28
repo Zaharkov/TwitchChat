@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkApi", "VkApi\VkApi.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestClientHelper", "RestClientHelper\RestClientHelper.csproj", "{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{4794D8CF-BDAE-48F9-B5E9-E62980B69830}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

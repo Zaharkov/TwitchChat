@@ -16,11 +16,8 @@ namespace TwitchChat.Dialog
         public LoginWindow()
         {
             InitializeComponent();
-            //wbMain.Navigating += OnNavigatingTwitch;
-            //wbMain.Navigate(TwitchApi.TwitchApiClient.AuthorizeUrl);
-
-            wbMain.Navigating += OnNavigatingVk;
-            wbMain.Navigate(VkApiClient.AuthorizeUrl);
+            wbMain.Navigating += OnNavigatingTwitch;
+            wbMain.Navigate(TwitchApi.TwitchApiClient.AuthorizeUrl);
         }
 
         void OnNavigatingTwitch(object sender, NavigatingCancelEventArgs e)
@@ -39,7 +36,8 @@ namespace TwitchChat.Dialog
                     }
                 }
                 wbMain.Navigating -= OnNavigatingTwitch;
-                Close();
+                wbMain.Navigating += OnNavigatingVk;
+                wbMain.Navigate(VkApiClient.AuthorizeUrl);
             }
         }
 
@@ -49,8 +47,6 @@ namespace TwitchChat.Dialog
             {
                 var fragments = e.Uri.Query.TrimStart('?').Split('=');
                 VkAccessToken = fragments[1];
-
-                var path = VkApiClient.GetTokenUrl + VkAccessToken;
 
                 wbMain.Navigating -= OnNavigatingVk;
                 Close();

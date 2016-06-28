@@ -6,33 +6,49 @@ using VkApi.Entities;
 
 namespace VkApi
 {
-    public class VkApiClient
+    public static class VkApiClient
     {
         private static readonly string VkClientId = Configuration.GetSetting("VkClientId");
         private static readonly string VkClientSecret = Configuration.GetSetting("VkClientSecret");
         private static readonly string Url = Configuration.GetSetting("Url");
 
-        private readonly IRestClient _client;
-        private readonly string _accessToken;
+        private static readonly IRestClient ApiClient;
+        private static readonly IRestClient AuthClient;
+        private static string _accessToken;
 
         public static string AuthorizeUrl =
             $"https://oauth.vk.com/authorize?client_id={VkClientId}&display=page&redirect_uri={Url}&scope=audio&response_type=code";
-        public static string GetTokenUrl =
-            $"https://oauth.vk.com/access_token?client_id={VkClientId}&client_secret={VkClientSecret}&redirect_uri={Url}&code=";
 
-        public VkApiClient(string accessToken)
+        static VkApiClient()
         {
-            Check.ForNullReference(accessToken);
-
-            _client = new RestClientBuilder()
+            ApiClient = new RestClientBuilder()
                 .BaseUri("https://api.vk.com/method")
                 .Build();
 
-            _accessToken = accessToken;
+            AuthClient = new RestClientBuilder()
+                .BaseUri("https://oauth.vk.com")
+                .Build();
         }
 
-        public List<User> GetBroadcastList()
+        public static void GetToken(string code)
         {
+            var request = new RestRequestBuilder("access_token")
+                .Method(Method.GET)
+                .AddQueryParameterIfNotNull("client_id", VkClientId)
+                .AddQueryParameterIfNotNull("client_secret", VkClientSecret)
+                .AddQueryParameterIfNotNull("redirect_uri", Url)
+                .AddQueryParameterIfNotNull("code", code)
+                .Build();
+
+            var result = ExecuteAuth<Token>(request);
+
+            _accessToken = result.AccessToken;
+        }
+
+        public static List<User> GetBroadcastList()
+        {
+            Check.ForNullReference(_accessToken, nameof(_accessToken));
+
             var request = new RestRequestBuilder("audio.getBroadcastList")
                 .Method(Method.GET)
                 .AddQueryParameterIfNotNull("access_token", _accessToken)
@@ -40,16 +56,25 @@ namespace VkApi
                 .AddQueryParameterIfNotNull("filter", "all")
                 .Build();
 
-            return Execute<List<User>>(request);
+            return ExecuteApi<List<User>>(request);
         }
 
-        private T Execute<T>(IRestRequest request) where T : class, new()
+        private static T ExecuteApi<T>(IRestRequest request) where T : class, new()
         {
-            var result = _client.Execute<Response<T>>(request);
+            var result = ApiClient.Execute<Response<T>>(request);
 
             Utils.ResponseChecker.ValidateResponse(result);
 
             return result.Data.Data;
+        }
+
+        private static T ExecuteAuth<T>(IRestRequest request) where T : class, new()
+        {
+            var result = AuthClient.Execute<T>(request);
+
+            Utils.ResponseChecker.ValidateResponse(result);
+
+            return result.Data;
         }
     }
 }

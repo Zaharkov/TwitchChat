@@ -526,6 +526,8 @@ namespace TwitchChat.Code
                             OnReceived(message);
                             Thread.Sleep(100);
 
+                            Debug.WriteLine(message.Raw);
+
                             return message;
                         }
 
@@ -587,6 +589,7 @@ namespace TwitchChat.Code
             {
                 State = IrcState.Error;
                 Debug.WriteLine("Unhandled Exception: {0}", e.ToString());
+                throw;
             }
             finally
             {

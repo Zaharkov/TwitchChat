@@ -1,4 +1,6 @@
 ﻿
+using TwitchChat.Code.Commands;
+
 namespace TwitchChat
 {
     using System.Windows;

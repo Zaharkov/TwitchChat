@@ -2,6 +2,7 @@
 using TwitchApi.Utils;
 using TwitchChat.Code;
 using TwitchChat.ViewModel;
+using VkApi;
 
 namespace TwitchChat
 {
@@ -158,12 +159,12 @@ namespace TwitchChat
         {
             var login = new Dialog.LoginWindow();
             login.ShowDialog();
-            var token = login.TwitchAccessToken;
 
             try
             {
-                var user = TwitchApiClient.GetUserByToken(token);
-                _irc.Login(user.Name, "oauth:" + token);
+                VkApiClient.GetToken(login.VkAccessToken);
+                var user = TwitchApiClient.GetUserByToken(login.TwitchAccessToken);
+                _irc.Login(user.Name, "oauth:" + login.TwitchAccessToken);
             }
             catch (Exception ex)
             {

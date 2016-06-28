@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Token.cs" />
     <Compile Include="Entities\Error.cs" />
     <Compile Include="Entities\RequestParam.cs" />
     <Compile Include="Entities\StatusAudio.cs" />

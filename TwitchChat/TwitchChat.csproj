@@ -56,6 +56,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Code\Commands\Command.cs" />
+    <Compile Include="Code\Commands\CommandFactory.cs" />
+    <Compile Include="Code\Commands\Music.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
     <Compile Include="Controls\ChannelViewModel.cs" />
     <Compile Include="Controls\ChatGroupViewModel.cs" />
@@ -128,9 +131,15 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
+      <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
+      <Name>RestClientHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TwitchApi\TwitchApi.csproj">
       <Project>{cf15d97a-d0b5-4c4f-8f15-9ab6bae5ec59}</Project>
       <Name>TwitchApi</Name>
