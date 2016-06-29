@@ -1,4 +1,7 @@
-﻿using VkApi;
+﻿using Database;
+using Database.Entities;
+using TwitchApi;
+using VkApi;
 
 namespace TwitchChat.Dialog
 {
@@ -9,15 +12,11 @@ namespace TwitchChat.Dialog
     /// </summary>
     public partial class LoginWindow
     {
-        public string TwitchAccessToken { get; set; }
-
-        public string VkAccessToken { get; set; }
-
         public LoginWindow()
         {
             InitializeComponent();
             wbMain.Navigating += OnNavigatingTwitch;
-            wbMain.Navigate(TwitchApi.TwitchApiClient.AuthorizeUrl);
+            wbMain.Navigate(TwitchApiClient.AuthorizeUrl);
         }
 
         void OnNavigatingTwitch(object sender, NavigatingCancelEventArgs e)
@@ -31,7 +30,8 @@ namespace TwitchChat.Dialog
                     switch (values[0])
                     {
                         case "access_token":
-                            TwitchAccessToken = values[1];
+                            TwitchApiClient.SetToken(values[1]);
+                            SqLiteClient.AddToken(AccessTokenType.Twitch, values[1]);
                             break;
                     }
                 }
@@ -46,7 +46,10 @@ namespace TwitchChat.Dialog
             if (e.Uri.Query.StartsWith("?code"))
             {
                 var fragments = e.Uri.Query.TrimStart('?').Split('=');
-                VkAccessToken = fragments[1];
+                var code = fragments[1];
+
+                var token = VkApiClient.GetToken(code);
+                SqLiteClient.AddToken(AccessTokenType.Vk, token.AccessToken, token.Expire);
 
                 wbMain.Navigating -= OnNavigatingVk;
                 Close();

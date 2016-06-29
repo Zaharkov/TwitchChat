@@ -30,7 +30,7 @@ namespace VkApi
                 .Build();
         }
 
-        public static void GetToken(string code)
+        public static Token GetToken(string code)
         {
             var request = new RestRequestBuilder("access_token")
                 .Method(Method.GET)
@@ -43,6 +43,8 @@ namespace VkApi
             var result = ExecuteAuth<Token>(request);
 
             _accessToken = result.AccessToken;
+
+            return result;
         }
 
         public static List<User> GetBroadcastList()

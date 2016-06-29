@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
+using Database.Entities;
 
 namespace Database
 {
     public static class SqLiteClient
     {
         private const string DataBaseName = "TwitchChat.sqlite";
+        private static readonly DateTime UnixTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         static SqLiteClient()
         {
-            if (!File.Exists(DataBaseName))
-            {
-                SQLiteConnection.CreateFile(DataBaseName);
-                Execute("CREATE TABLE AccessTokens (type nvarchar(20), value nvarchar(255), expire bigint)");
-            }
+            if (File.Exists(DataBaseName))
+                return;
+
+            SQLiteConnection.CreateFile(DataBaseName);
+            Execute("CREATE TABLE AccessTokens (type nvarchar(20), value nvarchar(255), expire bigint)");
         }
 
         private static Dictionary<int, Dictionary<string, string>> Execute(string sql)
@@ -42,17 +43,22 @@ namespace Database
             }
         }
 
-        public static void AddToken(string type, string value, long? expire = null)
+        public static void AddToken(AccessTokenType type, string value, int? expire = null)
         {
-            Execute($"INSERT INTO AccessTokens VALUES ('{type}', '{value}', {(expire.HasValue ? $"'{expire.Value}'" : "NULL")})");
+            var diff = expire.HasValue ? (long) (DateTime.UtcNow - UnixTime).TotalSeconds + expire.Value : 0;
+
+            Execute($"DELETE FROM AccessTokens WHERE type = '{type}'");
+            Execute($"INSERT INTO AccessTokens VALUES ('{type}', '{value}', {(expire.HasValue ? $"'{diff}'" : "NULL")})");
         }
 
-        public static string GetNotExpiredToken(string type)
+        public static string GetNotExpiredToken(AccessTokenType type)
         {
-            //TODO
-            var result = Execute($"SELECT value FROM AccessTokens WHERE type = '{type}' AND expire <");
+            //get time in stamp + 12 hours 
+            var diff = (long)(DateTime.UtcNow - UnixTime).TotalSeconds + 3600 * 12;
+            
+            var result = Execute($"SELECT value FROM AccessTokens WHERE type = '{type}' AND (expire IS NULL OR expire > {diff})");
 
-            return result.First().Value.First().Value;
+            return result.Count > 0 ? result[0]["value"] : null;
         }
     }
 }

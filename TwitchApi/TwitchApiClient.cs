@@ -13,13 +13,29 @@ namespace TwitchApi
         private static readonly string TwitchClientId = Configuration.GetSetting("ClientId");
         private static readonly string TwitchUrl = Configuration.GetSetting("Url");
 
+        private static string _accessToken;
+
         public static readonly string AuthorizeUrl =
-            $"https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={TwitchClientId}&redirect_uri={TwitchUrl}&scope={"chat_login user_read"}";
+            $"https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={TwitchClientId}&redirect_uri={TwitchUrl}&scope=chat_login user_read";
 
         static TwitchApiClient()
         {
             ClientApi = new RestClientBuilder().BaseUri(TwitchApiBaseUrl).Build();
             ClientTmi = new RestClientBuilder().BaseUri(TwitchTmiBaseUrl).Build();
+        }
+
+        public static void SetToken(string token)
+        {
+            Check.ForNullReference(token);
+
+            _accessToken = token;
+        }
+
+        public static string GetToken()
+        {
+            Check.ForNullReference(_accessToken);
+
+            return _accessToken;
         }
 
         public static Servers GetServers()
@@ -34,6 +50,8 @@ namespace TwitchApi
 
         public static Badges GetBadges(string channelName)
         {
+            Check.ForNullReference(channelName);
+
             var request = new RestRequestBuilder($"/kraken/chat/{channelName}/badges")
                 .Method(Method.GET)
                 .Build();
@@ -43,6 +61,8 @@ namespace TwitchApi
 
         public static User GetUserByName(string userName)
         {
+            Check.ForNullReference(userName);
+
             var request = new RestRequestBuilder($"/kraken/users/{userName}")
                .Method(Method.GET)
                .Build();
@@ -50,13 +70,13 @@ namespace TwitchApi
             return ExecuteApi<User>(request);
         }
 
-        public static User GetUserByToken(string token)
+        public static User GetUserByToken()
         {
             var request = new RestRequestBuilder("/kraken/user")
                .Method(Method.GET)
                .Build();
 
-            request.AddHeader("Authorization", "OAuth " + token);
+            request.AddHeader("Authorization", "OAuth " + _accessToken);
 
             return ExecuteApi<User>(request);
         }

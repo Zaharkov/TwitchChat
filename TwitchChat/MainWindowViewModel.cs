@@ -162,9 +162,8 @@ namespace TwitchChat
 
             try
             {
-                VkApiClient.GetToken(login.VkAccessToken);
-                var user = TwitchApiClient.GetUserByToken(login.TwitchAccessToken);
-                _irc.Login(user.Name, "oauth:" + login.TwitchAccessToken);
+                var user = TwitchApiClient.GetUserByToken();
+                _irc.Login(user.Name, "oauth:" + TwitchApiClient.GetToken());
             }
             catch (Exception ex)
             {
