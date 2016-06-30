@@ -206,7 +206,7 @@ namespace TwitchChat.Code
     /// </summary>
     public enum UserType
     {
-        Default, Mod, GlobalMod, Admin, Staff
+        Default, Mod, GlobalMod, Admin, Staff, Broadcaster
     }
 
     /// <summary>
@@ -303,12 +303,15 @@ namespace TwitchChat.Code
             DisplayName = init["display-name"];
             Mod = "1" == init["mod"];
             Subscriber = "1" == init["subscriber"];
+            Broadcaster = "broadcaster/1" == init["badges"];
             Turbo = "1" == init["turbo"];
             UserId = init["user-id"];
-            UserType = init["user-type"] == "mod" ? UserType.Mod :
+            UserType = 
+                init["user-type"] == "mod" ? UserType.Mod :
                 init["user-type"] == "global_mod" ? UserType.GlobalMod :
                 init["user-type"] == "admin" ? UserType.Admin :
                 init["user-type"] == "staff" ? UserType.Staff :
+                init["badges"] == "broadcaster/1" ? UserType.Broadcaster :
                 UserType.Default;
         }
 
@@ -316,6 +319,7 @@ namespace TwitchChat.Code
         public string DisplayName { get; set; }
         public bool Mod { get; set; }
         public bool Subscriber { get; set; }
+        public bool Broadcaster { get; set; }
         public bool Turbo { get; set; }
         public string UserId { get; set; }
         public UserType UserType { get; set; }

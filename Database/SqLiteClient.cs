@@ -13,11 +13,18 @@ namespace Database
 
         static SqLiteClient()
         {
-            if (File.Exists(DataBaseName))
-                return;
+            if (!File.Exists(DataBaseName))
+                SQLiteConnection.CreateFile(DataBaseName);
 
-            SQLiteConnection.CreateFile(DataBaseName);
-            Execute("CREATE TABLE AccessTokens (type nvarchar(20), value nvarchar(255), expire bigint)");
+            if(!IsTableExists("AccessTokens"))
+                Execute("CREATE TABLE AccessTokens (type nvarchar(20), value nvarchar(255), expire bigint)");
+        }
+
+        private static bool IsTableExists(string name)
+        {
+            var result = Execute($"SELECT name FROM sqlite_master WHERE type='table' AND name='{name}'");
+
+            return result.Count > 0;
         }
 
         private static Dictionary<int, Dictionary<string, string>> Execute(string sql)

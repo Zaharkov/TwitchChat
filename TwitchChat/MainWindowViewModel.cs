@@ -1,6 +1,7 @@
 ﻿using TwitchApi;
 using TwitchApi.Utils;
 using TwitchChat.Code;
+using TwitchChat.Dialog;
 using TwitchChat.ViewModel;
 using VkApi;
 
@@ -157,8 +158,8 @@ namespace TwitchChat
         //  Login to twitch
         void Login()
         {
-            var login = new Dialog.LoginWindow();
-            login.ShowDialog();
+            LoginWindow.Login(LoginType.Twitch);
+            LoginWindow.Login(LoginType.Vk);
 
             try
             {

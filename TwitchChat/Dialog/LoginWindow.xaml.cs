@@ -1,32 +1,76 @@
-﻿using Database;
+﻿using System;
+using System.Windows.Navigation;
+using Database;
 using Database.Entities;
 using TwitchApi;
 using VkApi;
 
 namespace TwitchChat.Dialog
 {
-    using System.Windows.Navigation;
-
     /// <summary>
     /// Interaction logic for Login.xaml
     /// </summary>
     public partial class LoginWindow
     {
-        public LoginWindow()
+        private static bool _isTokenFromDatabase;
+
+        private LoginWindow(LoginType type)
         {
             InitializeComponent();
-            wbMain.Navigating += OnNavigatingTwitch;
-            wbMain.Navigate(TwitchApiClient.AuthorizeUrl);
+
+            switch (type)
+            {
+                case LoginType.Twitch:
+                {
+                    var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Twitch);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        wbMain.Navigating += OnNavigatingTwitch;
+                        wbMain.Navigate(TwitchApiClient.AuthorizeUrl);
+                    }
+                    else
+                    {
+                        _isTokenFromDatabase = true;
+                        TwitchApiClient.SetToken(token);
+                    }
+                    break;
+                }
+                case LoginType.Vk:
+                {
+                    var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Vk);
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        wbMain.Navigating += OnNavigatingVk;
+                        wbMain.Navigate(VkApiClient.AuthorizeUrl);
+                    }
+                    else
+                    {
+                        _isTokenFromDatabase = true;
+                        TwitchApiClient.SetToken(token);
+                    }
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            } 
         }
 
-        void OnNavigatingTwitch(object sender, NavigatingCancelEventArgs e)
+        public static void Login(LoginType type)
+        {
+            var login = new LoginWindow(type);
+
+            if(!_isTokenFromDatabase)
+                login.ShowDialog();
+        }
+
+        private void OnNavigatingTwitch(object sender, NavigatingCancelEventArgs e)
         {
             if (e.Uri.Fragment.StartsWith("#access_token"))
             {
                 var fragments = e.Uri.Fragment.TrimStart('#').Split('&');
                 foreach (var fragment in fragments)
                 {
-                    var values = fragment.Split(new[] { '=' }, 2);
+                    var values = fragment.Split(new[] {'='}, 2);
                     switch (values[0])
                     {
                         case "access_token":
@@ -36,12 +80,11 @@ namespace TwitchChat.Dialog
                     }
                 }
                 wbMain.Navigating -= OnNavigatingTwitch;
-                wbMain.Navigating += OnNavigatingVk;
-                wbMain.Navigate(VkApiClient.AuthorizeUrl);
+                Close();
             }
         }
 
-        void OnNavigatingVk(object sender, NavigatingCancelEventArgs e)
+        private void OnNavigatingVk(object sender, NavigatingCancelEventArgs e)
         {
             if (e.Uri.Query.StartsWith("?code"))
             {

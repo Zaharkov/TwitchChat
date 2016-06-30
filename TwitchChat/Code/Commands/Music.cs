@@ -14,7 +14,7 @@ namespace TwitchChat.Code.Commands
 
         public static string GetMusic(MessageEventArgs e)
         {
-            if (!e.Mod || !e.Subscriber)
+            if (!e.Mod && !e.Subscriber && !e.Broadcaster)
                 return null;
 
             if (_firstTime)

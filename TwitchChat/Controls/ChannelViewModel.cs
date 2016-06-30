@@ -158,7 +158,7 @@ namespace TwitchChat.Controls
                 {
                     var result = CommandFactory.ExecuteCommand(e);
 
-                    if(string.IsNullOrEmpty(result))
+                    if(!string.IsNullOrEmpty(result))
                         _irc.Message(ChannelName, result);
                 }
             }
