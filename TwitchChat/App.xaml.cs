@@ -1,7 +1,4 @@
-﻿
-using TwitchChat.Code.Commands;
-
-namespace TwitchChat
+﻿namespace TwitchChat
 {
     using System.Windows;
     using Dialog;

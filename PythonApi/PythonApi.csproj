@@ -50,6 +50,7 @@
     <None Include="Python27\tcl\tix8.4.3\pref\TK.cs" />
     <None Include="Python27\tcl\tix8.4.3\pref\TkWin.cs" />
     <None Include="Python27\tcl\tix8.4.3\pref\WmDefault.cs" />
+    <Compile Include="Entities\Mmr.cs" />
     <Compile Include="PythonApiClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

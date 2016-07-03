@@ -58,10 +58,9 @@ namespace Database
             Execute($"INSERT INTO AccessTokens VALUES ('{type}', '{value}', {(expire.HasValue ? $"'{diff}'" : "NULL")})");
         }
 
-        public static string GetNotExpiredToken(AccessTokenType type)
+        public static string GetNotExpiredToken(AccessTokenType type, int? expireLag = null)
         {
-            //get time in stamp + 12 hours 
-            var diff = (long)(DateTime.UtcNow - UnixTime).TotalSeconds + 3600 * 12;
+            var diff = (long)(DateTime.UtcNow - UnixTime).TotalSeconds + (expireLag ?? 0);
             
             var result = Execute($"SELECT value FROM AccessTokens WHERE type = '{type}' AND (expire IS NULL OR expire > {diff})");
 

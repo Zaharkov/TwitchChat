@@ -5,7 +5,7 @@ using VkApi;
 
 namespace TwitchChat.Code.Commands
 {
-    public static class Music
+    public static class MusicCommand
     {
         private static bool _firstTime = true;
         private static readonly Stopwatch Timer = new Stopwatch();

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
+using PythonApi.Entities;
 using RestClientHelper;
 
 namespace PythonApi
@@ -12,7 +14,6 @@ namespace PythonApi
     /// </summary>
     public static class PythonApiClient
     {
-        private static readonly string SteamId = Configuration.GetSetting("SteamID");
         private static readonly string SteamUser = Configuration.GetSetting("SteamUser");
         private static readonly string SteamPass = Configuration.GetSetting("SteamPass");
 
@@ -62,7 +63,7 @@ namespace PythonApi
             
         }
 
-        public static string GetMmr()
+        public static Mmr GetMmr(string steamId)
         {
             var command = $@"
 
@@ -87,16 +88,6 @@ client = SteamClient()
 def print_error(result):
     print 'Error:', EResult(result)
 
-
-@client.on('auth_code_required')
-def auth_code_prompt(is_2fa, code_mismatch):
-    if is_2fa:
-        code = raw_input('Enter 2FA Code: ')
-        client.login(two_factor_code=code, **logOnDetails)
-    else:
-        code = raw_input('Enter Email Code: ')
-        client.login(auth_code=code, **logOnDetails)
-
 client.login(**logOnDetails)
 client.wait_event(EMsg.ClientAccountInfo)
 		
@@ -108,7 +99,7 @@ def done():
 
 @dota.on('ready')
 def ready():
-    jobid = dota.request_profile_card({SteamId})
+    jobid = dota.request_profile_card({steamId})
     resp = dota.wait_event(jobid)
     global profile_result
     profile_result = resp
@@ -123,7 +114,34 @@ print profile_result
 
             var result = Execute(command);
 
-            return result;
+            if (result == null)
+                return new Mmr();
+
+            var solo = Regex.Match(result, @"stat_id: k_eStat_SoloRank.. *stat_score: (\d+)", RegexOptions.Singleline);
+            var party = Regex.Match(result, @"stat_id: k_eStat_PartyRank.. *stat_score: (\d+)", RegexOptions.Singleline);
+
+            int? soloInt = null;
+            int? partyInt = null;
+
+            if (solo.Success && solo.Groups.Count > 1 && !string.IsNullOrEmpty(solo.Groups[1].Value))
+            {
+                int tryParse;
+                if (int.TryParse(solo.Groups[1].Value, out tryParse))
+                    soloInt = tryParse;
+            }
+
+            if (party.Success && party.Groups.Count > 1 && !string.IsNullOrEmpty(party.Groups[1].Value))
+            {
+                int tryParse;
+                if (int.TryParse(party.Groups[1].Value, out tryParse))
+                    partyInt = tryParse;
+            }
+
+            return new Mmr
+            {
+                SoloMmr = soloInt,
+                PartyMmr = partyInt
+            };
         }
     }
 }

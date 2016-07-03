@@ -37,7 +37,7 @@ namespace TwitchChat.Dialog
                 }
                 case LoginType.Vk:
                 {
-                    var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Vk);
+                    var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Vk, 3600 * 12);
                     if (string.IsNullOrEmpty(token))
                     {
                         wbMain.Navigating += OnNavigatingVk;

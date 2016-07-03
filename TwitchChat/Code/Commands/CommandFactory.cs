@@ -15,7 +15,11 @@ namespace TwitchChat.Code.Commands
             switch (command)
             {
                 case Command.Music:
-                    return Music.GetMusic(e);
+                    return MusicCommand.GetMusic(e);
+                case Command.Mmr:
+                    return MmrCommand.GetMmr(e);
+                case Command.MmrUpdate:
+                    return MmrCommand.MmrUpdate(e);
                 default:
                     return null;
             }

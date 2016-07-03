@@ -3,6 +3,8 @@
     public enum AccessTokenType
     {
         Twitch,
-        Vk
+        Vk,
+        SoloMmr,
+        PartyMmr
     }
 }
