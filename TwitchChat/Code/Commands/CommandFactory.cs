@@ -12,17 +12,25 @@ namespace TwitchChat.Code.Commands
             if (!parse)
                 return null;
 
+            Func<MessageEventArgs, string> commandFunc;
             switch (command)
             {
                 case Command.Music:
-                    return MusicCommand.GetMusic(e);
+                    commandFunc = MusicCommand.GetMusic;
+                    break;
                 case Command.Mmr:
-                    return MmrCommand.GetMmr(e);
+                    commandFunc = MmrCommand.GetMmr;
+                    break;
                 case Command.MmrUpdate:
-                    return MmrCommand.MmrUpdate(e);
+                    commandFunc = MmrCommand.MmrUpdate;
+                    break;
+                case Command.Global:
+                    return null;
                 default:
                     return null;
             }
+
+            return DelayDecorator.Get(command).Execute(commandFunc, e);
         }
     }
 }

@@ -86,10 +86,10 @@ client = SteamClient()
 
 @client.on('error')
 def print_error(result):
-    print 'Error:', EResult(result)
+    raise EResult(result)
 
 client.login(**logOnDetails)
-client.wait_event(EMsg.ClientAccountInfo)
+client.wait_event(EMsg.ClientAccountInfo, 10)
 		
 dota = Dota2Client(client)
 
