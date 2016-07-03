@@ -13,6 +13,7 @@ namespace TwitchChat.Code.Commands
         private static readonly string DelaysConfig = Configuration.GetSetting("DelaysConfig");
         private static readonly Dictionary<Command, int> Configs = new Dictionary<Command, int>();
         private static readonly Dictionary<Command, DelayDecorator> Instances = new Dictionary<Command, DelayDecorator>();
+        private static readonly Dictionary<Command, Dictionary<string, DelayDecorator>> UserInstances = new Dictionary<Command, Dictionary<string, DelayDecorator>>();
 
         private DelayDecorator()
         {
@@ -26,6 +27,28 @@ namespace TwitchChat.Code.Commands
             var decorator = new DelayDecorator {_command = command};
 
             Instances.Add(command, decorator);
+
+            return decorator;
+        }
+
+        public static DelayDecorator Get(string username, Command command)
+        {
+            if (UserInstances.ContainsKey(command))
+            {
+                if (UserInstances[command].ContainsKey(username))
+                    return UserInstances[command][username];
+
+                var userDecorator = new DelayDecorator { _command = command };
+
+                UserInstances[command].Add(username, userDecorator);
+
+                return userDecorator;
+            }
+
+            var decorator = new DelayDecorator { _command = command };
+            var user = new Dictionary<string, DelayDecorator> {{username, decorator}};
+
+            UserInstances.Add(command, user);
 
             return decorator;
         }

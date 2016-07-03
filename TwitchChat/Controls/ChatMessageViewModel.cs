@@ -19,13 +19,13 @@ namespace TwitchChat.Controls
                 Badges.Add(badges.GlobalMod.Image);
             if (message.UserType == UserType.Staff)
                 Badges.Add(badges.Staff.Image);
-            if (message.Subscriber)
+            if (message.UserType == UserType.Subscriber)
                 Badges.Add(badges.Subscriber.Image);
-            if (message.Mod || message.UserType == UserType.Mod)
+            if (message.UserType == UserType.Mod)
                 Badges.Add(badges.Mod.Image);
-            if (message.Turbo)
+            if (message.UserType == UserType.Turbo)
                 Badges.Add(badges.Turbo.Image);
-            if (message.Channel == message.User)
+            if (message.UserType == UserType.Broadcaster)
                 Badges.Add(badges.Broadcaster.Image);
         }
     }

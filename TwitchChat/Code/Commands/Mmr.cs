@@ -75,7 +75,7 @@ namespace TwitchChat.Code.Commands
             var solo = soloInt.HasValue && soloInt.Value > 0 ? $"Одиночный рейтинг равен: {soloInt.Value}" : "Одиночный рейтинг не доступен";
             var party = partyInt.HasValue && partyInt.Value > 0 ? $"Групповой рейтинг равен: {partyInt.Value}" : "Групповой рейтинг не доступен";
 
-            return $"БОТ: {solo}. {party}";
+            return $"{solo}. {party}";
         }
     }
 }

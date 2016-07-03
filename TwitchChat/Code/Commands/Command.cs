@@ -5,7 +5,9 @@ namespace TwitchChat.Code.Commands
     {
         Global,
         Music,
+        Song,
         Mmr,
-        MmrUpdate
+        MmrUpdate,
+        Help
     }
 }

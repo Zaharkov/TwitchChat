@@ -62,9 +62,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Code\Commands\CommandAccess.cs" />
     <Compile Include="Code\Commands\DelayDecorator.cs" />
     <Compile Include="Code\Commands\Command.cs" />
     <Compile Include="Code\Commands\CommandFactory.cs" />
+    <Compile Include="Code\Commands\Help.cs" />
     <Compile Include="Code\Commands\Mmr.cs" />
     <Compile Include="Code\Commands\Music.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
