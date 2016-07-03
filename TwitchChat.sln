@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestClientHelper", "RestCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{4794D8CF-BDAE-48F9-B5E9-E62980B69830}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PythonApi", "PythonApi\PythonApi.csproj", "{6D22F854-D203-4F8A-AB23-4124F5F16D61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D22F854-D203-4F8A-AB23-4124F5F16D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D22F854-D203-4F8A-AB23-4124F5F16D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D22F854-D203-4F8A-AB23-4124F5F16D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D22F854-D203-4F8A-AB23-4124F5F16D61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
