@@ -42,7 +42,7 @@ namespace TwitchChat.Code.Commands
                 : DelayDecorator.Get(command).Execute(commandFunc, e);
 
             if (!string.IsNullOrEmpty(result) && command != Command.Help)
-                result = "БОТ: " + result;
+                result = $"БОТ: @{e.User} {result}";
 
             return result;
         }

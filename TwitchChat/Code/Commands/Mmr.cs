@@ -41,9 +41,6 @@ namespace TwitchChat.Code.Commands
 
         public static string MmrUpdate(MessageEventArgs e)
         {
-            if (!e.Broadcaster)
-                return null;
-
             int? solo;
             int? party;
             GetMmr(out solo, out party);
