@@ -206,7 +206,7 @@ namespace TwitchChat.Code
     /// </summary>
     public enum UserType
     {
-        Default, Mod, GlobalMod, Admin, Staff, Broadcaster, Subscriber, Turbo
+        Default, Moderator, GlobalMod, Admin, Staff, Broadcaster, Subscriber, Turbo
     }
 
     /// <summary>
@@ -307,7 +307,7 @@ namespace TwitchChat.Code
             Turbo = "1" == init["turbo"];
             UserId = init["user-id"];
             UserType = 
-                init["user-type"] == "mod" ? UserType.Mod :
+                init["user-type"] == "mod" ? UserType.Moderator :
                 init["user-type"] == "global_mod" ? UserType.GlobalMod :
                 init["user-type"] == "admin" ? UserType.Admin :
                 init["user-type"] == "staff" ? UserType.Staff :

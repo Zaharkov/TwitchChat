@@ -8,10 +8,10 @@ namespace TwitchChat.Code.Commands
         public static readonly Dictionary<Command, List<UserType>> Accesses = new Dictionary<Command, List<UserType>>
         {
             { Command.Global, new List<UserType>() },
-            { Command.Mmr, new List<UserType> { UserType.Broadcaster, UserType.Mod, UserType.Subscriber } },
+            { Command.Mmr, new List<UserType>() },
             { Command.MmrUpdate, new List<UserType> { UserType.Broadcaster } },
-            { Command.Song, new List<UserType> { UserType.Broadcaster, UserType.Mod, UserType.Subscriber } },
-            { Command.Music, new List<UserType> { UserType.Broadcaster, UserType.Mod, UserType.Subscriber } },
+            { Command.Song, new List<UserType>() },
+            { Command.Music, new List<UserType>() },
             { Command.Help, new List<UserType>() }
         };
 

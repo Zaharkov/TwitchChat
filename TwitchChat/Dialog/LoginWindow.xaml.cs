@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Navigation;
 using Database;
 using Database.Entities;
@@ -12,7 +13,11 @@ namespace TwitchChat.Dialog
     /// </summary>
     public partial class LoginWindow
     {
-        private static bool _isTokenFromDatabase;
+        private static readonly Dictionary<LoginType, bool> IsTokenFromDatabase = new Dictionary<LoginType, bool>
+        {
+            { LoginType.Twitch, false },
+            { LoginType.Vk, false }
+        };
 
         private LoginWindow(LoginType type)
         {
@@ -30,7 +35,7 @@ namespace TwitchChat.Dialog
                     }
                     else
                     {
-                        _isTokenFromDatabase = true;
+                        IsTokenFromDatabase[type] = true;
                         TwitchApiClient.SetToken(token);
                     }
                     break;
@@ -45,8 +50,8 @@ namespace TwitchChat.Dialog
                     }
                     else
                     {
-                        _isTokenFromDatabase = true;
-                        TwitchApiClient.SetToken(token);
+                        IsTokenFromDatabase[type] = true;
+                        VkApiClient.SetToken(token);
                     }
                     break;
                 }
@@ -59,7 +64,7 @@ namespace TwitchChat.Dialog
         {
             var login = new LoginWindow(type);
 
-            if(!_isTokenFromDatabase)
+            if(!IsTokenFromDatabase[type])
                 login.ShowDialog();
         }
 

@@ -179,7 +179,7 @@ namespace TwitchChat.Controls
                 ["mod"] = _mod ? "1" : "0",
                 ["subscriber"] = _subscriber ? "1" : "0",
                 ["turbo"] = _irc.Turbo ? "1" : "0",
-                ["user-type"] = _irc.UserType == UserType.Mod
+                ["user-type"] = _irc.UserType == UserType.Moderator
                     ? "mod"
                     : _irc.UserType == UserType.GlobalMod
                         ? "global_mod"

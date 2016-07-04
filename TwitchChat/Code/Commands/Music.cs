@@ -10,9 +10,6 @@ namespace TwitchChat.Code.Commands
 
         public static string GetMusic(MessageEventArgs e)
         {
-            if (!e.Mod && !e.Subscriber && !e.Broadcaster)
-                return null;
-
             var list = VkApiClient.GetBroadcastList();
 
             var user = list.FirstOrDefault(t => t.Name.Equals(UserName) || $"{t.FirstName} {t.SecondName}".Equals(UserName));

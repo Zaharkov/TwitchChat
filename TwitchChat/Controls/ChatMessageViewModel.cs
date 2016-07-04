@@ -21,7 +21,7 @@ namespace TwitchChat.Controls
                 Badges.Add(badges.Staff.Image);
             if (message.UserType == UserType.Subscriber)
                 Badges.Add(badges.Subscriber.Image);
-            if (message.UserType == UserType.Mod)
+            if (message.UserType == UserType.Moderator)
                 Badges.Add(badges.Mod.Image);
             if (message.UserType == UserType.Turbo)
                 Badges.Add(badges.Turbo.Image);

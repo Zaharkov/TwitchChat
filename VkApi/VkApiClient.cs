@@ -30,6 +30,13 @@ namespace VkApi
                 .Build();
         }
 
+        public static void SetToken(string token)
+        {
+            Check.ForNullReference(token, nameof(token));
+
+            _accessToken = token;
+        }
+
         public static Token GetToken(string code)
         {
             var request = new RestRequestBuilder("access_token")

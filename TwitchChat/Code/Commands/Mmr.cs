@@ -12,14 +12,6 @@ namespace TwitchChat.Code.Commands
 
         public static string GetMmr(MessageEventArgs e)
         {
-            if (!e.Mod && !e.Subscriber && !e.Broadcaster)
-                return null;
-
-            return GetMmr();
-        }
-
-        private static string GetMmr()
-        {
             int? soloInt = null;
             int? partyInt = null;
 

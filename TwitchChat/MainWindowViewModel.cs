@@ -3,7 +3,6 @@ using TwitchApi.Utils;
 using TwitchChat.Code;
 using TwitchChat.Dialog;
 using TwitchChat.ViewModel;
-using VkApi;
 
 namespace TwitchChat
 {
@@ -69,7 +68,7 @@ namespace TwitchChat
         //  Stores all joined channels
         public ObservableCollection<Controls.ChannelViewModel> Channels { get; set; }
         //  Stores all active whisper sessions
-        public ObservableCollection<Dialog.WhisperWindowViewModel> Whispers { get; set; }
+        public ObservableCollection<WhisperWindowViewModel> Whispers { get; set; }
 
         public MainWindowViewModel()
         {
@@ -88,7 +87,7 @@ namespace TwitchChat
 
             //  Setup observable collections
             Channels = new ObservableCollection<Controls.ChannelViewModel>();
-            Whispers = new ObservableCollection<Dialog.WhisperWindowViewModel>();
+            Whispers = new ObservableCollection<WhisperWindowViewModel>();
         }
 
         private void OnDisconnected(object sender, DisconnectEventArgs e)
@@ -127,7 +126,7 @@ namespace TwitchChat
             Application.Current.Dispatcher.Invoke(() =>
             {
                 if (Whispers.All(x => x.UserName.ToLower() != e.User.ToLower()))
-                    Whispers.Add(new Dialog.WhisperWindowViewModel(_irc, e.User, e));
+                    Whispers.Add(new WhisperWindowViewModel(_irc, e.User, e));
             });
         }
 
@@ -142,7 +141,7 @@ namespace TwitchChat
                     if (result.Name.ToLower() == _irc.User.ToLower())
                         MessageBox.Show("Unable to message self");
                     else
-                        Whispers.Add(new Dialog.WhisperWindowViewModel(_irc, NewWhisperUserName));
+                        Whispers.Add(new WhisperWindowViewModel(_irc, NewWhisperUserName));
                 }
                 catch (ErrorResponseDataException ex)
                 {

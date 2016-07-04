@@ -7,7 +7,7 @@ namespace VkApi.Entities
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
 
-        [JsonProperty("expire")]
+        [JsonProperty("expires_in")]
         public int Expire { get; set; }
     }
 }
