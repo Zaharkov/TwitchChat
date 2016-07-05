@@ -8,6 +8,7 @@ namespace TwitchChat.Code.Commands
         Song,
         Mmr,
         MmrUpdate,
-        Help
+        Help,
+        MyTime
     }
 }

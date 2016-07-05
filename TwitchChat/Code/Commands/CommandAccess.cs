@@ -12,6 +12,7 @@ namespace TwitchChat.Code.Commands
             { Command.MmrUpdate, new List<UserType> { UserType.Broadcaster } },
             { Command.Song, new List<UserType>() },
             { Command.Music, new List<UserType>() },
+            { Command.MyTime, new List<UserType> { UserType.Broadcaster} },
             { Command.Help, new List<UserType>() }
         };
 

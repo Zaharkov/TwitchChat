@@ -2,6 +2,7 @@
 using Database.Entities;
 using PythonApi;
 using RestClientHelper;
+using TwitchChat.Controls;
 
 namespace TwitchChat.Code.Commands
 {
@@ -10,7 +11,7 @@ namespace TwitchChat.Code.Commands
         private static readonly string SteamId = Configuration.GetSetting("SteamID");
         private static readonly int Delay = int.Parse(Configuration.GetSetting("SteamMmrDelay"));
 
-        public static string GetMmr(MessageEventArgs e)
+        public static string GetMmr(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             int? soloInt = null;
             int? partyInt = null;
@@ -39,7 +40,7 @@ namespace TwitchChat.Code.Commands
             return BuildString(soloInt, partyInt);
         }
 
-        public static string MmrUpdate(MessageEventArgs e)
+        public static string MmrUpdate(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             int? solo;
             int? party;

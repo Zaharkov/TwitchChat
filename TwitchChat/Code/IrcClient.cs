@@ -261,7 +261,7 @@ namespace TwitchChat.Code
             State = IrcState.Closing;
             _send("QUIT");
             _planned = true;
-            _thread.Abort();
+            Dispose();
         }
 
         #endregion

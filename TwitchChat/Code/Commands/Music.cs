@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using RestClientHelper;
+using TwitchChat.Controls;
 using VkApi;
 
 namespace TwitchChat.Code.Commands
@@ -8,7 +9,7 @@ namespace TwitchChat.Code.Commands
     {
         private static readonly string UserName = Configuration.GetSetting("VkAudioName");
 
-        public static string GetMusic(MessageEventArgs e)
+        public static string GetMusic(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var list = VkApiClient.GetBroadcastList();
 

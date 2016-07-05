@@ -121,6 +121,28 @@ namespace TwitchChat.Controls
             }
         }
 
+        private ChatMemberViewModel FindOrJoinUser(string name)
+        {
+            var user = ChatGroups.SelectMany(x => x.Members).FirstOrDefault(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase));
+
+            if (user == null)
+            {
+                user = new ChatMemberViewModel
+                {
+                    Name = name
+                };
+
+                var group = _getGroup("Viewers");
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    group.Members.Add(user);
+                });
+            }
+
+            return user;
+        }
+
         private void UserParted(object sender, TwitchEventArgs e)
         {
             if (e.Channel == ChannelName)
@@ -156,7 +178,7 @@ namespace TwitchChat.Controls
 
                 if (IsChatCommand(e))
                 {
-                    var result = CommandFactory.ExecuteCommand(e);
+                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.User));
 
                     if(!string.IsNullOrEmpty(result))
                         _irc.Message(ChannelName, result);

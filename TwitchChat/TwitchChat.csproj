@@ -66,6 +66,7 @@
     <Compile Include="Code\Commands\DelayDecorator.cs" />
     <Compile Include="Code\Commands\Command.cs" />
     <Compile Include="Code\Commands\CommandFactory.cs" />
+    <Compile Include="Code\Commands\MyTime.cs" />
     <Compile Include="Code\Commands\Help.cs" />
     <Compile Include="Code\Commands\Mmr.cs" />
     <Compile Include="Code\Commands\Music.cs" />

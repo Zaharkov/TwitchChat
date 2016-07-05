@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using RestClientHelper;
+using TwitchChat.Controls;
 
 namespace TwitchChat.Code.Commands
 {
@@ -58,13 +59,13 @@ namespace TwitchChat.Code.Commands
             BuildDelays();
         }
 
-        public string Execute(Func<MessageEventArgs, string> func, MessageEventArgs e)
+        public string Execute(Func<MessageEventArgs, ChatMemberViewModel, string> func, MessageEventArgs e, ChatMemberViewModel userModel)
         {
             if (_firstTime)
             {
                 _firstTime = false;
                 _timer.Start();
-                return func(e);
+                return func(e, userModel);
             }
 
             var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global];
@@ -72,7 +73,7 @@ namespace TwitchChat.Code.Commands
             if (_timer.Elapsed.TotalSeconds > delay)
             {
                 _timer.Restart();
-                return func(e);
+                return func(e, userModel);
             }
 
             return null;

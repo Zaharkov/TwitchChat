@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using TwitchChat.Controls;
 
 namespace TwitchChat.Code.Commands
 {
     public static class HelpCommand
     {
-        public static string GetHelp(MessageEventArgs e)
+        public static string GetHelp(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var accessList = CommandAccess.Accesses;
             var builder = new StringBuilder();
