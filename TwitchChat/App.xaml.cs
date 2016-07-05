@@ -23,6 +23,7 @@
             mainWindow.Closing += (sender, ee) =>
             {
                 _vm.Logout();
+                Current.Shutdown();
             };
             mainWindow.Show();
         }

@@ -115,7 +115,8 @@ namespace TwitchChat.Code
         #region Private Fields
 
         private Thread _thread;
-        private StreamWriter _stream;
+        private StreamReader _streamReader;
+        private StreamWriter _streamWriter;
 
         //  Reconnection 
         private bool _planned;
@@ -269,10 +270,10 @@ namespace TwitchChat.Code
         {
             try
             {
-                if (_stream != null)
+                if (_streamWriter != null)
                 {
-                    _stream.WriteLine(input);
-                    _stream.Flush();
+                    _streamWriter.WriteLine(input);
+                    _streamWriter.Flush();
 
                     //  Raise Sent Event
                     OnSent(input);
@@ -303,26 +304,28 @@ namespace TwitchChat.Code
         /// <summary>
         /// http://tools.ietf.org/html/rfc1459#section-2.3.1
         /// </summary>
-        /// <param name="sr"></param>
         /// <returns></returns>
-        private Message _read(StreamReader sr)
+        private Message _read()
         {
             //  Initialize buffers
-            MessageState mode = MessageState.Start;
-            NameValueCollection tags = new NameValueCollection();
-            StringBuilder key = new StringBuilder();
-            StringBuilder value = new StringBuilder();
-            StringBuilder input = new StringBuilder();
-            StringBuilder prefix = new StringBuilder();
-            StringBuilder command = new StringBuilder();
-            StringBuilder parameter = new StringBuilder();
-            List<string> @params = new List<string>();
+            var mode = MessageState.Start;
+            var tags = new NameValueCollection();
+            var key = new StringBuilder();
+            var value = new StringBuilder();
+            var input = new StringBuilder();
+            var prefix = new StringBuilder();
+            var command = new StringBuilder();
+            var parameter = new StringBuilder();
+            var @params = new List<string>();
             do
             {
-                char[] ca = new char[1];
-                sr.Read(ca, 0, 1);
-                char c = ca[0];
+                var ca = new char[1];
+                _streamReader.Read(ca, 0, 1);
+                var c = ca[0];
                 input.Append(c);
+
+                if (State == IrcState.Closed)
+                    break;
 
                 switch (mode)
                 {
@@ -393,8 +396,8 @@ namespace TwitchChat.Code
                                 value.Clear();
                                 break;
                             case '\\':
-                                if (sr.Peek() == -1) throw new EndOfStreamException("Unexpected end of stream during escape sequence.");
-                                char x = (char)sr.Read();
+                                if (_streamReader.Peek() == -1) throw new EndOfStreamException("Unexpected end of stream during escape sequence.");
+                                char x = (char)_streamReader.Read();
                                 switch (x)
                                 {
                                     case ':':
@@ -531,7 +534,7 @@ namespace TwitchChat.Code
 
                         throw new FormatException($"Found {(int) c} instead of LF character.");
                 }
-            } while (sr.Peek() != -1);
+            } while (_streamReader.Peek() != -1);
             throw new EndOfStreamException("Stream ended before a full message could be constructed");
         }
 
@@ -540,7 +543,7 @@ namespace TwitchChat.Code
         /// </summary>
         private void _run()
         {
-            TcpClient irc = new TcpClient();
+            var irc = new TcpClient();
 
             try
             {
@@ -554,7 +557,7 @@ namespace TwitchChat.Code
 
                 //  Get network stream
                 NetworkStream stream = irc.GetStream();
-                _stream = new StreamWriter(stream);
+                _streamWriter = new StreamWriter(stream);
                 _channels.Clear();
 
                 //  Connection Registration
@@ -570,18 +573,21 @@ namespace TwitchChat.Code
                 //  https://tools.ietf.org/html/rfc2812#section-3.1.3
                 if (!string.IsNullOrWhiteSpace(_user)) _send("USER " + _user);
 
-                using (var sr = new StreamReader(stream))
-                {
-                    //  https://tools.ietf.org/html/rfc2812#section-3.1
-                    if (_read(sr).Command != "001") throw new Exception("Registration Failed. Welcome message expected");
+                _streamReader = new StreamReader(stream);
+                //  https://tools.ietf.org/html/rfc2812#section-3.1
+                if (_read().Command != "001")
+                    throw new Exception("Registration Failed. Welcome message expected");
 
-                    //  Raise connect event
-                    State = IrcState.Registered;
-                    OnConnect();
-                    Debug.WriteLine("Connected thread: {0}", Thread.CurrentThread.ManagedThreadId);
+                //  Raise connect event
+                State = IrcState.Registered;
+                OnConnect();
+                Debug.WriteLine($"Connected thread: {Thread.CurrentThread.ManagedThreadId}");
 
-                    while (true) _read(sr);
-                }
+                while (true) _read();
+            }
+            catch (ThreadAbortException)
+            {
+                //thread has aborted
             }
             catch (Exception e)
             {
@@ -592,8 +598,11 @@ namespace TwitchChat.Code
             finally
             {
                 //  Close TCP Client
-                _stream = null;
-                if (irc.Connected) irc.Close();
+                _streamWriter?.Dispose();
+                _streamReader?.Dispose();
+
+                if (irc.Connected)
+                    irc.Dispose();
 
                 //  Raise Disconnect on a new thread
                 new Thread(OnDisconnect).Start();
@@ -604,6 +613,8 @@ namespace TwitchChat.Code
         {
             //  Make sure thread is closed
             _planned = true;
+            _streamWriter?.Dispose();
+            _streamReader?.Dispose();
             _thread?.Abort();
         }
     }
