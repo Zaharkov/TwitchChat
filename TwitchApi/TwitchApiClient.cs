@@ -16,7 +16,7 @@ namespace TwitchApi
         private static string _accessToken;
 
         public static readonly string AuthorizeUrl =
-            $"https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={TwitchClientId}&redirect_uri={TwitchUrl}&scope=chat_login user_read";
+            $"https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id={TwitchClientId}&redirect_uri={TwitchUrl}&scope=chat_login user_read channel_read channel_subscriptions user_follows_edit";
 
         static TwitchApiClient()
         {
@@ -48,6 +48,15 @@ namespace TwitchApi
             return ExecuteTmi<Servers>(request);
         }
 
+        public static ChatterInfo GetUsersList(string channel)
+        {
+            var request = new RestRequestBuilder($"/group/user/{channel}/chatters")
+                .Method(Method.GET)
+                .Build();
+
+            return ExecuteTmi<ChatterInfo>(request);
+        }
+
         public static Badges GetBadges(string channelName)
         {
             Check.ForNullReference(channelName);
@@ -61,7 +70,7 @@ namespace TwitchApi
 
         public static User GetUserByName(string userName)
         {
-            Check.ForNullReference(userName);
+            Check.ForNullReference(userName, nameof(userName));
 
             var request = new RestRequestBuilder($"/kraken/users/{userName}")
                .Method(Method.GET)
@@ -72,6 +81,8 @@ namespace TwitchApi
 
         public static User GetUserByToken()
         {
+            Check.ForNullReference(_accessToken, nameof(_accessToken));
+
             var request = new RestRequestBuilder("/kraken/user")
                .Method(Method.GET)
                .Build();

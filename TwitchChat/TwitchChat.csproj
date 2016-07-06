@@ -70,6 +70,7 @@
     <Compile Include="Code\Commands\Help.cs" />
     <Compile Include="Code\Commands\Mmr.cs" />
     <Compile Include="Code\Commands\Music.cs" />
+    <Compile Include="Code\Helpers\PeriodicTask.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
     <Compile Include="Controls\ChannelViewModel.cs" />
     <Compile Include="Controls\ChatGroupViewModel.cs" />

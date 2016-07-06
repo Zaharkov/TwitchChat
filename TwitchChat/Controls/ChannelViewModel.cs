@@ -94,13 +94,13 @@ namespace TwitchChat.Controls
             if (e.Channel == ChannelName)
             {
                 //  Add names to general viewer group
-                var group = _getGroup("Viewers");
+                var group = _getGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     foreach (var name in e.Names)
                     {
-                        if (ChatGroups.SelectMany(x => x.Members).All(x => x.Name.ToLower() != name.ToLower()))
+                        if (group.Members.All(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase)))
                             group.Members.Add(new ChatMemberViewModel { Name = name });
                     }
                 });
@@ -112,7 +112,7 @@ namespace TwitchChat.Controls
             if (e.Channel == ChannelName)
             {
                 //  Add names to general viewer group
-                var group = _getGroup("Viewers");
+                var group = _getGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -123,7 +123,8 @@ namespace TwitchChat.Controls
 
         private ChatMemberViewModel FindOrJoinUser(string name)
         {
-            var user = ChatGroups.SelectMany(x => x.Members).FirstOrDefault(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase));
+            var group = _getGroup();
+            var user = group.Members.FirstOrDefault(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase));
 
             if (user == null)
             {
@@ -131,8 +132,6 @@ namespace TwitchChat.Controls
                 {
                     Name = name
                 };
-
-                var group = _getGroup("Viewers");
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -147,20 +146,16 @@ namespace TwitchChat.Controls
         {
             if (e.Channel == ChannelName)
             {
-                //  Search groups for user
-                foreach (var group in ChatGroups)
+                var group = _getGroup();
+
+                var user = group.Members.FirstOrDefault(x => string.Equals(x.Name, e.User, StringComparison.CurrentCultureIgnoreCase));
+                if (user != null)
                 {
-                    //  Find user among the group members
-                    var user = group.Members.FirstOrDefault(x => x.Name.ToLower() == e.User.ToLower());
-                    if (user != null)
+                    //  Remove once user is gound and removed
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        //  Remove once user is gound and removed
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            group.Members.Remove(user);
-                        });
-                        break;
-                    }
+                        group.Members.Remove(user);
+                    });
                 }
             }
         }
@@ -229,14 +224,14 @@ namespace TwitchChat.Controls
         #region Helpers
 
         //  Helper to get and create groups
-        ChatGroupViewModel _getGroup(string groupName)
+        private ChatGroupViewModel _getGroup()
         {
             //  Attempt to get group
-            var group = ChatGroups.FirstOrDefault(x => x.Name == groupName);
+            var group = ChatGroups.FirstOrDefault(x => x.Name == "Viewers");
             if (group == null)
             {
                 //  Create group if it doesnt exist
-                group = new ChatGroupViewModel() { Name = groupName };
+                group = new ChatGroupViewModel { Name = "Viewers" };
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {

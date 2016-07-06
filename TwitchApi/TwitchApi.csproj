@@ -52,8 +52,10 @@
   <ItemGroup>
     <Compile Include="Entities\BadgeFormat.cs" />
     <Compile Include="Entities\Badges.cs" />
+    <Compile Include="Entities\Chatters.cs" />
     <Compile Include="Entities\Error.cs" />
     <Compile Include="Entities\Server.cs" />
+    <Compile Include="Entities\ChatterInfo.cs" />
     <Compile Include="Entities\Servers.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="TwitchApiClient.cs" />
