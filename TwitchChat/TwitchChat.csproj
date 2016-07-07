@@ -72,6 +72,10 @@
     <Compile Include="Code\Commands\Music.cs" />
     <Compile Include="Code\Helpers\PeriodicTask.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
+    <Compile Include="Code\Helpers\DelayConfig.cs" />
+    <Compile Include="Code\Timers\Help.cs" />
+    <Compile Include="Code\Timers\TimerFactory.cs" />
+    <Compile Include="Code\Timers\Timer.cs" />
     <Compile Include="Controls\ChannelViewModel.cs" />
     <Compile Include="Controls\ChatGroupViewModel.cs" />
     <Compile Include="Controls\ChatMemberViewModel.cs" />

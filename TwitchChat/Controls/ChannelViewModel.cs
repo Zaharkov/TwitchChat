@@ -47,6 +47,8 @@ namespace TwitchChat.Controls
             }
         }
 
+        public TwitchIrcClient Client => _irc;
+
         //  Groups of chatters
         public ObservableCollection<ChatGroupViewModel> ChatGroups { get; set; } = new ObservableCollection<ChatGroupViewModel>();
         //  Messages from to the current channel
@@ -94,7 +96,7 @@ namespace TwitchChat.Controls
             if (e.Channel == ChannelName)
             {
                 //  Add names to general viewer group
-                var group = _getGroup();
+                var group = GetGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -112,7 +114,7 @@ namespace TwitchChat.Controls
             if (e.Channel == ChannelName)
             {
                 //  Add names to general viewer group
-                var group = _getGroup();
+                var group = GetGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -123,7 +125,7 @@ namespace TwitchChat.Controls
 
         private ChatMemberViewModel FindOrJoinUser(string name)
         {
-            var group = _getGroup();
+            var group = GetGroup();
             var user = group.Members.FirstOrDefault(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase));
 
             if (user == null)
@@ -146,7 +148,7 @@ namespace TwitchChat.Controls
         {
             if (e.Channel == ChannelName)
             {
-                var group = _getGroup();
+                var group = GetGroup();
 
                 var user = group.Members.FirstOrDefault(x => string.Equals(x.Name, e.User, StringComparison.CurrentCultureIgnoreCase));
                 if (user != null)
@@ -224,14 +226,14 @@ namespace TwitchChat.Controls
         #region Helpers
 
         //  Helper to get and create groups
-        private ChatGroupViewModel _getGroup()
+        public ChatGroupViewModel GetGroup(string name = null)
         {
             //  Attempt to get group
-            var group = ChatGroups.FirstOrDefault(x => x.Name == "Viewers");
+            var group = ChatGroups.FirstOrDefault(x => x.Name == (name ?? "Viewers"));
             if (group == null)
             {
                 //  Create group if it doesnt exist
-                group = new ChatGroupViewModel { Name = "Viewers" };
+                group = new ChatGroupViewModel { Name = name ?? "Viewers" };
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
