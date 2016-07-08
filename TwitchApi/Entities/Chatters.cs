@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace TwitchApi.Entities
@@ -23,6 +24,23 @@ namespace TwitchApi.Entities
 
         [JsonProperty("viewers")]
         public List<string> Viewers { get; set; }
+
+        public List<string> this[ChatterType name]
+        {
+            get
+            {
+                switch (name)
+                {
+                    case ChatterType.Moderators: return Moderators;
+                    case ChatterType.Staff: return Staff;
+                    case ChatterType.Admins: return Admins;
+                    case ChatterType.GlobalMods: return GlobalMods;
+                    case ChatterType.Viewers: return Viewers;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(name), name, null);
+                }
+            }
+        }
     }
 }
 

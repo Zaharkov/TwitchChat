@@ -174,7 +174,11 @@ namespace TwitchChat
         //  Logout from twitch
         public void Logout()
         {
-            if (_irc.State == IrcClient.IrcState.Registered) _irc.Quit();
+            foreach (var channel in Channels)
+                channel.UpdateChattersInfo();
+
+            if (_irc.State == IrcClient.IrcState.Registered)
+                _irc.Quit();
         }
     }
 }

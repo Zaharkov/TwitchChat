@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
+using System.Text;
 using Database.Entities;
 
 namespace Database
@@ -18,6 +20,9 @@ namespace Database
 
             if(!IsTableExists("AccessTokens"))
                 Execute("CREATE TABLE AccessTokens (type nvarchar(20), value nvarchar(255), expire bigint)");
+
+            if (!IsTableExists("ChattersInfo"))
+                Execute("CREATE TABLE ChattersInfo (name nvarchar(128), chatName nvarchar(128), type nvarchar(35), seconds bigint, PRIMARY KEY(name, chatName))");
         }
 
         private static bool IsTableExists(string name)
@@ -65,6 +70,30 @@ namespace Database
             var result = Execute($"SELECT value FROM AccessTokens WHERE type = '{type}' AND (expire IS NULL OR expire > {diff})");
 
             return result.Count > 0 ? result[0]["value"] : null;
+        }
+
+        public static void UpdateChatterInfo(List<ChatterData> chattersInfo)
+        {
+            var builder = new StringBuilder();
+            var last = chattersInfo.Last();
+            builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds) VALUES");
+
+            foreach (var chatterData in chattersInfo)
+                builder.AppendLine($@"('{chatterData.Name}', '{chatterData.ChatName}', '{chatterData.Type}', {chatterData.Seconds} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = '{chatterData.Name}' AND chatName = '{chatterData.ChatName}')){(last == chatterData ? "" : ",")}");
+
+            Execute(builder.ToString());
+        }
+
+        public static long GetChatterTime(string name, string chatName)
+        {
+            var result = Execute($"SELECT seconds FROM ChattersInfo WHERE name = '{name}' AND chatName = '{chatName}'");
+
+            return result.Count == 0 ? 0 : long.Parse(result[0]["seconds"]);
+        }
+
+        public static void DeletChatter(string name, string chatName)
+        {
+            Execute($"DELETE FROM ChattersInfo WHERE name = '{name}' AND chatName = '{chatName}'");
         }
     }
 }

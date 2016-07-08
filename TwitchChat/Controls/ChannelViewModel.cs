@@ -3,11 +3,14 @@ using TwitchApi.Entities;
 using TwitchChat.Code;
 using TwitchChat.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Database;
+using Database.Entities;
 using TwitchChat.Code.Commands;
 
 namespace TwitchChat.Controls
@@ -226,14 +229,14 @@ namespace TwitchChat.Controls
         #region Helpers
 
         //  Helper to get and create groups
-        public ChatGroupViewModel GetGroup(string name = null)
+        public ChatGroupViewModel GetGroup(ChatterType type = ChatterType.Viewers)
         {
             //  Attempt to get group
-            var group = ChatGroups.FirstOrDefault(x => x.Name == (name ?? "Viewers"));
+            var group = ChatGroups.FirstOrDefault(x => x.Name == type.ToString());
             if (group == null)
             {
                 //  Create group if it doesnt exist
-                group = new ChatGroupViewModel { Name = name ?? "Viewers" };
+                group = new ChatGroupViewModel { Name = type.ToString() };
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -241,6 +244,21 @@ namespace TwitchChat.Controls
                 });
             }
             return group;
+        }
+
+        public void UpdateChattersInfo()
+        {
+            var listForUpdate = new List<ChatterData>();
+            foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
+            {
+                var group = GetGroup(chatterType).Members;
+                foreach (var user in group)
+                {
+                    listForUpdate.Add(new ChatterData(user.Name, ChannelName, chatterType.ToString(), (long)user.Timer.Elapsed.TotalSeconds));
+                }
+            }
+
+            SqLiteClient.UpdateChatterInfo(listForUpdate);
         }
 
         #endregion

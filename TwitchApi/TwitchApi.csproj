@@ -53,6 +53,7 @@
     <Compile Include="Entities\BadgeFormat.cs" />
     <Compile Include="Entities\Badges.cs" />
     <Compile Include="Entities\Chatters.cs" />
+    <Compile Include="Entities\ChatterType.cs" />
     <Compile Include="Entities\Error.cs" />
     <Compile Include="Entities\Server.cs" />
     <Compile Include="Entities\ChatterInfo.cs" />

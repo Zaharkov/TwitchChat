@@ -1,4 +1,8 @@
-﻿namespace TwitchChat
+﻿using System.Collections.Generic;
+using Database;
+using Database.Entities;
+
+namespace TwitchChat
 {
     using System.Windows;
     using Dialog;
