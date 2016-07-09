@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Database;
 using Database.Entities;
 using TwitchChat.Code.Commands;
+using TwitchChat.Code.Timers;
 
 namespace TwitchChat.Controls
 {
@@ -22,6 +24,8 @@ namespace TwitchChat.Controls
         //  Store channel specific status
         private bool _mod;
         private bool _subscriber;
+
+        private readonly List<CancellationTokenSource> _cancellationTokens;
 
         //  The badges that are taken from https://api.twitch.tv/kraken/chat/{0}/badges
         private readonly Badges _badges;
@@ -81,8 +85,9 @@ namespace TwitchChat.Controls
             SendCommand = new DelegateCommand(Send);
             PartCommand = new DelegateCommand(Part);
 
-
             _badges = TwitchApiClient.GetBadges(channelName);
+
+            _cancellationTokens = TimerFactory.InitTimers(this);
         }
 
         private void UserStateReceived(object sender, UserStateEventArgs e)
@@ -105,7 +110,7 @@ namespace TwitchChat.Controls
                 {
                     foreach (var name in e.Names)
                     {
-                        if (group.Members.All(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase)))
+                        if (!group.Members.Any(x => name.Equals(x.Name)))
                             group.Members.Add(new ChatMemberViewModel { Name = name });
                     }
                 });
@@ -121,7 +126,8 @@ namespace TwitchChat.Controls
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    group.Members.Add(new ChatMemberViewModel() { Name = e.User });
+                    if (!group.Members.Any(x => e.User.Equals(x.Name)))
+                        group.Members.Add(new ChatMemberViewModel { Name = e.User });
                 });
             }
         }
@@ -129,18 +135,16 @@ namespace TwitchChat.Controls
         private ChatMemberViewModel FindOrJoinUser(string name)
         {
             var group = GetGroup();
-            var user = group.Members.FirstOrDefault(x => !string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase));
+            var user = group.Members.FirstOrDefault(x => name.Equals(x.Name));
 
             if (user == null)
             {
-                user = new ChatMemberViewModel
-                {
-                    Name = name
-                };
+                user = new ChatMemberViewModel { Name = name };
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    group.Members.Add(user);
+                    if (!group.Members.Any(x => name.Equals(x.Name)))
+                        group.Members.Add(user);
                 });
             }
 
@@ -153,7 +157,7 @@ namespace TwitchChat.Controls
             {
                 var group = GetGroup();
 
-                var user = group.Members.FirstOrDefault(x => string.Equals(x.Name, e.User, StringComparison.CurrentCultureIgnoreCase));
+                var user = group.Members.FirstOrDefault(x => e.User.Equals(x.Name));
                 if (user != null)
                 {
                     //  Remove once user is gound and removed
@@ -191,7 +195,7 @@ namespace TwitchChat.Controls
             return e.Message.StartsWith("!");
         }
 
-        void Send()
+        private void Send()
         {
             //  Populate a name value collection to fake a MessageEventArg
             NameValueCollection nvc = new NameValueCollection
@@ -219,8 +223,16 @@ namespace TwitchChat.Controls
             Message = string.Empty;
         }
 
-        void Part()
+        private void Part()
         {
+            foreach (var cancellationToken in _cancellationTokens)
+            {
+                cancellationToken.Cancel();
+                cancellationToken.Dispose();
+            }
+
+            UpdateChattersInfo();
+
             _irc.Part(_channelName);
             //  Raise the event.  MainWindowViewModel uses this to remove from list of channels
             Parted?.Invoke(this, EventArgs.Empty);

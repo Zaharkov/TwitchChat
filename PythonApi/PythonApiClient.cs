@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using Database;
 using PythonApi.Entities;
 using RestClientHelper;
 
@@ -57,6 +58,7 @@ namespace PythonApi
             }
             catch (Exception ex)
             {
+                SqLiteClient.LogException("PythonApi error", ex);
                 Debug.WriteLine($"PythonApi error: {ex.Message}");
                 return null;
             }

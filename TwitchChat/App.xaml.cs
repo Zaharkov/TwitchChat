@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using Database;
-using Database.Entities;
 
 namespace TwitchChat
 {
@@ -29,6 +29,13 @@ namespace TwitchChat
                 _vm.Logout();
                 Current.Shutdown();
             };
+
+            Current.DispatcherUnhandledException += (serder, ee) =>
+            {
+                SqLiteClient.LogException("Fatal error in application", ee.Exception);
+                _vm.Logout();
+            };
+
             mainWindow.Show();
         }
 

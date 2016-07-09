@@ -1,4 +1,5 @@
-﻿using TwitchChat.Controls;
+﻿using Database;
+using TwitchChat.Controls;
 
 namespace TwitchChat.Code.Commands
 {
@@ -6,9 +7,26 @@ namespace TwitchChat.Code.Commands
     {
         public static string GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            var seconds = (int)userModel.Timer.Elapsed.TotalSeconds;
+            var chatTime = (long)userModel.Timer.Elapsed.TotalSeconds;
+            var dbTime = SqLiteClient.GetChatterTime(userModel.Name, e.Channel);
 
-            return $"слежу за тобой уже {seconds} секунд";
+            var totalTime = chatTime + dbTime;
+
+            return $"слежу за тобой уже {totalTime} {GetSecondsName(totalTime)}";
+        }
+
+        private static string GetSecondsName(long seconds)
+        {
+            if (seconds % 10 == 1)
+                return "секунду";
+
+            if (seconds%10 != 2 && seconds%10 != 3 && seconds%10 != 4)
+                return "секунд";
+
+            if (seconds % 100 > 11 && seconds % 100 < 15)
+                return "секунд";
+
+            return "секунды";
         }
     }
 }

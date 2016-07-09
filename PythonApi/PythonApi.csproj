@@ -5061,6 +5061,10 @@
     <None Include="Python27\Tools\Scripts\pydocgui.pyw" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Database\Database.csproj">
+      <Project>{4794d8cf-bdae-48f9-b5e9-e62980b69830}</Project>
+      <Name>Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
       <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
       <Name>RestClientHelper</Name>

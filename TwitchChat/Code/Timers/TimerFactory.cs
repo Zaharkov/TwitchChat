@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Windows;
 using Database;
 using Database.Entities;
 using TwitchApi;
@@ -14,8 +16,9 @@ namespace TwitchChat.Code.Timers
     {
         private static readonly Dictionary<Timer, int> Config = DelayConfig<Timer>.GetDelayConfig("TimersConfig");
 
-        public static void Execute(ChannelViewModel channelModel)
+        public static List<CancellationTokenSource> InitTimers(ChannelViewModel channelModel)
         {
+            var cancelTokens = new List<CancellationTokenSource>();
             foreach (Timer timer in Enum.GetValues(typeof(Timer)))
             {
                 var delay = Config.ContainsKey(timer) ? Config[timer] : Config[Timer.Global];
@@ -45,19 +48,23 @@ namespace TwitchChat.Code.Timers
                             foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
                             {
                                 var group = channelModel.GetGroup(chatterType).Members;
+                                var forDelete = new List<ChatMemberViewModel>();
                                 foreach (var user in group)
                                 {
                                     if (!newUsers.Chatters[chatterType].Any(t => t.Equals(user.Name)))
                                     {
-                                        group.Remove(user);
+                                        forDelete.Add(user);
                                         listForUpdate.Add(new ChatterData(user.Name, channelModel.ChannelName, chatterType.ToString(), (long)user.Timer.Elapsed.TotalSeconds));
                                     }
                                 }
 
+                                foreach (var memberViewModel in forDelete)
+                                    Application.Current.Dispatcher.Invoke(() => group.Remove(memberViewModel));
+
                                 foreach (var user in newUsers.Chatters[chatterType])
                                 {
                                     if (!group.Any(t => t.Name.Equals(user)))
-                                        group.Add(new ChatMemberViewModel { Name = user });
+                                        Application.Current.Dispatcher.Invoke(() => group.Add(new ChatMemberViewModel { Name = user }));
                                 }
                             }
 
@@ -69,8 +76,12 @@ namespace TwitchChat.Code.Timers
                         throw new ArgumentOutOfRangeException();
                 }
 
-                PeriodicTaskFactory.Start(action, delay * 1000);
+                var cancelToken = new CancellationTokenSource();
+                cancelTokens.Add(cancelToken);
+                PeriodicTaskFactory.Start(action, delay * 1000, cancelToken: cancelToken.Token);
             }
+
+            return cancelTokens;
         }
     }
 }

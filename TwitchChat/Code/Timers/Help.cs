@@ -6,7 +6,7 @@ namespace TwitchChat.Code.Timers
     {
         public static string GetHelpTimerText()
         {
-            return $"список всех пользовательских команд можно посмотреть в справке !{Command.Help}";
+            return $"БОТ: Список всех пользовательских команд можно посмотреть в справке !{Command.Help}";
         }
     }
 }

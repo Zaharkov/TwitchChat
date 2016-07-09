@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Database;
 
 namespace TwitchChat.Code
 {
@@ -281,6 +282,7 @@ namespace TwitchChat.Code
             }
             catch (Exception ex)
             {
+                SqLiteClient.LogException("Unhandled exception during send", ex);
                 Debug.WriteLine("Unhandled exception during send: {0}", ex.ToString());
             }
         }

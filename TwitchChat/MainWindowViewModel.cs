@@ -101,14 +101,24 @@ namespace TwitchChat
         }
 
         //  Join a new channel
-        void Join()
+        private void Join()
         {
             if (Channels.All(x => x.ChannelName != NewChannelName))
             {
-                var vm = new Controls.ChannelViewModel(_irc, NewChannelName);
-                vm.Parted += OnParted;
-                Channels.Add(vm);
-                CurrentChannel = vm;
+                try
+                {
+                    var result = TwitchApiClient.GetUserByName(NewChannelName.ToLower());
+
+                    var vm = new Controls.ChannelViewModel(_irc, result.Name);
+                    vm.Parted += OnParted;
+                    Channels.Add(vm);
+                    CurrentChannel = vm;
+                }
+                catch (ErrorResponseDataException ex)
+                {
+                    if ((int)ex.Status == 422)
+                        MessageBox.Show("Channel not found");
+                }  
             }
             NewChannelName = string.Empty;
         }
@@ -117,6 +127,10 @@ namespace TwitchChat
         private void OnParted(object sender, EventArgs e)
         {
             var vm = sender as Controls.ChannelViewModel;
+
+            if (vm == null)
+                return;
+
             Channels.Remove(vm);
         }
 
@@ -131,7 +145,7 @@ namespace TwitchChat
         }
 
         //  Start a new private message
-        void Whisper()
+        private void Whisper()
         {
             if (Whispers.All(x => x.UserName.ToLower() != NewWhisperUserName.ToLower()))
             {
@@ -147,15 +161,13 @@ namespace TwitchChat
                 {
                     if(ex.Status == HttpStatusCode.NotFound)
                         MessageBox.Show("User not found");
-
-                    throw;
                 }
             }
             NewWhisperUserName = string.Empty;
         }
 
         //  Login to twitch
-        void Login()
+        private void Login()
         {
             LoginWindow.Login(LoginType.Twitch);
             LoginWindow.Login(LoginType.Vk);
@@ -165,17 +177,20 @@ namespace TwitchChat
                 var user = TwitchApiClient.GetUserByToken();
                 _irc.Login(user.Name, "oauth:" + TwitchApiClient.GetToken());
             }
-            catch (Exception ex)
+            catch (ErrorResponseDataException ex)
             {
-                Debug.WriteLine("Unhandled exception while logging in: {0}", ex);
+                if (ex.Status == HttpStatusCode.NotFound)
+                    MessageBox.Show("Cannot login - twitch user not found");
             }
         }
 
         //  Logout from twitch
         public void Logout()
         {
-            foreach (var channel in Channels)
-                channel.UpdateChattersInfo();
+            var channels = Channels.ToList();
+
+            foreach (var channel in channels)
+                channel.PartCommand.Execute(new string[] {});
 
             if (_irc.State == IrcClient.IrcState.Registered)
                 _irc.Quit();
