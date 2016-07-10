@@ -14,13 +14,15 @@ namespace TwitchChat.Code.Commands
             { Command.Song, new List<UserType>() },
             { Command.Music, new List<UserType>() },
             { Command.MyTime, new List<UserType>() },
-            { Command.Help, new List<UserType>() }
+            { Command.Help, new List<UserType>() },
+            { Command.Шейкер, new List<UserType>() }
         };
 
         private static readonly List<Command> UserAttachedCommands = new List<Command>
         {
             Command.Help,
-            Command.MyTime
+            Command.MyTime,
+            Command.Шейкер
         };
 
         public static Dictionary<List<Command>, List<UserType>> GetGroupedAccess()

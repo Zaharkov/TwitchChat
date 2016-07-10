@@ -35,6 +35,9 @@ namespace TwitchChat.Code.Commands
                 case Command.MyTime:
                     commandFunc = MyTimeCommand.GetMyTime;
                     break;
+                case Command.Шейкер:
+                    commandFunc = SheikerCommand.GetSheiker;
+                    break;
                 case Command.Global:
                     return null;
                 default:

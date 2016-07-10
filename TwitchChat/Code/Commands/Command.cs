@@ -9,6 +9,7 @@ namespace TwitchChat.Code.Commands
         Mmr,
         MmrUpdate,
         Help,
-        MyTime
+        MyTime,
+        Шейкер
     }
 }
