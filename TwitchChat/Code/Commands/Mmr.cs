@@ -1,6 +1,6 @@
 ﻿using Database;
 using Database.Entities;
-using PythonApi;
+using DotaClient;
 using RestClientHelper;
 using TwitchChat.Controls;
 
@@ -8,8 +8,10 @@ namespace TwitchChat.Code.Commands
 {
     public static class MmrCommand
     {
-        private static readonly string SteamId = Configuration.GetSetting("SteamID");
+        private static readonly long SteamId = long.Parse(Configuration.GetSetting("SteamID"));
         private static readonly int Delay = int.Parse(Configuration.GetSetting("SteamMmrDelay"));
+        private static readonly string SteamUser = Configuration.GetSetting("SteamUser");
+        private static readonly string SteamPass = Configuration.GetSetting("SteamPass");
 
         public static string GetMmr(MessageEventArgs e, ChatMemberViewModel userModel)
         {
@@ -51,10 +53,11 @@ namespace TwitchChat.Code.Commands
 
         private static void GetMmr(out int? solo, out int? party)
         {
-            var mmr = PythonApiClient.GetMmr(SteamId);
+            var dota = new DotaClientApi(SteamUser, SteamPass, SteamId);
+            dota.GetMmr(out solo, out party);
 
-            solo = mmr.SoloMmr.HasValue && mmr.SoloMmr.Value > 0 ? mmr.SoloMmr : null;
-            party = mmr.PartyMmr.HasValue && mmr.PartyMmr.Value > 0 ? mmr.PartyMmr : null;
+            solo = solo.HasValue && solo.Value > 0 ? solo : null;
+            party = party.HasValue && party.Value > 0 ? party : null;
 
             SqLiteClient.AddToken(AccessTokenType.SoloMmr, solo?.ToString() ?? "0", Delay);
             SqLiteClient.AddToken(AccessTokenType.PartyMmr, party?.ToString() ?? "0", Delay);

@@ -159,9 +159,9 @@
       <Project>{4794d8cf-bdae-48f9-b5e9-e62980b69830}</Project>
       <Name>Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PythonApi\PythonApi.csproj">
-      <Project>{6d22f854-d203-4f8a-ab23-4124f5f16d61}</Project>
-      <Name>PythonApi</Name>
+    <ProjectReference Include="..\DotaClient\DotaClient.csproj">
+      <Project>{be3021d8-2a45-418c-aabe-877b3b01d746}</Project>
+      <Name>DotaClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
       <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
