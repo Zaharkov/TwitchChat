@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using TwitchChat.Controls;
 
@@ -9,22 +8,19 @@ namespace TwitchChat.Code.Commands
     {
         public static string GetHelp(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            var accessList = CommandAccess.Accesses;
+            var groupedAccess = CommandAccess.GetGroupedAccess();
+
             var builder = new StringBuilder();
 
-            foreach (Command command in Enum.GetValues(typeof(Command)))
+            foreach (var grouped in groupedAccess)
             {
-                if(command == Command.Global)
-                    continue;
+                var commands = string.Join(",", grouped.Key.Select(t => $"!{t}"));
 
-                if (!accessList.ContainsKey(command))
-                    builder.Append($"!{command} - доступна всем, ");
-                else
-                {
-                    builder.Append(!accessList[command].Any()
-                        ? $"!{command} - доступна всем, "
-                        : $"!{command} - доступна для {string.Join(",", accessList[command])}, ");
-                }
+                var ending = grouped.Key.Count > 1 ? "ы" : "а";
+
+                builder.Append(!grouped.Value.Any()
+                    ? $"{commands} - доступн{ending} всем; "
+                    : $"{commands} - доступн{ending} для {string.Join(",", grouped.Value)}; ");
             }
 
             return $"/w {e.User} {builder}";
