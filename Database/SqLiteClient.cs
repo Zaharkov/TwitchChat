@@ -134,26 +134,30 @@ namespace Database
             if (!chattersInfo.Any())
                 return;
 
-            using (var command = new SQLiteCommand())
+            foreach (var partion in chattersInfo.Partition(200))
             {
-                var builder = new StringBuilder();
-                var last = chattersInfo.Last();
-                builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds) VALUES");
-
-                var i = 1;
-                foreach (var chatterData in chattersInfo)
+                using (var command = new SQLiteCommand())
                 {
-                    builder.AppendLine($"(@name{i}, @chatName{i}, @type{i}, @seconds{i} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i})){(last == chatterData ? "" : ",")}");
+                    var partionList = partion.ToList();
+                    var builder = new StringBuilder();
+                    var last = partionList.Last();
+                    builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds) VALUES");
 
-                    command.Parameters.Add(new SQLiteParameter($"@name{i}", chatterData.Name));
-                    command.Parameters.Add(new SQLiteParameter($"@chatName{i}", chatterData.ChatName));
-                    command.Parameters.Add(new SQLiteParameter($"@type{i}", chatterData.Type));
-                    command.Parameters.Add(new SQLiteParameter($"@seconds{i}", chatterData.Seconds));
+                    var i = 1;
+                    foreach (var chatterData in partionList)
+                    {
+                        builder.AppendLine($"(@name{i}, @chatName{i}, @type{i}, @seconds{i} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i})){(last == chatterData ? "" : ",")}");
 
-                    i++;
+                        command.Parameters.Add(new SQLiteParameter($"@name{i}", chatterData.Name));
+                        command.Parameters.Add(new SQLiteParameter($"@chatName{i}", chatterData.ChatName));
+                        command.Parameters.Add(new SQLiteParameter($"@type{i}", chatterData.Type));
+                        command.Parameters.Add(new SQLiteParameter($"@seconds{i}", chatterData.Seconds));
+
+                        i++;
+                    }
+                    command.CommandText = builder.ToString();
+                    Execute(command);
                 }
-                command.CommandText = builder.ToString();
-                Execute(command);
             }
         }
 

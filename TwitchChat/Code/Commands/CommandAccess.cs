@@ -16,6 +16,12 @@ namespace TwitchChat.Code.Commands
             { Command.Help, new List<UserType>() }
         };
 
+        private static readonly List<Command> UserAttachedCommands = new List<Command>
+        {
+            Command.Help,
+            Command.MyTime
+        };
+
         public static bool IsHaveAccess(MessageEventArgs e, Command command)
         {
             if (Accesses.ContainsKey(command))
@@ -26,7 +32,7 @@ namespace TwitchChat.Code.Commands
 
         public static bool IsUserAttachedCommand(Command command)
         {
-            return command == Command.Help;
+            return UserAttachedCommands.Contains(command);
         }
     }
 }

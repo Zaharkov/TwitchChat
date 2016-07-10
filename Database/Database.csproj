@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Entities\ChatterData.cs" />
     <Compile Include="Entities\AccessTokenType.cs" />
+    <Compile Include="Partition.cs" />
     <Compile Include="SqLiteClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
