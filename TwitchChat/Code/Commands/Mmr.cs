@@ -3,6 +3,7 @@ using Database.Entities;
 using DotaClient;
 using RestClientHelper;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {

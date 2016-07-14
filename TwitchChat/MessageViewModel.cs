@@ -1,4 +1,4 @@
-﻿using TwitchChat.Code;
+﻿using Twitchiedll.IRC.Events;
 
 namespace TwitchChat
 {
@@ -11,9 +11,16 @@ namespace TwitchChat
 
         public MessageViewModel(MessageEventArgs message)
         {
-            User = string.IsNullOrWhiteSpace(message.DisplayName) ? message.User : message.DisplayName;
+            User = string.IsNullOrWhiteSpace(message.DisplayName) ? message.Username : message.DisplayName;
             Message = message.Message;
-            Color = string.IsNullOrWhiteSpace(message.Color) ? "#000000" : message.Color;
+            Color = string.IsNullOrWhiteSpace(message.ColorHex) ? "#000000" : message.ColorHex;
+        }
+
+        public MessageViewModel(string user, string message, string color)
+        {
+            User = user;
+            Message = message;
+            Color = string.IsNullOrWhiteSpace(color) ?"#000000" : color;
         }
     }
 }

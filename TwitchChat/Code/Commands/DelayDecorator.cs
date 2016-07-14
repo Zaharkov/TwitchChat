@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using TwitchChat.Code.Helpers;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {

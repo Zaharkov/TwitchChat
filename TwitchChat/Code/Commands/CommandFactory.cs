@@ -1,5 +1,6 @@
 ﻿using System;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
@@ -45,11 +46,11 @@ namespace TwitchChat.Code.Commands
             }
 
             var result = CommandAccess.IsUserAttachedCommand(command)
-                ? DelayDecorator.Get(e.User, command).Execute(commandFunc, e, userModel)
+                ? DelayDecorator.Get(e.Username, command).Execute(commandFunc, e, userModel)
                 : DelayDecorator.Get(command).Execute(commandFunc, e, userModel);
 
             if (!string.IsNullOrEmpty(result) && command != Command.Help)
-                result = $"БОТ: @{e.User} {result}";
+                result = $"БОТ: @{e.Username} {result}";
 
             return result;
         }

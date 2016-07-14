@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Twitchiedll.IRC;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class CommandAccess
     {
-        private static readonly Dictionary<Command, List<UserType>> Accesses = new Dictionary<Command, List<UserType>>
+        private static readonly Dictionary<Command, UserType> Accesses = new Dictionary<Command, UserType>
         {
-            { Command.Global, new List<UserType>() },
-            { Command.Mmr, new List<UserType>() },
-            { Command.MmrUpdate, new List<UserType> { UserType.Broadcaster } },
-            { Command.Song, new List<UserType>() },
-            { Command.Music, new List<UserType>() },
-            { Command.MyTime, new List<UserType>() },
-            { Command.Help, new List<UserType>() },
-            { Command.Шейкер, new List<UserType>() }
+            { Command.Global, UserType.Default },
+            { Command.Mmr, UserType.Default },
+            { Command.MmrUpdate, UserType.Broadcaster },
+            { Command.Song, UserType.Default },
+            { Command.Music, UserType.Default },
+            { Command.MyTime, UserType.Default },
+            { Command.Help, UserType.Default },
+            { Command.Шейкер, UserType.Default }
         };
 
         private static readonly List<Command> UserAttachedCommands = new List<Command>
@@ -25,10 +27,10 @@ namespace TwitchChat.Code.Commands
             Command.Шейкер
         };
 
-        public static Dictionary<List<Command>, List<UserType>> GetGroupedAccess()
+        public static Dictionary<List<Command>, UserType> GetGroupedAccess()
         {
-            var groupedAccess = new Dictionary<List<Command>, List<UserType>>();
-            var copy = Accesses.ToDictionary(k => k.Key, v => v.Value.ToList());
+            var groupedAccess = new Dictionary<List<Command>, UserType>();
+            var copy = Accesses.ToDictionary(k => k.Key, v => v.Value);
 
             foreach (var access in copy)
             {
@@ -38,7 +40,7 @@ namespace TwitchChat.Code.Commands
                 var added = false;
                 foreach (var grouped in groupedAccess)
                 {
-                    if (ScrambledEquals(access.Value, grouped.Value))
+                    if (access.Value == grouped.Value)
                     {
                         grouped.Key.Add(access.Key);
                         added = true;
@@ -61,7 +63,7 @@ namespace TwitchChat.Code.Commands
                     if (grouped.Key.Any(t => t == command))
                         inList = true;
 
-                    if (!grouped.Value.Any())
+                    if (grouped.Value == UserType.Default)
                         emptyUserList = grouped.Key;
                 }
 
@@ -71,7 +73,7 @@ namespace TwitchChat.Code.Commands
                         emptyUserList.Add(command);
                     else
                     {
-                        groupedAccess.Add(new List<Command> { command }, new List<UserType>());
+                        groupedAccess.Add(new List<Command> { command }, UserType.Default);
                     }
                 }
             }
@@ -81,11 +83,8 @@ namespace TwitchChat.Code.Commands
 
         public static bool IsHaveAccess(MessageEventArgs e, Command command)
         {
-            if (e.User == "artemzaharkov")
-                return true;
-
             if (Accesses.ContainsKey(command))
-                return !Accesses[command].Any() || Accesses[command].Contains(e.UserType);
+                return Accesses[command] == UserType.Default || Accesses[command].HasFlag(e.UserType);
 
             return true;
         }
@@ -93,34 +92,6 @@ namespace TwitchChat.Code.Commands
         public static bool IsUserAttachedCommand(Command command)
         {
             return UserAttachedCommands.Contains(command);
-        }
-
-        private static bool ScrambledEquals<T>(IEnumerable<T> list1, IEnumerable<T> list2)
-        {
-            var cnt = new Dictionary<T, int>();
-            foreach (T s in list1)
-            {
-                if (cnt.ContainsKey(s))
-                {
-                    cnt[s]++;
-                }
-                else
-                {
-                    cnt.Add(s, 1);
-                }
-            }
-            foreach (T s in list2)
-            {
-                if (cnt.ContainsKey(s))
-                {
-                    cnt[s]--;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return cnt.Values.All(c => c == 0);
         }
     }
 }

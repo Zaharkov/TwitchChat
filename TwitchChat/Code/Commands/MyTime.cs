@@ -1,5 +1,6 @@
 ﻿using Database;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {

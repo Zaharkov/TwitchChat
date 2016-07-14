@@ -5,7 +5,7 @@ using TwitchChat.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -14,17 +14,13 @@ using Database;
 using Database.Entities;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls
 {
     public class ChannelViewModel : ViewModelBase
     {
         private readonly TwitchIrcClient _irc;
-
-        //  Store channel specific status
-        private bool _mod;
-        private bool _subscriber;
-
         private readonly List<CancellationTokenSource> _cancellationTokens;
 
         //  The badges that are taken from https://api.twitch.tv/kraken/chat/{0}/badges
@@ -72,11 +68,17 @@ namespace TwitchChat.Controls
         {
             _irc = irc;
 
-            _irc.MessageReceived += MessageReceived;
-            _irc.UserParted += UserParted;
-            _irc.UserJoined += UserJoined;
-            _irc.NamesReceived += NamesReceived;
-            _irc.UserStateReceived += UserStateReceived;
+            _irc.OnRawMessage += OnRawMessage;
+            _irc.OnMessage += OnMessage;
+            _irc.OnPing += OnPing;
+            //_irc.OnRoomState;
+            //_irc.OnMode; TODO move to moderator list
+            _irc.OnNames += OnNames;
+            _irc.OnJoin += OnJoin;
+            _irc.OnPart += OnPart;
+            //_irc.OnNotice;
+            //_irc.OnSubscribe; TODO 
+            //_irc.OnClearChat; TODO
 
             _channelName = channelName;
 
@@ -90,25 +92,26 @@ namespace TwitchChat.Controls
             _cancellationTokens = TimerFactory.InitTimers(this);
         }
 
-        private void UserStateReceived(object sender, UserStateEventArgs e)
+        private void OnRawMessage(string buffer)
         {
-            if (e.Channel == ChannelName)
-            {
-                _mod = e.Mod;
-                _subscriber = e.Subscriber;
-            }
+            Debug.WriteLine(buffer);
         }
 
-        private void NamesReceived(object sender, NamesReceivedEventArgs e)
+        private void OnPing(string buffer)
         {
-            if (e.Channel == ChannelName)
+            _irc.Pong(buffer);
+        }
+
+        private void OnNames(NamesEventArgs e)
+        {
+            if (e.Names.ContainsKey(ChannelName))
             {
                 //  Add names to general viewer group
                 var group = GetGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    foreach (var name in e.Names)
+                    foreach (var name in e.Names[ChannelName])
                     {
                         if (!group.Members.Any(x => name.Equals(x.Name)))
                             group.Members.Add(new ChatMemberViewModel { Name = name });
@@ -117,7 +120,7 @@ namespace TwitchChat.Controls
             }
         }
 
-        private void UserJoined(object sender, TwitchEventArgs e)
+        private void OnJoin(JoinEventArgs e)
         {
             if (e.Channel == ChannelName)
             {
@@ -126,8 +129,8 @@ namespace TwitchChat.Controls
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (!group.Members.Any(x => e.User.Equals(x.Name)))
-                        group.Members.Add(new ChatMemberViewModel { Name = e.User });
+                    if (!group.Members.Any(x => e.Username.Equals(x.Name)))
+                        group.Members.Add(new ChatMemberViewModel { Name = e.Username });
                 });
             }
         }
@@ -151,13 +154,13 @@ namespace TwitchChat.Controls
             return user;
         }
 
-        private void UserParted(object sender, TwitchEventArgs e)
+        private void OnPart(PartEventArgs e)
         {
             if (e.Channel == ChannelName)
             {
                 var group = GetGroup();
 
-                var user = group.Members.FirstOrDefault(x => e.User.Equals(x.Name));
+                var user = group.Members.FirstOrDefault(x => e.Username.Equals(x.Name));
                 if (user != null)
                 {
                     //  Remove once user is gound and removed
@@ -169,7 +172,7 @@ namespace TwitchChat.Controls
             }
         }
 
-        private void MessageReceived(object sender, MessageEventArgs e)
+        private void OnMessage(MessageEventArgs e)
         {
             if (e.Channel == ChannelName)
             {
@@ -182,8 +185,8 @@ namespace TwitchChat.Controls
 
                 if (IsChatCommand(e))
                 {
-                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.User));
-
+                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username));
+                
                     if(!string.IsNullOrEmpty(result))
                         _irc.Message(ChannelName, result);
                 }
@@ -197,30 +200,20 @@ namespace TwitchChat.Controls
 
         private void Send()
         {
-            //  Populate a name value collection to fake a MessageEventArg
-            NameValueCollection nvc = new NameValueCollection
-            {
-                ["color"] = _irc.Color,
-                ["display-name"] = _irc.DisplayName,
-                ["mod"] = _mod ? "1" : "0",
-                ["subscriber"] = _subscriber ? "1" : "0",
-                ["turbo"] = _irc.Turbo ? "1" : "0",
-                ["user-type"] = _irc.UserType == UserType.Moderator
-                    ? "mod"
-                    : _irc.UserType == UserType.GlobalMod
-                        ? "global_mod"
-                        : _irc.UserType == UserType.Admin
-                            ? "admin"
-                            : _irc.UserType == UserType.Staff
-                                ? "staff"
-                                : ""
-            };
-            Messages.Add(new ChatMessageViewModel(new MessageEventArgs(nvc, Message) { User = _irc.User, Channel = ChannelName }, _badges));
-            if (Messages.Count > App.Maxmessages)
-                Messages.RemoveAt(0);
+            if (!_irc.UserStateInfo.ContainsKey(_channelName))
+                throw new Exception("Channel if undefined! UserState not sended?");
 
-            _irc.Message(_channelName, Message);
-            Message = string.Empty;
+            var userInfo = _irc.UserStateInfo[_channelName];
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, _badges));
+                if (Messages.Count > App.Maxmessages)
+                    Messages.RemoveAt(0);
+
+                _irc.Message(_channelName, Message);
+                Message = string.Empty;
+            });
         }
 
         private void Part()

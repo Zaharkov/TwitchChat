@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
 using TwitchChat.Controls;
+using Twitchiedll.IRC;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
@@ -18,12 +20,12 @@ namespace TwitchChat.Code.Commands
 
                 var ending = grouped.Key.Count > 1 ? "ы" : "а";
 
-                builder.Append(!grouped.Value.Any()
+                builder.Append(grouped.Value == UserType.Default
                     ? $"{commands} - доступн{ending} всем; "
                     : $"{commands} - доступн{ending} для {string.Join(",", grouped.Value)}; ");
             }
 
-            return $"/w {e.User} {builder}";
+            return $"/w {e.Username} {builder}";
         }
     }
 }

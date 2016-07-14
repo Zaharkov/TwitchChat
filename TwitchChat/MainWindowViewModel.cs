@@ -3,17 +3,17 @@ using TwitchApi.Utils;
 using TwitchChat.Code;
 using TwitchChat.Dialog;
 using TwitchChat.ViewModel;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Net;
+using System.Windows;
+using System.Windows.Input;
+using Twitchiedll.IRC;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat
 {
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Net;
-    using System.Windows;
-    using System.Windows.Input;
-
     public class MainWindowViewModel : ViewModelBase
     {
         //  Main IRC client
@@ -46,7 +46,7 @@ namespace TwitchChat
             }
         }
 
-        public bool IsLoggedIn => _irc?.State == IrcClient.IrcState.Registered;
+        public bool IsLoggedIn => _irc?.State == IrcState.Registered;
 
         public ICommand LoginCommand { get; private set; }
         public ICommand LogoutCommand { get; private set; }
@@ -74,9 +74,9 @@ namespace TwitchChat
         {
             _irc = new TwitchIrcClient();
 
-            _irc.WhisperReceived += OnWhisperReceived;
-            _irc.Connected += OnConnected;
-            _irc.Disconnected += OnDisconnected;
+            _irc.OnWhisper += OnWhisperReceived;
+            //_irc.Connected += OnConnected;
+            //_irc.Disconnected += OnDisconnected;
 
             //  Setup delegate commands
             LoginCommand = new RelayCommand(Login, () => !IsLoggedIn);
@@ -90,15 +90,15 @@ namespace TwitchChat
             Whispers = new ObservableCollection<WhisperWindowViewModel>();
         }
 
-        private void OnDisconnected(object sender, DisconnectEventArgs e)
-        {
-            NotifyPropertyChanged("IsLoggedIn");
-        }
-
-        private void OnConnected(object sender, EventArgs e)
-        {
-            NotifyPropertyChanged("IsLoggedIn");
-        }
+        //private void OnDisconnected(object sender, DisconnectEventArgs e)
+        //{
+        //    NotifyPropertyChanged("IsLoggedIn");
+        //}
+        //
+        //private void OnConnected(object sender, EventArgs e)
+        //{
+        //    NotifyPropertyChanged("IsLoggedIn");
+        //}
 
         //  Join a new channel
         private void Join()
@@ -135,24 +135,24 @@ namespace TwitchChat
         }
 
         //  Open a whisper once a whisper is received
-        private void OnWhisperReceived(object sender, MessageEventArgs e)
+        private void OnWhisperReceived(MessageEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (Whispers.All(x => x.UserName.ToLower() != e.User.ToLower()))
-                    Whispers.Add(new WhisperWindowViewModel(_irc, e.User, e));
+                if (!Whispers.Any(x => x.UserName.Equals(e.Username)))
+                    Whispers.Add(new WhisperWindowViewModel(_irc, e.Username, e));
             });
         }
 
         //  Start a new private message
         private void Whisper()
         {
-            if (Whispers.All(x => x.UserName.ToLower() != NewWhisperUserName.ToLower()))
+            if (!Whispers.Any(x => x.UserName.Equals(NewWhisperUserName)))
             {
                 try
                 {
                     var result = TwitchApiClient.GetUserByName(NewWhisperUserName.ToLower());
-                    if (result.Name.ToLower() == _irc.User.ToLower())
+                    if (result.Name.Equals(_irc.User))
                         MessageBox.Show("Unable to message self");
                     else
                         Whispers.Add(new WhisperWindowViewModel(_irc, NewWhisperUserName));
@@ -192,7 +192,7 @@ namespace TwitchChat
             foreach (var channel in channels)
                 channel.PartCommand.Execute(new string[] {});
 
-            if (_irc.State == IrcClient.IrcState.Registered)
+            if (_irc.State == IrcState.Registered)
                 _irc.Quit();
         }
     }

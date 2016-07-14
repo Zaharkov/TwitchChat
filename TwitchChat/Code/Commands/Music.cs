@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using RestClientHelper;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Events;
 using VkApi;
 
 namespace TwitchChat.Code.Commands

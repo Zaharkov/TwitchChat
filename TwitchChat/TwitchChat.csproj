@@ -108,7 +108,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Code\IrcClient.cs" />
     <Compile Include="Code\TwitchIrcClient.cs" />
     <Compile Include="Controls\Channel.xaml.cs">
       <DependentUpon>Channel.xaml</DependentUpon>
@@ -170,6 +169,10 @@
     <ProjectReference Include="..\TwitchApi\TwitchApi.csproj">
       <Project>{cf15d97a-d0b5-4c4f-8f15-9ab6bae5ec59}</Project>
       <Name>TwitchApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Twitchie\Twitchiedll\Twitchiedll.csproj">
+      <Project>{1fa9eaff-12ac-4fb2-8013-770e6904e6de}</Project>
+      <Name>Twitchiedll</Name>
     </ProjectReference>
     <ProjectReference Include="..\VkApi\VkApi.csproj">
       <Project>{9e1c9ce7-e1ea-4644-9517-df4d06fa3f18}</Project>

@@ -1,3 +1,6 @@
 [submodule "SteamKit"]
 	path = SteamKit
 	url = git://github.com/Zaharkov/SteamKit.git
+[submodule "Twitchie"]
+	path = Twitchie
+	url = https://github.com/Zaharkov/Twitchie.git

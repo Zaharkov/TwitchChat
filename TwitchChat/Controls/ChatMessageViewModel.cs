@@ -1,6 +1,7 @@
 ﻿using TwitchApi.Entities;
-using TwitchChat.Code;
 using System.Collections.ObjectModel;
+using Twitchiedll.IRC;
+using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls
 {
@@ -11,21 +12,32 @@ namespace TwitchChat.Controls
 
         public ChatMessageViewModel(MessageEventArgs message, Badges badges) : base(message)
         {
+            InitBadges(message.UserType, badges);
+        }
+
+        public ChatMessageViewModel(UserType type, string user, string message, string color, Badges badges) 
+            : base(user, message, color)
+        {
+            InitBadges(type, badges);
+        }
+
+        private void InitBadges(UserType type, Badges badges)
+        {
             Badges = new ObservableCollection<string>();
 
-            if (message.UserType == UserType.Admin)
+            if (type.HasFlag(UserType.Admin) && badges.Admin != null)
                 Badges.Add(badges.Admin.Image);
-            if (message.UserType == UserType.GlobalMod)
+            if (type.HasFlag(UserType.Globalmoderator) && badges.GlobalMod != null)
                 Badges.Add(badges.GlobalMod.Image);
-            if (message.UserType == UserType.Staff)
+            if (type.HasFlag(UserType.Staff) && badges.Staff != null)
                 Badges.Add(badges.Staff.Image);
-            if (message.UserType == UserType.Subscriber)
+            if (type.HasFlag(UserType.Subscriber) && badges.Subscriber != null)
                 Badges.Add(badges.Subscriber.Image);
-            if (message.UserType == UserType.Moderator)
+            if (type.HasFlag(UserType.Moderator) && badges.Mod != null)
                 Badges.Add(badges.Mod.Image);
-            if (message.UserType == UserType.Turbo)
+            if (type.HasFlag(UserType.Turbo) && badges.Turbo != null)
                 Badges.Add(badges.Turbo.Image);
-            if (message.UserType == UserType.Broadcaster)
+            if (type.HasFlag(UserType.Broadcaster) && badges.Broadcaster != null)
                 Badges.Add(badges.Broadcaster.Image);
         }
     }
