@@ -46,8 +46,20 @@ namespace TwitchChat.Code
 
         private void OnGetUserState(UserStateEventArgs state)
         {
-            if(!UserStateInfo.ContainsKey(state.Channel))
+            if(UserStateInfo.ContainsKey(state.Channel))
+                UserStateInfo[state.Channel] = state;
+            else
                 UserStateInfo.Add(state.Channel, state);
+
+            var allMod = true;
+            foreach (var userState in UserStateInfo)
+            {
+                if (!userState.Value.UserType.HasFlag(UserType.Moderator))
+                    allMod = false;
+            }
+
+            if (allMod)
+                MessageHandler.GlobalMessageLimit = MessageHandler.ModeratorUserLimit;
         }
 
         /// <summary>
