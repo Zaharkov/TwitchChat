@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TwitchChat.Code;
 using TwitchChat.ViewModel;
 using Twitchiedll.IRC.Events;
@@ -37,6 +38,8 @@ namespace TwitchChat.Dialog
             }
         }
 
+        public event EventHandler OnRemove;
+
         //  Collectrion of all messages
         public ObservableCollection<MessageViewModel> Messages { get; set; } = new ObservableCollection<MessageViewModel>();
 
@@ -53,6 +56,11 @@ namespace TwitchChat.Dialog
 
             if (e != null)
                 WhisperReceived(e);
+        }
+
+        public void Remove(object sender, EventArgs args)
+        {
+            OnRemove?.Invoke(this, args);
         }
 
         private void WhisperReceived(MessageEventArgs e)

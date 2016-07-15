@@ -1,4 +1,6 @@
-﻿using Database;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
+using Database;
 
 namespace TwitchChat
 {
@@ -37,20 +39,38 @@ namespace TwitchChat
             mainWindow.Show();
         }
 
-        private void Whispers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Whispers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach(WhisperWindowViewModel vm in e.NewItems)
+            if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                var whisperWindow = new WhisperWindow {DataContext = vm};
-                whisperWindow.Closing += WhisperWindow_Closing;
-                whisperWindow.Show();
+                return;
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (WhisperWindowViewModel vm in e.NewItems)
+                {
+                    var whisperWindow = new WhisperWindow {DataContext = vm};
+                    vm.OnRemove += (whisperSender, ee) =>
+                    {
+                        _vm.Whispers.Remove(whisperSender as WhisperWindowViewModel);
+                        whisperWindow.Close();
+                    };
+                    whisperWindow.Closing += WhisperWindow_Closing;
+                    whisperWindow.Show();
+                }
             }
         }
 
-        private void WhisperWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void WhisperWindow_Closing(object sender, CancelEventArgs e)
         {
+            var window = sender as WhisperWindow;
+
+            if (window == null)
+                return;
+
             //  Remove a whipser once the window is closed
-            _vm.Whispers.Remove(sender as WhisperWindowViewModel);
+            _vm.Whispers.Remove(window.DataContext as WhisperWindowViewModel);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Input;
+using TwitchChat.Controls;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
@@ -46,7 +47,7 @@ namespace TwitchChat
             }
         }
 
-        public bool IsLoggedIn => _irc?.State == IrcState.Registered;
+        private bool IsLogged => _irc?.State == IrcState.Registered;
 
         public ICommand LoginCommand { get; private set; }
         public ICommand LogoutCommand { get; private set; }
@@ -54,8 +55,8 @@ namespace TwitchChat
         public ICommand JoinCommand { get; private set; }
         public ICommand WhisperCommand { get; private set; }
 
-        private Controls.ChannelViewModel _currentChannel;
-        public Controls.ChannelViewModel CurrentChannel
+        private ChannelViewModel _currentChannel;
+        public ChannelViewModel CurrentChannel
         {
             get { return _currentChannel; }
             set
@@ -66,7 +67,7 @@ namespace TwitchChat
         }
 
         //  Stores all joined channels
-        public ObservableCollection<Controls.ChannelViewModel> Channels { get; set; }
+        public ObservableCollection<ChannelViewModel> Channels { get; set; }
         //  Stores all active whisper sessions
         public ObservableCollection<WhisperWindowViewModel> Whispers { get; set; }
 
@@ -74,30 +75,30 @@ namespace TwitchChat
         {
             _irc = new TwitchIrcClient();
 
-            _irc.OnWhisper += OnWhisperReceived;
+            _irc.OnWhisper += OnWhisper;
             //_irc.Connected += OnConnected;
             //_irc.Disconnected += OnDisconnected;
 
             //  Setup delegate commands
-            LoginCommand = new RelayCommand(Login, () => !IsLoggedIn);
-            LogoutCommand = new RelayCommand(Logout, () => IsLoggedIn);
+            LoginCommand = new RelayCommand(Login, () => !IsLogged);
+            LogoutCommand = new RelayCommand(Logout, () => IsLogged);
 
-            JoinCommand = new RelayCommand(Join, () => IsLoggedIn);
-            WhisperCommand = new RelayCommand(Whisper, () => IsLoggedIn);
+            JoinCommand = new RelayCommand(Join, () => IsLogged);
+            WhisperCommand = new RelayCommand(Whisper, () => IsLogged);
 
             //  Setup observable collections
-            Channels = new ObservableCollection<Controls.ChannelViewModel>();
+            Channels = new ObservableCollection<ChannelViewModel>();
             Whispers = new ObservableCollection<WhisperWindowViewModel>();
         }
 
         //private void OnDisconnected(object sender, DisconnectEventArgs e)
         //{
-        //    NotifyPropertyChanged("IsLoggedIn");
+        //    NotifyPropertyChanged("IsLogged");
         //}
         //
         //private void OnConnected(object sender, EventArgs e)
         //{
-        //    NotifyPropertyChanged("IsLoggedIn");
+        //    NotifyPropertyChanged("IsLogged");
         //}
 
         //  Join a new channel
@@ -109,7 +110,7 @@ namespace TwitchChat
                 {
                     var result = TwitchApiClient.GetUserByName(NewChannelName.ToLower());
 
-                    var vm = new Controls.ChannelViewModel(_irc, result.Name);
+                    var vm = new ChannelViewModel(_irc, result.Name);
                     vm.Parted += OnParted;
                     Channels.Add(vm);
                     CurrentChannel = vm;
@@ -126,7 +127,7 @@ namespace TwitchChat
         //  Channel was parted
         private void OnParted(object sender, EventArgs e)
         {
-            var vm = sender as Controls.ChannelViewModel;
+            var vm = sender as ChannelViewModel;
 
             if (vm == null)
                 return;
@@ -135,7 +136,7 @@ namespace TwitchChat
         }
 
         //  Open a whisper once a whisper is received
-        private void OnWhisperReceived(MessageEventArgs e)
+        private void OnWhisper(MessageEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -175,6 +176,10 @@ namespace TwitchChat
             try
             {
                 var user = TwitchApiClient.GetUserByToken();
+
+                if(_irc.State == IrcState.Closed)
+                    _irc.Reconnect();
+
                 _irc.Login(user.Name, "oauth:" + TwitchApiClient.GetToken());
             }
             catch (ErrorResponseDataException ex)
@@ -188,9 +193,13 @@ namespace TwitchChat
         public void Logout()
         {
             var channels = Channels.ToList();
+            var whispers = Whispers.ToList();
 
             foreach (var channel in channels)
                 channel.PartCommand.Execute(new string[] {});
+
+            foreach (var whisper in whispers)
+                whisper.Remove(whisper, EventArgs.Empty);
 
             if (_irc.State == IrcState.Registered)
                 _irc.Quit();
