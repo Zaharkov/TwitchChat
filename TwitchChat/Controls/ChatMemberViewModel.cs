@@ -7,6 +7,18 @@ namespace TwitchChat.Controls
     {
         public string Name { get; set; }
 
-        public Stopwatch Timer { get; } = Stopwatch.StartNew();
+        private Stopwatch Timer { get; } = Stopwatch.StartNew();
+
+        public long GetTime()
+        {
+            return (long) Timer.Elapsed.TotalSeconds;
+        }
+
+        public long GetTimeAndRestart()
+        {
+            var time = (long) Timer.Elapsed.TotalSeconds;
+            Timer.Restart();
+            return time;
+        }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using TwitchApi;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
@@ -11,15 +10,19 @@ namespace TwitchChat.Code
 {
     public class TwitchIrcClient : Twitchie
     {
-        private Thread _listenThread;
-        public IrcState State { get; private set; }
-
-        public string User { get; set; }
-
-        public Dictionary<string, UserStateEventArgs> UserStateInfo = new Dictionary<string, UserStateEventArgs>();
-
+        private Task _listenTask;
         private readonly string _server;
         private readonly int _port;
+
+        public IrcState State { get; private set; }
+        public string User { get; set; }
+        public Dictionary<string, UserStateEventArgs> UserStateInfo = new Dictionary<string, UserStateEventArgs>();
+
+        public delegate void ErrorEventHandler(Exception e);
+        public delegate void DisconnectEventHandler();
+
+        public event DisconnectEventHandler OnDisconnect;
+        public event ErrorEventHandler OnError;
 
         public TwitchIrcClient()
         {
@@ -67,39 +70,34 @@ namespace TwitchChat.Code
         {
             State = IrcState.Closing;
             base.Quit();
-            _listenThread.Abort();
-            _listenThread.Join();
+            _listenTask.Wait();
             State = IrcState.Closed;
         }
 
         private void Run()
         {
-            _listenThread = new Thread(() =>
+            _listenTask = Task.Run(() =>
             {
                 try
                 {
                     Listen();
                 }
-                catch (ThreadAbortException)
-                {
-
-                }
                 catch (Exception ex)
                 {
                     State = IrcState.Error;
-                    Debug.WriteLine($"Unhandled Exception: {ex}");
-                    throw;
+                    OnError?.Invoke(ex);
                 }
                 finally
                 {
                     Dispose();
                 }
 
-                State = IrcState.Disconnected;
-
+                if (State != IrcState.Closing)
+                {
+                    State = IrcState.Disconnected;
+                    OnDisconnect?.Invoke();
+                }
             });
-
-            _listenThread.Start();
         }
     }
 }

@@ -51,9 +51,9 @@ namespace TwitchChat
                 foreach (WhisperWindowViewModel vm in e.NewItems)
                 {
                     var whisperWindow = new WhisperWindow {DataContext = vm};
-                    vm.OnRemove += (whisperSender, ee) =>
+                    vm.OnRemove += (model) =>
                     {
-                        _vm.Whispers.Remove(whisperSender as WhisperWindowViewModel);
+                        _vm.Whispers.Remove(model);
                         whisperWindow.Close();
                     };
                     whisperWindow.Closing += WhisperWindow_Closing;

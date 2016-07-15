@@ -76,8 +76,8 @@ namespace TwitchChat
             _irc = new TwitchIrcClient();
 
             _irc.OnWhisper += OnWhisper;
-            //_irc.Connected += OnConnected;
-            //_irc.Disconnected += OnDisconnected;
+            _irc.OnDisconnect += OnDisconnect;
+            _irc.OnError += OnError;
 
             //  Setup delegate commands
             LoginCommand = new RelayCommand(Login, () => !IsLogged);
@@ -91,15 +91,16 @@ namespace TwitchChat
             Whispers = new ObservableCollection<WhisperWindowViewModel>();
         }
 
-        //private void OnDisconnected(object sender, DisconnectEventArgs e)
-        //{
-        //    NotifyPropertyChanged("IsLogged");
-        //}
-        //
-        //private void OnConnected(object sender, EventArgs e)
-        //{
-        //    NotifyPropertyChanged("IsLogged");
-        //}
+        private void OnError(Exception e)
+        {
+            throw e;
+        }
+
+        private void OnDisconnect()
+        {
+            Logout();
+            MessageBox.Show("Server was disconnected");
+        }
 
         //  Join a new channel
         private void Join()
@@ -125,14 +126,9 @@ namespace TwitchChat
         }
 
         //  Channel was parted
-        private void OnParted(object sender, EventArgs e)
+        private void OnParted(ChannelViewModel model)
         {
-            var vm = sender as ChannelViewModel;
-
-            if (vm == null)
-                return;
-
-            Channels.Remove(vm);
+            Channels.Remove(model);
         }
 
         //  Open a whisper once a whisper is received

@@ -8,7 +8,7 @@ namespace TwitchChat.Code.Commands
     {
         public static string GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            var chatTime = (long)userModel.Timer.Elapsed.TotalSeconds;
+            var chatTime = userModel.GetTime();
             var dbTime = SqLiteClient.GetChatterTime(userModel.Name, e.Channel);
 
             var totalTime = chatTime + dbTime;

@@ -14,6 +14,7 @@ using Database;
 using Database.Entities;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
+using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls
@@ -62,7 +63,8 @@ namespace TwitchChat.Controls
         public ICommand PartCommand { get; private set; }
 
         //  Event to notify other models channel has been parted
-        public event EventHandler Parted;
+        public delegate void PartedEventHandler(ChannelViewModel model);
+        public event PartedEventHandler Parted;
 
         public ChannelViewModel(TwitchIrcClient irc, string channelName)
         {
@@ -233,9 +235,11 @@ namespace TwitchChat.Controls
 
             UpdateChattersInfo();
 
-            _irc.Part(_channelName);
+            if (_irc.State == IrcState.Registered)
+                _irc.Part(_channelName);
+
             //  Raise the event.  MainWindowViewModel uses this to remove from list of channels
-            Parted?.Invoke(this, EventArgs.Empty);
+            Parted?.Invoke(this);
         }
 
         #region Helpers
@@ -266,7 +270,7 @@ namespace TwitchChat.Controls
                 var group = GetGroup(chatterType).Members;
                 foreach (var user in group)
                 {
-                    listForUpdate.Add(new ChatterData(user.Name, ChannelName, chatterType.ToString(), (long)user.Timer.Elapsed.TotalSeconds));
+                    listForUpdate.Add(new ChatterData(user.Name, ChannelName, chatterType.ToString(), user.GetTimeAndRestart()));
                 }
             }
 

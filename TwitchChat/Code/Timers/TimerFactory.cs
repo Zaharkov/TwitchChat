@@ -54,7 +54,7 @@ namespace TwitchChat.Code.Timers
                                     if (!newUsers.Chatters[chatterType].Any(t => t.Equals(user.Name)))
                                     {
                                         forDelete.Add(user);
-                                        listForUpdate.Add(new ChatterData(user.Name, channelModel.ChannelName, chatterType.ToString(), (long)user.Timer.Elapsed.TotalSeconds));
+                                        listForUpdate.Add(new ChatterData(user.Name, channelModel.ChannelName, chatterType.ToString(), user.GetTimeAndRestart()));
                                     }
                                 }
 

@@ -38,7 +38,8 @@ namespace TwitchChat.Dialog
             }
         }
 
-        public event EventHandler OnRemove;
+        public delegate void RemoveEventHandler(WhisperWindowViewModel model);
+        public event RemoveEventHandler OnRemove; 
 
         //  Collectrion of all messages
         public ObservableCollection<MessageViewModel> Messages { get; set; } = new ObservableCollection<MessageViewModel>();
@@ -60,7 +61,7 @@ namespace TwitchChat.Dialog
 
         public void Remove(object sender, EventArgs args)
         {
-            OnRemove?.Invoke(this, args);
+            OnRemove?.Invoke(this);
         }
 
         private void WhisperReceived(MessageEventArgs e)
