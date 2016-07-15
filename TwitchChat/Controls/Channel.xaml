@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:TwitchChat.Controls"
              xmlns:h="clr-namespace:TwitchChat.Code.Helpers"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance local:ChannelViewModel}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -32,7 +32,7 @@
             </TreeView.Resources>
         </TreeView>
         <ScrollViewer Grid.Row="0" Grid.Column="2" HorizontalScrollBarVisibility="Disabled" h:ScrollViewerEx.AutoScroll="True" Padding="4">
-            <ItemsControl ItemsSource="{Binding Messages}">
+            <ItemsControl ItemsSource="{Binding Messages}" d:DataContext="{d:DesignInstance local:ChannelViewModel}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock TextWrapping="WrapWithOverflow">
@@ -52,8 +52,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <Run Text="{Binding User, StringFormat={}{0}: }" FontWeight="Bold" Foreground="{Binding Color}" />
-                            <Run Text="{Binding Message}" />
+                            <Run Text="{Binding User, StringFormat={}{0}: }" FontWeight="Bold" Foreground="{Binding ColorUser}" />
+                            <Run Text="{Binding Message}" Foreground="{Binding ColorMessage}"/>
                         </TextBlock>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -71,6 +71,6 @@
             </TextBox>
             <Button Grid.Column="1" Padding="10, 4" Command="{Binding SendCommand}">Send</Button>
         </Grid>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Left" ResizeBehavior="PreviousAndNext" Width="2" />
+        <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" ResizeBehavior="PreviousAndNext" Width="2" />
     </Grid>
 </UserControl>

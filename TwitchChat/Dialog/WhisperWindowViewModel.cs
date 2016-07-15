@@ -1,7 +1,9 @@
-﻿using TwitchChat.Code;
+﻿using System.Collections.Generic;
+using TwitchChat.Code;
 using TwitchChat.ViewModel;
 using Twitchiedll.IRC.Events;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -69,7 +71,17 @@ namespace TwitchChat.Dialog
         //  Send a whisper to chosen user
         private void Send()
         {
-            Messages.Add(new MessageViewModel(_irc.User, Message,  null));
+            var userInfo = _irc.UserStateInfo.FirstOrDefault();
+            var color = userInfo.Equals(default(KeyValuePair<string, UserStateEventArgs>)) ? null : userInfo.Value.ColorHex;
+
+            var isAction = false;
+            if (Message.StartsWith("/me"))
+            {
+                isAction = true;
+                Message = Message.Remove(0, 3).TrimStart(' ');
+            }
+
+            Messages.Add(new MessageViewModel(_irc.User, Message, color, isAction));
             if (Messages.Count > App.Maxmessages)
                 Messages.RemoveAt(0);
 

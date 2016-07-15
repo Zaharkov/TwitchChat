@@ -30,8 +30,8 @@ namespace TwitchChat.Dialog
                     var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Twitch);
                     if (string.IsNullOrEmpty(token))
                     {
-                        wbMain.Navigating += OnNavigatingTwitch;
-                        wbMain.Navigate(TwitchApiClient.AuthorizeUrl);
+                        WbMain.Navigating += OnNavigatingTwitch;
+                        WbMain.Navigate(TwitchApiClient.AuthorizeUrl);
                     }
                     else
                     {
@@ -45,8 +45,8 @@ namespace TwitchChat.Dialog
                     var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Vk, 3600 * 12);
                     if (string.IsNullOrEmpty(token))
                     {
-                        wbMain.Navigating += OnNavigatingVk;
-                        wbMain.Navigate(VkApiClient.AuthorizeUrl);
+                        WbMain.Navigating += OnNavigatingVk;
+                        WbMain.Navigate(VkApiClient.AuthorizeUrl);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace TwitchChat.Dialog
                             break;
                     }
                 }
-                wbMain.Navigating -= OnNavigatingTwitch;
+                WbMain.Navigating -= OnNavigatingTwitch;
                 Close();
             }
         }
@@ -99,7 +99,7 @@ namespace TwitchChat.Dialog
                 var token = VkApiClient.GetToken(code);
                 SqLiteClient.AddToken(AccessTokenType.Vk, token.AccessToken, token.Expire);
 
-                wbMain.Navigating -= OnNavigatingVk;
+                WbMain.Navigating -= OnNavigatingVk;
                 Close();
             }
         }

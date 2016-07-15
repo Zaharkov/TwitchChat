@@ -205,9 +205,16 @@ namespace TwitchChat.Controls
 
             var userInfo = _irc.UserStateInfo[_channelName];
 
+            var isAction = false;
+            if (Message.StartsWith("/me"))
+            {
+                isAction = true;
+                Message = Message.Remove(0, 3).TrimStart(' ');
+            }
+
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, _badges));
+                Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, isAction, _badges));
                 if (Messages.Count > App.Maxmessages)
                     Messages.RemoveAt(0);
 

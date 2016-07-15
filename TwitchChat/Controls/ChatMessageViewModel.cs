@@ -15,8 +15,8 @@ namespace TwitchChat.Controls
             InitBadges(message.UserType, badges);
         }
 
-        public ChatMessageViewModel(UserType type, string user, string message, string color, Badges badges) 
-            : base(user, message, color)
+        public ChatMessageViewModel(UserType type, string user, string message, string color, bool isAction, Badges badges) 
+            : base(user, message, color, isAction)
         {
             InitBadges(type, badges);
         }
