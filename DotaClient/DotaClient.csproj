@@ -35,6 +35,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AE.Net.Mail, Version=1.7.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AE.Net.Mail.1.7.10.0\lib\net45\AE.Net.Mail.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
       <Private>True</Private>
@@ -52,6 +56,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
+      <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
+      <Name>RestClientHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SteamKit\SteamKit2\SteamKit2\SteamKit2.csproj">
       <Project>{beb5bf07-bb56-402a-97a3-a41c6444c6a5}</Project>
       <Name>SteamKit2</Name>

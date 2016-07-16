@@ -9,10 +9,7 @@ namespace TwitchChat.Code.Commands
 {
     public static class MmrCommand
     {
-        private static readonly long SteamId = long.Parse(Configuration.GetSetting("SteamID"));
         private static readonly int Delay = int.Parse(Configuration.GetSetting("SteamMmrDelay"));
-        private static readonly string SteamUser = Configuration.GetSetting("SteamUser");
-        private static readonly string SteamPass = Configuration.GetSetting("SteamPass");
 
         public static string GetMmr(MessageEventArgs e, ChatMemberViewModel userModel)
         {
@@ -54,8 +51,7 @@ namespace TwitchChat.Code.Commands
 
         private static void GetMmr(out int? solo, out int? party)
         {
-            var dota = new DotaClientApi(SteamUser, SteamPass, SteamId);
-            dota.GetMmr(out solo, out party);
+            DotaClientApi.GetMmr(out solo, out party);
 
             solo = solo.HasValue && solo.Value > 0 ? solo : null;
             party = party.HasValue && party.Value > 0 ? party : null;
