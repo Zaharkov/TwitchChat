@@ -33,7 +33,7 @@ namespace Database
             {
                 using (var command = new SQLiteCommand())
                 {
-                    command.CommandText = "CREATE TABLE ChattersInfo (name nvarchar(128), chatName nvarchar(128), type nvarchar(35), seconds bigint, PRIMARY KEY(name, chatName))";
+                    command.CommandText = "CREATE TABLE ChattersInfo (name nvarchar(128), chatName nvarchar(128), type nvarchar(35), seconds bigint, steamId bigint, PRIMARY KEY(name, chatName))";
                     Execute(command);
                 }
             }
@@ -141,12 +141,12 @@ namespace Database
                     var partionList = partion.ToList();
                     var builder = new StringBuilder();
                     var last = partionList.Last();
-                    builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds) VALUES");
+                    builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds, steamId) VALUES");
 
                     var i = 1;
                     foreach (var chatterData in partionList)
                     {
-                        builder.AppendLine($"(@name{i}, @chatName{i}, @type{i}, @seconds{i} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i})){(last == chatterData ? "" : ",")}");
+                        builder.AppendLine($"(@name{i}, @chatName{i}, @type{i}, @seconds{i} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i}), (SELECT steamId FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i})){(last == chatterData ? "" : ",")}");
 
                         command.Parameters.Add(new SQLiteParameter($"@name{i}", chatterData.Name));
                         command.Parameters.Add(new SQLiteParameter($"@chatName{i}", chatterData.ChatName));
@@ -174,7 +174,47 @@ namespace Database
             }  
         }
 
-        public static Dictionary<int, Dictionary<string, string>> GetChatters()
+        public static long? GetChatterSteamId(string name)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT steamId FROM ChattersInfo WHERE name = @name";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
+
+                var result = Execute(command);
+                return result.Count == 0 
+                    ? null 
+                    : string.IsNullOrEmpty(result[0]["steamId"])
+                        ? (long?)null 
+                        : long.Parse(result[0]["steamId"]);
+            }
+        }
+
+        public static bool IsSteamIdAttachedToChatter(long steamId)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT * FROM ChattersInfo WHERE steamId = @steamId";
+                command.Parameters.Add(new SQLiteParameter("@steamId", steamId));
+
+                var result = Execute(command);
+                return result.Count != 0;
+            }
+        }
+
+        public static void AddChatterSteamId(string name, long steamId)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "UPDATE ChattersInfo SET steamId = @steamId WHERE name = @name";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
+                command.Parameters.Add(new SQLiteParameter("@steamId", steamId));
+
+                Execute(command);
+            }
+        }
+
+        public static Dictionary<int, Dictionary<string, string>> GetChattersInfo()
         {
             using (var command = new SQLiteCommand())
             {
@@ -183,7 +223,7 @@ namespace Database
             }
         }
 
-        public static void DeletChatter(string name, string chatName)
+        public static void DeleteChatterInfo(string name, string chatName)
         {
             using(var command = new SQLiteCommand())
             {

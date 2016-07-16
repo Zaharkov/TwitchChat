@@ -54,6 +54,26 @@ namespace TwitchChat.Code.Commands
             return decorator;
         }
 
+        public bool CanExecute(out int needWait)
+        {
+            if (_firstTime)
+            {
+                needWait = (int) _timer.Elapsed.TotalSeconds;
+                return true;
+            }
+
+            var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global];
+
+            if (_timer.Elapsed.TotalSeconds < delay)
+            {
+                needWait = delay - (int)_timer.Elapsed.TotalSeconds;
+                return false;
+            }
+
+            needWait = (int)_timer.Elapsed.TotalSeconds;
+            return true;
+        }
+
         public string Execute(Func<MessageEventArgs, ChatMemberViewModel, string> func, MessageEventArgs e, ChatMemberViewModel userModel)
         {
             if (_firstTime)

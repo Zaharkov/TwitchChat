@@ -25,7 +25,7 @@ namespace TwitchChat.Code.Commands
                     : $"{commands} - доступн{ending} для {string.Join(",", grouped.Value)}; ");
             }
 
-            return $"/w {e.Username} {builder}";
+            return builder.ToString();
         }
     }
 }

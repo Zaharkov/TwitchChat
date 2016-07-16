@@ -62,10 +62,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Code\Commands\SendType.cs" />
     <Compile Include="Code\Commands\CommandAccess.cs" />
     <Compile Include="Code\Commands\DelayDecorator.cs" />
     <Compile Include="Code\Commands\Command.cs" />
     <Compile Include="Code\Commands\CommandFactory.cs" />
+    <Compile Include="Code\Commands\Steam.cs" />
     <Compile Include="Code\Commands\Sheiker.cs" />
     <Compile Include="Code\Commands\MyTime.cs" />
     <Compile Include="Code\Commands\Help.cs" />
@@ -166,6 +168,10 @@
     <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
       <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
       <Name>RestClientHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SteamKit\SteamKit2\SteamKit2\SteamKit2.csproj">
+      <Project>{BEB5BF07-BB56-402A-97A3-A41C6444C6A5}</Project>
+      <Name>SteamKit2</Name>
     </ProjectReference>
     <ProjectReference Include="..\TwitchApi\TwitchApi.csproj">
       <Project>{cf15d97a-d0b5-4c4f-8f15-9ab6bae5ec59}</Project>

@@ -187,10 +187,25 @@ namespace TwitchChat.Controls
 
                 if (IsChatCommand(e))
                 {
-                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username));
-                
-                    if(!string.IsNullOrEmpty(result))
-                        _irc.Message(ChannelName, result);
+                    SendType type;
+                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username), out type);
+
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        switch (type)
+                        {
+                            case SendType.None:
+                                break;
+                            case SendType.Message:
+                                _irc.Message(ChannelName, result);
+                                break;
+                            case SendType.Whisper:
+                                _irc.Whisper(e.Username, result);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                        }
+                    }
                 }
             }
         }
@@ -252,12 +267,9 @@ namespace TwitchChat.Controls
             if (group == null)
             {
                 //  Create group if it doesnt exist
-                group = new ChatGroupViewModel { Name = type.ToString() };
+                group = new ChatGroupViewModel {Name = type.ToString()};
 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    ChatGroups.Add(group);
-                });
+                Application.Current.Dispatcher.Invoke(() => { ChatGroups.Add(group); });
             }
             return group;
         }

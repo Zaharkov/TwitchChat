@@ -10,6 +10,7 @@ namespace TwitchChat.Code.Commands
         MmrUpdate,
         Help,
         MyTime,
-        Шейкер
+        Шейкер,
+        AddSteam
     }
 }

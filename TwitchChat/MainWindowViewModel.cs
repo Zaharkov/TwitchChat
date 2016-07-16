@@ -7,8 +7,10 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using DotaClient;
 using TwitchChat.Controls;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
@@ -168,6 +170,7 @@ namespace TwitchChat
         {
             LoginWindow.Login(LoginType.Twitch);
             LoginWindow.Login(LoginType.Vk);
+            Task.Run(() => DotaClientApi.Init());
 
             try
             {
@@ -196,6 +199,8 @@ namespace TwitchChat
 
             foreach (var whisper in whispers)
                 whisper.Remove(whisper, EventArgs.Empty);
+
+            DotaClientApi.Disconnect();
 
             if (_irc.State == IrcState.Registered)
                 _irc.Quit();

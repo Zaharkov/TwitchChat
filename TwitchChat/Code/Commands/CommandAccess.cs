@@ -17,14 +17,16 @@ namespace TwitchChat.Code.Commands
             { Command.Music, UserType.Default },
             { Command.MyTime, UserType.Default },
             { Command.Help, UserType.Default },
-            { Command.Шейкер, UserType.Default }
+            { Command.Шейкер, UserType.Default },
+            { Command.AddSteam, UserType.Broadcaster }
         };
 
         private static readonly List<Command> UserAttachedCommands = new List<Command>
         {
             Command.Help,
             Command.MyTime,
-            Command.Шейкер
+            Command.Шейкер,
+            Command.AddSteam
         };
 
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()
@@ -84,7 +86,7 @@ namespace TwitchChat.Code.Commands
         public static bool IsHaveAccess(MessageEventArgs e, Command command)
         {
             if (Accesses.ContainsKey(command))
-                return Accesses[command] == UserType.Default || Accesses[command].HasFlag(e.UserType);
+                return Accesses[command] == UserType.Default || (Accesses[command] & e.UserType) != 0;
 
             return true;
         }

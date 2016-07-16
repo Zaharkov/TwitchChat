@@ -16,7 +16,7 @@ namespace TwitchChat.Code.Commands
             return $"слежу за тобой уже {totalTime} {GetSecondsName(totalTime)}";
         }
 
-        private static string GetSecondsName(long seconds)
+        public static string GetSecondsName(long seconds)
         {
             if (seconds % 10 == 1)
                 return "секунду";

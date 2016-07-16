@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -30,11 +32,12 @@ namespace DotaClient
         private static ClientState _state = ClientState.None;
         private static readonly Stopwatch ConnectProceed = new Stopwatch();
         private static DateTime _loginDate = DateTime.Now;
-        private const int MaxWaitForConnect = 30;
+        private const int MaxWaitForConnect = 60;
         private const int MaxWaitForMail = 30;
 
         private static readonly SteamClient SteamClient;
         private static readonly SteamUser User;
+        private static readonly SteamFriends SteamFriends;
         private static readonly SteamGameCoordinator GameCoordinator;
         private static readonly CallbackManager CallbackManager;
         private static string _authCode;
@@ -55,6 +58,8 @@ namespace DotaClient
     
             // get our handlers
             User = SteamClient.GetHandler<SteamUser>();
+            // get the steam friends handler, which is used for interacting with friends on the network after logging on
+            SteamFriends = SteamClient.GetHandler<SteamFriends>();
             GameCoordinator = SteamClient.GetHandler<SteamGameCoordinator>();
     
             // setup callbacks
@@ -63,11 +68,24 @@ namespace DotaClient
             CallbackManager.Subscribe<SteamClient.ConnectedCallback>(OnConnected);
             CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected);
             CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
+
+            CallbackManager.Subscribe<SteamUser.AccountInfoCallback>(OnAccountInfo);
+            CallbackManager.Subscribe<SteamFriends.FriendsListCallback>(OnFriendsList);
+            CallbackManager.Subscribe<SteamFriends.PersonaStateCallback>(OnPersonaState);
+            CallbackManager.Subscribe<SteamFriends.FriendAddedCallback>(OnFriendAdded);
+
+
             CallbackManager.Subscribe<SteamGameCoordinator.MessageCallback>(OnGcMessage);
             CallbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);
 
             ConnectProceed.Start();
             Connect();
+        }
+
+        public static void Init()
+        {
+            while (_state != ClientState.Logged && ConnectProceed.Elapsed.TotalSeconds < MaxWaitForConnect)
+                CallbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
         }
     
         private static void Connect()
@@ -79,7 +97,7 @@ namespace DotaClient
             SteamClient.Connect();
         }
     
-        private static T Wait<T>(Action command, int timeout = 30) where T : class, ProtoBuf.IExtensible
+        private static T Wait<T>(Action command = null, int timeout = 30) where T : class
         {
             while (_state != ClientState.Logged && ConnectProceed.Elapsed.TotalSeconds < MaxWaitForConnect)
                 CallbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
@@ -87,10 +105,10 @@ namespace DotaClient
             if (_disconnectedCount >= MaxDisconnectedCount || ConnectProceed.Elapsed.TotalSeconds > MaxWaitForConnect)
                 throw new Exception($"Connect to steam client failed with state: {_state}");
 
-            command();
+            command?.Invoke();
 
             var sw = Stopwatch.StartNew();
-            var name = typeof(T).Name;
+            var name = typeof(T).FullName;
 
             DebugListener.WriteLine($"Getting response for {name}");
 
@@ -131,6 +149,67 @@ namespace DotaClient
                 SqLiteClient.LogException("Error while try get MMR", ex);
                 DebugListener.WriteLine($"Error while try get MMR: {ex}");
             }
+        }
+
+        public static EFriendRelationship AddFriend(uint id)
+        {
+            try
+            {
+                var steamId = new SteamID();
+                steamId.Set(id, EUniverse.Public, EAccountType.Individual);
+
+                var friends = GetFriendList();
+                var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
+
+                if (!exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
+                {
+                    if (exist.Value == EFriendRelationship.RequestRecipient)
+                        return AddFriendReqest(steamId);
+
+                    return exist.Value;
+                }
+
+                return AddFriendReqest(steamId);
+            }
+            catch (Exception ex)
+            {
+                SqLiteClient.LogException("Error while try add steam friend", ex);
+                DebugListener.WriteLine($"Error while try add steam friend: {ex}");
+            }
+
+            return EFriendRelationship.Max;
+        }
+
+        private static EFriendRelationship AddFriendReqest(SteamID steamId)
+        {
+            var response = Wait<SteamFriends.FriendAddedCallback>(() => SteamFriends.AddFriend(steamId));
+
+            if (response.Result == EResult.OK)
+            {
+                var friends = GetFriendList();
+                var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
+
+                if (!exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
+                    return exist.Value;
+            }
+
+            return EFriendRelationship.Max;
+        }
+
+        private static Dictionary<SteamID, EFriendRelationship> GetFriendList()
+        {
+            Wait<ReadOnlyCollection<SteamFriends.FriendsListCallback.Friend>>();
+            var count = SteamFriends.GetFriendCount();
+
+            var friends = new Dictionary<SteamID, EFriendRelationship>();
+            for (var i = 0; i < count; i++)
+            {
+                var steamId = SteamFriends.GetFriendByIndex(i);
+                var relationship = SteamFriends.GetFriendRelationship(steamId);
+                friends.Add(steamId, relationship);
+            }
+
+            return friends;
         }
 
         // called when the client successfully (or unsuccessfully) connects to steam
@@ -320,6 +399,45 @@ namespace DotaClient
                 _authCode = match.Groups["code"].Value;
         }
 
+        private static void OnAccountInfo(SteamUser.AccountInfoCallback callback)
+        {
+            // before being able to interact with friends, you must wait for the account info callback
+            // this callback is posted shortly after a successful logon
+
+            // at this point, we can go online on friends, so lets do that
+            SteamFriends.SetPersonaState(EPersonaState.Online);
+        }
+
+        private static void OnFriendsList(SteamFriends.FriendsListCallback callback)
+        {
+            DebugListener.WriteLine("Getted friends list");
+
+            var name = typeof(ReadOnlyCollection<SteamFriends.FriendsListCallback.Friend>).FullName;
+
+            if (ResponseHandler.ContainsKey(name))
+                ResponseHandler[name] = callback.FriendList;
+            else
+                ResponseHandler.Add(name, callback.FriendList);
+        }
+
+        private static void OnFriendAdded(SteamFriends.FriendAddedCallback callback)
+        {
+            var name = typeof(SteamFriends.FriendAddedCallback).FullName;
+
+            if (ResponseHandler.ContainsKey(name))
+                ResponseHandler[name] = callback;
+            else
+                ResponseHandler.Add(name, callback);
+        }
+
+        private static void OnPersonaState(SteamFriends.PersonaStateCallback callback)
+        {
+            // this callback is received when the persona state (friend information) of a friend changes
+
+            // for this sample we'll simply display the names of the friends
+            DebugListener.WriteLine($"State change: {callback.Name}");
+        }
+
         // called when a gamecoordinator (GC) message arrives
         // these kinds of messages are designed to be game-specific
         // in this case, we'll be handling dota's GC messages
@@ -333,6 +451,8 @@ namespace DotaClient
                 { ( uint )EDOTAGCMsg.k_EMsgClientToGCGetProfileCardResponse, OnProfileDetails },
             };
     
+            DebugListener.WriteLine($"Received msg {callback.EMsg}");
+
             Action<IPacketGCMsg> func;
             if (!messageMap.TryGetValue(callback.EMsg, out func))
             {
@@ -365,12 +485,12 @@ namespace DotaClient
         private static void OnProfileDetails(IPacketGCMsg packetMsg)
         {
             var msg = new ClientGCMsgProtobuf<CMsgClientToGCGetProfileCard>(packetMsg);
-            const string name = nameof(CMsgClientToGCGetProfileCard);
+            var name = typeof(CMsgClientToGCGetProfileCard).FullName;
 
             if (ResponseHandler.ContainsKey(name))
                 ResponseHandler[name] = msg.Body;
             else
-                ResponseHandler.Add(nameof(CMsgClientToGCGetProfileCard), msg.Body);
+                ResponseHandler.Add(name, msg.Body);
         }
 
         private static void GetProfile()
@@ -381,6 +501,12 @@ namespace DotaClient
             };
 
             GameCoordinator.Send(requestProfile, Appid);
+        }
+
+        public static void Disconnect()
+        {
+            if(_state == ClientState.Logged)
+                SteamClient.Disconnect();
         }
     }
 }
