@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
 using AE.Net.Mail;
@@ -62,6 +64,7 @@ namespace DotaClient
             CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected);
             CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
             CallbackManager.Subscribe<SteamGameCoordinator.MessageCallback>(OnGcMessage);
+            CallbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);
 
             ConnectProceed.Start();
             Connect();
@@ -150,14 +153,27 @@ namespace DotaClient
             _loginDate = DateTime.Now;
 
             DebugListener.WriteLine($"Connected! Logging '{SteamUser}' into Steam...");
-    
-            // we've successfully connected, so now attempt to logon
-            User.LogOn(new SteamUser.LogOnDetails
+
+            var logOnDetails = new SteamUser.LogOnDetails
             {
                 Username = SteamUser,
-                Password = SteamPass,
-                AuthCode = _authCode
-            });
+                Password = SteamPass
+            };
+
+            byte[] sentryHash = null;
+            if (File.Exists("sentry.bin"))
+            {
+                var sentryFile = File.ReadAllBytes("sentry.bin");
+                sentryHash = CryptoHelper.SHAHash(sentryFile);
+            }
+
+            if (sentryHash != null)
+                logOnDetails.SentryFileHash = sentryHash;
+            else
+                logOnDetails.AuthCode = _authCode;
+
+            // we've successfully connected, so now attempt to logon
+            User.LogOn(logOnDetails);
         }
 
         private static void OnDisconnected(SteamClient.DisconnectedCallback callback)
@@ -177,6 +193,46 @@ namespace DotaClient
                 _state = ClientState.Disconnected;
         }
 
+        private static void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
+        {
+            DebugListener.WriteLine("Updating sentryfile...");
+
+            // write out our sentry file
+            // ideally we'd want to write to the filename specified in the callback
+            // but then this sample would require more code to find the correct sentry file to read during logon
+            // for the sake of simplicity, we'll just use "sentry.bin"
+
+            int fileSize;
+            byte[] sentryHash;
+            using (var fs = File.Open("sentry.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                fs.Seek(callback.Offset, SeekOrigin.Begin);
+                fs.Write(callback.Data, 0, callback.BytesToWrite);
+                fileSize = (int)fs.Length;
+
+                fs.Seek(0, SeekOrigin.Begin);
+                using (var sha = new SHA1CryptoServiceProvider())
+                {
+                    sentryHash = sha.ComputeHash(fs);
+                }
+            }
+
+            // inform the steam servers that we're accepting this sentry file
+            User.SendMachineAuthResponse(new SteamUser.MachineAuthDetails
+            {
+                JobID = callback.JobID,
+                FileName = callback.FileName,
+                BytesWritten = callback.BytesToWrite,
+                FileSize = fileSize,
+                Offset = callback.Offset,
+                Result = EResult.OK,
+                LastError = 0,
+                OneTimePassword = callback.OneTimePassword,
+                SentryFileHash = sentryHash,
+            });
+
+            DebugListener.WriteLine("Done!");
+        }
 
         // called when the client successfully (or unsuccessfully) logs onto an account
         private static void OnLoggedOn(SteamUser.LoggedOnCallback callback)
