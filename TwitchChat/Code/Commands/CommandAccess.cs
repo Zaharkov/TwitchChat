@@ -25,8 +25,6 @@ namespace TwitchChat.Code.Commands
         private static readonly List<Command> UserAttachedCommands = new List<Command>
         {
             Command.Help,
-            Command.MyTime,
-            Command.Шейкер,
             Command.AddSteam,
             Command.RemoveSteam
         };
