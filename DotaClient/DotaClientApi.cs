@@ -79,11 +79,14 @@ namespace DotaClient
             CallbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnMachineAuth);
 
             ConnectProceed.Start();
-            Connect();
+            
         }
 
         public static void Init()
         {
+            if(_state == ClientState.Disconnected)
+                Connect();
+
             while (_state != ClientState.Logged && ConnectProceed.Elapsed.TotalSeconds < MaxWaitForConnect)
                 CallbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
         }
@@ -505,8 +508,11 @@ namespace DotaClient
 
         public static void Disconnect()
         {
-            if(_state == ClientState.Logged)
+            if (_state == ClientState.Logged)
+            {
+                _state = ClientState.Disconnected;
                 SteamClient.Disconnect();
+            }
         }
     }
 }
