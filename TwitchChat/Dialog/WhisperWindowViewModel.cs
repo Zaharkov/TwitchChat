@@ -61,6 +61,7 @@ namespace TwitchChat.Dialog
 
         public void Remove(object sender, EventArgs args)
         {
+            _irc.OnWhisper -= WhisperReceived;
             OnRemove?.Invoke(this);
         }
 

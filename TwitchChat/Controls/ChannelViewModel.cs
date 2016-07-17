@@ -69,10 +69,8 @@ namespace TwitchChat.Controls
         public ChannelViewModel(TwitchIrcClient irc, string channelName)
         {
             _irc = irc;
-
             _irc.OnRawMessage += OnRawMessage;
             _irc.OnMessage += OnMessage;
-            _irc.OnPing += OnPing;
             //_irc.OnRoomState;
             //_irc.OnMode; TODO move to moderator list
             _irc.OnNames += OnNames;
@@ -97,11 +95,6 @@ namespace TwitchChat.Controls
         private void OnRawMessage(string buffer)
         {
             Debug.WriteLine(buffer);
-        }
-
-        private void OnPing(string buffer)
-        {
-            _irc.Pong(buffer);
         }
 
         private void OnNames(NamesEventArgs e)
@@ -212,7 +205,7 @@ namespace TwitchChat.Controls
 
         private static bool IsChatCommand(MessageEventArgs e)
         {
-            return e.Message.StartsWith("!");
+            return !e.Message.StartsWith("! ") && e.Message.StartsWith("!");
         }
 
         private void Send()
@@ -252,6 +245,17 @@ namespace TwitchChat.Controls
 
             if (_irc.State == IrcState.Registered)
                 _irc.Part(_channelName);
+
+            _irc.OnRawMessage -= OnRawMessage;
+            _irc.OnMessage -= OnMessage;
+            //_irc.OnRoomState;
+            //_irc.OnMode; TODO move to moderator list
+            _irc.OnNames -= OnNames;
+            _irc.OnJoin -= OnJoin;
+            _irc.OnPart -= OnPart;
+            //_irc.OnNotice;
+            //_irc.OnSubscribe; TODO 
+            //_irc.OnClearChat; TODO
 
             //  Raise the event.  MainWindowViewModel uses this to remove from list of channels
             Parted?.Invoke(this);

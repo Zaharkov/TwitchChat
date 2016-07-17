@@ -174,6 +174,18 @@ namespace Database
             }  
         }
 
+        public static bool IsChatterExist(string name)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT * FROM ChattersInfo WHERE name = @name";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
+
+                var result = Execute(command);
+                return result.Count != 0;
+            }
+        }
+
         public static long? GetChatterSteamId(string name)
         {
             using (var command = new SQLiteCommand())
@@ -190,14 +202,18 @@ namespace Database
             }
         }
 
-        public static bool IsSteamIdAttachedToChatter(long steamId)
+        public static bool IsSteamIdAttachedToChatter(long steamId, ref string name)
         {
             using (var command = new SQLiteCommand())
             {
-                command.CommandText = "SELECT * FROM ChattersInfo WHERE steamId = @steamId";
+                command.CommandText = "SELECT name FROM ChattersInfo WHERE steamId = @steamId";
                 command.Parameters.Add(new SQLiteParameter("@steamId", steamId));
 
                 var result = Execute(command);
+
+                if (result.Count != 0)
+                    name = result[0]["name"];
+
                 return result.Count != 0;
             }
         }
@@ -209,6 +225,17 @@ namespace Database
                 command.CommandText = "UPDATE ChattersInfo SET steamId = @steamId WHERE name = @name";
                 command.Parameters.Add(new SQLiteParameter("@name", name));
                 command.Parameters.Add(new SQLiteParameter("@steamId", steamId));
+
+                Execute(command);
+            }
+        }
+
+        public static void DeleteChatterSteamId(string name)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "UPDATE ChattersInfo SET steamId = NULL WHERE name = @name";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
 
                 Execute(command);
             }

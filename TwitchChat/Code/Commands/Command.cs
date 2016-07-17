@@ -11,6 +11,7 @@ namespace TwitchChat.Code.Commands
         Help,
         MyTime,
         Шейкер,
-        AddSteam
+        AddSteam,
+        RemoveSteam
     }
 }

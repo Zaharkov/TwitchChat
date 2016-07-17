@@ -54,6 +54,10 @@ namespace TwitchChat.Code.Commands
                     commandFunc = SteamCommand.AddSteam;
                     sendType = SendType.Whisper;
                     break;
+                case Command.RemoveSteam:
+                    commandFunc = SteamCommand.RemoveSteam;
+                    sendType = SendType.Whisper;
+                    break;
                 case Command.Global:
                     return null;
                 default:

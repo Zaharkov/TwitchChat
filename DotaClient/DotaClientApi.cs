@@ -7,8 +7,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using AE.Net.Mail;
 using Database;
+using DotaClient.Friend;
 using RestClientHelper;
 using SteamKit2;
 using SteamKit2.GC;
@@ -35,12 +37,16 @@ namespace DotaClient
         private const int MaxWaitForConnect = 60;
         private const int MaxWaitForMail = 30;
 
+        private static CancellationTokenSource _checkForCallbacksToken;
+
         private static readonly SteamClient SteamClient;
         private static readonly SteamUser User;
         private static readonly SteamFriends SteamFriends;
         private static readonly SteamGameCoordinator GameCoordinator;
         private static readonly CallbackManager CallbackManager;
         private static string _authCode;
+
+        private static bool _needWaitFriendList = true;
 
         private static readonly Dictionary<string, object>  ResponseHandler = new Dictionary<string, object>();
 
@@ -84,11 +90,26 @@ namespace DotaClient
 
         public static void Init()
         {
-            if(_state == ClientState.Disconnected)
+            if(_state == ClientState.Disconnected || _state == ClientState.None)
                 Connect();
 
             while (_state != ClientState.Logged && ConnectProceed.Elapsed.TotalSeconds < MaxWaitForConnect)
                 CallbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+
+            if (_state == ClientState.Logged)
+            {
+                _checkForCallbacksToken = new CancellationTokenSource();
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        if (_checkForCallbacksToken.Token.IsCancellationRequested)
+                            break;
+
+                        CallbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+                    }
+                });
+            }
         }
     
         private static void Connect()
@@ -154,7 +175,7 @@ namespace DotaClient
             }
         }
 
-        public static EFriendRelationship AddFriend(uint id)
+        public static FriendResponseContainer AddFriend(uint id)
         {
             try
             {
@@ -167,12 +188,12 @@ namespace DotaClient
                 if (!exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
                 {
                     if (exist.Value == EFriendRelationship.RequestRecipient)
-                        return AddFriendReqest(steamId);
+                        return AddFriendRequest(steamId);
 
-                    return exist.Value;
+                    return new FriendResponseContainer(EResult.OK, exist.Value, FriendResponseStatus.AlreadyAdded);
                 }
 
-                return AddFriendReqest(steamId);
+                return AddFriendRequest(steamId);
             }
             catch (Exception ex)
             {
@@ -180,10 +201,47 @@ namespace DotaClient
                 DebugListener.WriteLine($"Error while try add steam friend: {ex}");
             }
 
-            return EFriendRelationship.Max;
+            return new FriendResponseContainer(EResult.Fail, EFriendRelationship.None, FriendResponseStatus.Error);
         }
 
-        private static EFriendRelationship AddFriendReqest(SteamID steamId)
+        public static FriendResponseContainer RemoveFriend(uint id, bool ignoreBug = false)
+        {
+            try
+            {
+                var steamId = new SteamID();
+                steamId.Set(id, EUniverse.Public, EAccountType.Individual);
+
+                var friends = GetFriendList();
+                var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
+
+                if (!exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
+                {
+                    if(exist.Value == EFriendRelationship.Friend || exist.Value == EFriendRelationship.RequestRecipient)
+                        return RemoveFriendRequest(steamId);
+
+                    if (exist.Value == EFriendRelationship.RequestInitiator)
+                    {
+                        if(ignoreBug)
+                            return RemoveFriendRequest(steamId);
+
+                        return new FriendResponseContainer(EResult.OK, exist.Value, FriendResponseStatus.CantRemove);
+                    }
+
+                    return new FriendResponseContainer(EResult.OK, exist.Value, FriendResponseStatus.NotInFriends);
+                }
+
+                return new FriendResponseContainer(EResult.OK, EFriendRelationship.None, FriendResponseStatus.NotInFriends);
+            }
+            catch (Exception ex)
+            {
+                SqLiteClient.LogException("Error while try remove steam friend", ex);
+                DebugListener.WriteLine($"Error while try remove steam friend: {ex}");
+            }
+
+            return new FriendResponseContainer(EResult.Fail, EFriendRelationship.Max, FriendResponseStatus.Error);
+        }
+
+        private static FriendResponseContainer AddFriendRequest(SteamID steamId)
         {
             var response = Wait<SteamFriends.FriendAddedCallback>(() => SteamFriends.AddFriend(steamId));
 
@@ -193,15 +251,34 @@ namespace DotaClient
                 var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
 
                 if (!exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
-                    return exist.Value;
+                    return new FriendResponseContainer(response.Result, exist.Value, FriendResponseStatus.Added);
             }
 
-            return EFriendRelationship.Max;
+            return new FriendResponseContainer(response.Result, EFriendRelationship.Max, FriendResponseStatus.Error);
+        }
+
+        private static FriendResponseContainer RemoveFriendRequest(SteamID steamId)
+        {
+            SteamFriends.RemoveFriend(steamId);
+            Wait<ReadOnlyCollection<SteamFriends.FriendsListCallback.Friend>>();
+            _needWaitFriendList = false;
+
+            var friends = GetFriendList();
+            var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
+
+            if (exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
+                return new FriendResponseContainer(EResult.OK, EFriendRelationship.None, FriendResponseStatus.Removed);
+
+            return new FriendResponseContainer(EResult.Fail, EFriendRelationship.Max, FriendResponseStatus.Error);
         }
 
         private static Dictionary<SteamID, EFriendRelationship> GetFriendList()
         {
-            Wait<ReadOnlyCollection<SteamFriends.FriendsListCallback.Friend>>();
+            if(_needWaitFriendList)
+                Wait<ReadOnlyCollection<SteamFriends.FriendsListCallback.Friend>>();
+
+            _needWaitFriendList = false;
+
             var count = SteamFriends.GetFriendCount();
 
             var friends = new Dictionary<SteamID, EFriendRelationship>();
@@ -265,7 +342,7 @@ namespace DotaClient
 
             DebugListener.WriteLine("Disconnected from Steam, reconnecting...");
 
-            if (_disconnectedCount < MaxDisconnectedCount && _state != ClientState.Error)
+            if (_disconnectedCount < MaxDisconnectedCount && _state != ClientState.Error && _state != ClientState.Disconnected)
             {
                 _disconnectedCount++;
                 Connect();
@@ -328,8 +405,6 @@ namespace DotaClient
                 }
 
                 // logon failed (password incorrect, steamguard enabled, etc)
-                // an EResult of AccountLogonDenied means the account has SteamGuard enabled and an email containing the authcode was sent
-                // in that case, you would get the auth code from the email and provide it in the LogOnDetails
 
                 _state = ClientState.Error;
 
@@ -413,24 +488,14 @@ namespace DotaClient
 
         private static void OnFriendsList(SteamFriends.FriendsListCallback callback)
         {
+            _needWaitFriendList = true;
             DebugListener.WriteLine("Getted friends list");
-
-            var name = typeof(ReadOnlyCollection<SteamFriends.FriendsListCallback.Friend>).FullName;
-
-            if (ResponseHandler.ContainsKey(name))
-                ResponseHandler[name] = callback.FriendList;
-            else
-                ResponseHandler.Add(name, callback.FriendList);
+            AddToResponseHandler(callback.FriendList);
         }
 
         private static void OnFriendAdded(SteamFriends.FriendAddedCallback callback)
         {
-            var name = typeof(SteamFriends.FriendAddedCallback).FullName;
-
-            if (ResponseHandler.ContainsKey(name))
-                ResponseHandler[name] = callback;
-            else
-                ResponseHandler.Add(name, callback);
+            AddToResponseHandler(callback);
         }
 
         private static void OnPersonaState(SteamFriends.PersonaStateCallback callback)
@@ -488,12 +553,8 @@ namespace DotaClient
         private static void OnProfileDetails(IPacketGCMsg packetMsg)
         {
             var msg = new ClientGCMsgProtobuf<CMsgClientToGCGetProfileCard>(packetMsg);
-            var name = typeof(CMsgClientToGCGetProfileCard).FullName;
 
-            if (ResponseHandler.ContainsKey(name))
-                ResponseHandler[name] = msg.Body;
-            else
-                ResponseHandler.Add(name, msg.Body);
+            AddToResponseHandler(msg.Body);
         }
 
         private static void GetProfile()
@@ -506,10 +567,21 @@ namespace DotaClient
             GameCoordinator.Send(requestProfile, Appid);
         }
 
+        private static void AddToResponseHandler<T>(T value)
+        {
+            var name = typeof(T).FullName;
+
+            if (ResponseHandler.ContainsKey(name))
+                ResponseHandler[name] = value;
+            else
+                ResponseHandler.Add(name, value);
+        }
+
         public static void Disconnect()
         {
             if (_state == ClientState.Logged)
             {
+                _checkForCallbacksToken.Cancel();
                 _state = ClientState.Disconnected;
                 SteamClient.Disconnect();
             }

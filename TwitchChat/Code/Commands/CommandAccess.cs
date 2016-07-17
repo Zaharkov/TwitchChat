@@ -18,7 +18,8 @@ namespace TwitchChat.Code.Commands
             { Command.MyTime, UserType.Default },
             { Command.Help, UserType.Default },
             { Command.Шейкер, UserType.Default },
-            { Command.AddSteam, UserType.Broadcaster }
+            { Command.AddSteam, UserType.Broadcaster },
+            { Command.RemoveSteam, UserType.Broadcaster }
         };
 
         private static readonly List<Command> UserAttachedCommands = new List<Command>
@@ -26,7 +27,8 @@ namespace TwitchChat.Code.Commands
             Command.Help,
             Command.MyTime,
             Command.Шейкер,
-            Command.AddSteam
+            Command.AddSteam,
+            Command.RemoveSteam
         };
 
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()

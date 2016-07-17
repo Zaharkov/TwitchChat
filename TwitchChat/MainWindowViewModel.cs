@@ -130,6 +130,7 @@ namespace TwitchChat
         //  Channel was parted
         private void OnParted(ChannelViewModel model)
         {
+            model.Parted -= OnParted;
             Channels.Remove(model);
         }
 
