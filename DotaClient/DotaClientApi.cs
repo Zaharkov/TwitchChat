@@ -190,7 +190,7 @@ namespace DotaClient
                     if (exist.Value == EFriendRelationship.RequestRecipient)
                         return AddFriendRequest(steamId);
 
-                    return new FriendResponseContainer(EResult.OK, exist.Value, FriendResponseStatus.AlreadyAdded);
+                    return new FriendResponseContainer((int)EResult.OK, exist.Value.Map(), FriendResponseStatus.AlreadyAdded);
                 }
 
                 return AddFriendRequest(steamId);
@@ -201,7 +201,7 @@ namespace DotaClient
                 DebugListener.WriteLine($"Error while try add steam friend: {ex}");
             }
 
-            return new FriendResponseContainer(EResult.Fail, EFriendRelationship.None, FriendResponseStatus.Error);
+            return new FriendResponseContainer((int)EResult.Fail, FriendResponseRelationship.None, FriendResponseStatus.Error);
         }
 
         public static FriendResponseContainer RemoveFriend(uint id, bool ignoreBug = false)
@@ -224,13 +224,13 @@ namespace DotaClient
                         if(ignoreBug)
                             return RemoveFriendRequest(steamId);
 
-                        return new FriendResponseContainer(EResult.OK, exist.Value, FriendResponseStatus.CantRemove);
+                        return new FriendResponseContainer((int)EResult.OK, exist.Value.Map(), FriendResponseStatus.CantRemove);
                     }
 
-                    return new FriendResponseContainer(EResult.OK, exist.Value, FriendResponseStatus.NotInFriends);
+                    return new FriendResponseContainer((int)EResult.OK, exist.Value.Map(), FriendResponseStatus.NotInFriends);
                 }
 
-                return new FriendResponseContainer(EResult.OK, EFriendRelationship.None, FriendResponseStatus.NotInFriends);
+                return new FriendResponseContainer((int)EResult.OK, FriendResponseRelationship.None, FriendResponseStatus.NotInFriends);
             }
             catch (Exception ex)
             {
@@ -238,7 +238,7 @@ namespace DotaClient
                 DebugListener.WriteLine($"Error while try remove steam friend: {ex}");
             }
 
-            return new FriendResponseContainer(EResult.Fail, EFriendRelationship.Max, FriendResponseStatus.Error);
+            return new FriendResponseContainer((int)EResult.Fail, FriendResponseRelationship.Error, FriendResponseStatus.Error);
         }
 
         private static FriendResponseContainer AddFriendRequest(SteamID steamId)
@@ -251,10 +251,10 @@ namespace DotaClient
                 var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
 
                 if (!exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
-                    return new FriendResponseContainer(response.Result, exist.Value, FriendResponseStatus.Added);
+                    return new FriendResponseContainer((int)response.Result, exist.Value.Map(), FriendResponseStatus.Added);
             }
 
-            return new FriendResponseContainer(response.Result, EFriendRelationship.Max, FriendResponseStatus.Error);
+            return new FriendResponseContainer((int)response.Result, FriendResponseRelationship.Error, FriendResponseStatus.Error);
         }
 
         private static FriendResponseContainer RemoveFriendRequest(SteamID steamId)
@@ -267,9 +267,9 @@ namespace DotaClient
             var exist = friends.FirstOrDefault(t => t.Key.AccountID == steamId.AccountID);
 
             if (exist.Equals(default(KeyValuePair<SteamID, EFriendRelationship>)))
-                return new FriendResponseContainer(EResult.OK, EFriendRelationship.None, FriendResponseStatus.Removed);
+                return new FriendResponseContainer((int)EResult.OK, FriendResponseRelationship.None, FriendResponseStatus.Removed);
 
-            return new FriendResponseContainer(EResult.Fail, EFriendRelationship.Max, FriendResponseStatus.Error);
+            return new FriendResponseContainer((int)EResult.Fail, FriendResponseRelationship.Error, FriendResponseStatus.Error);
         }
 
         private static Dictionary<SteamID, EFriendRelationship> GetFriendList()

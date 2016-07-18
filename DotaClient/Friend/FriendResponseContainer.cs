@@ -1,16 +1,14 @@
-﻿using SteamKit2;
-
-namespace DotaClient.Friend
+﻿namespace DotaClient.Friend
 {
     public class FriendResponseContainer
     {
-        public EFriendRelationship Relationship { get; }
-        public EResult Result { get; }
+        public FriendResponseRelationship Relationship { get; }
+        public int StatusCode { get; }
         public FriendResponseStatus Status { get; }
 
-        public FriendResponseContainer(EResult result, EFriendRelationship relationship, FriendResponseStatus status)
+        public FriendResponseContainer(int statusCode, FriendResponseRelationship relationship, FriendResponseStatus status)
         {
-            Result = result;
+            StatusCode = statusCode;
             Relationship = relationship;
             Status = status;
         }

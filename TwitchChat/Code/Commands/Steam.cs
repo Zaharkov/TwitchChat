@@ -2,7 +2,6 @@
 using Database;
 using DotaClient;
 using DotaClient.Friend;
-using SteamKit2;
 using TwitchChat.Controls;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
@@ -83,10 +82,10 @@ namespace TwitchChat.Code.Commands
                     break;
                 case FriendResponseStatus.Error:
                 {
-                    if(response.Result == EResult.Ignored)
+                    if(response.StatusCode == 41) // Ignored = 41
                         return $"Похоже пользователь steam {steamId} уже был ранее удален из друзей без подтверждения заявки. Это вызывает баг в steam, который можно исправить, если заблокировать и потом разблокировать все связи с ним в steam";
 
-                    return $"Во время добавления '{steamId}' произошла ошибка: {response.Result}. Попробуйте позже";
+                    return $"Во время добавления '{steamId}' произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
                 }
                 case FriendResponseStatus.NotInFriends:
                     return $"Пользователь steam '{steamId}' не находится в списке друзей. Статус: {response.Relationship}";
@@ -96,20 +95,17 @@ namespace TwitchChat.Code.Commands
 
             switch (response.Relationship)
             {
-                case EFriendRelationship.None:
-                case EFriendRelationship.Max:
-                case EFriendRelationship.SuggestedFriend:
-                    return $"Во время добавления '{steamId}' в steam произошла ошибка: {response.Result}. Попробуйте позже";
-                case EFriendRelationship.Blocked:
-                case EFriendRelationship.Ignored:
-                case EFriendRelationship.IgnoredFriend:
+                case FriendResponseRelationship.None:
+                case FriendResponseRelationship.Error:
+                    return $"Во время добавления '{steamId}' в steam произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
+                case FriendResponseRelationship.Banned:
                     return $"Пользователь steam '{steamId}' находится в черном списке или заблокирован. Очень жаль";
-                case EFriendRelationship.RequestRecipient:
+                case FriendResponseRelationship.Recipient:
                     return $"Уже был запрос в друзья со стороны пользователя steam '{steamId}', но подтверждение заявки не сработало. Попробуйте позже";
-                case EFriendRelationship.Friend:
+                case FriendResponseRelationship.Friend:
                     SqLiteClient.AddChatterSteamId(userName, steamId);
                     return $"Пользователь steam '{steamId}' уже находится в списке друзей. Теперь он привязан к Вам";
-                case EFriendRelationship.RequestInitiator:
+                case FriendResponseRelationship.Initiator:
                 {
                     SqLiteClient.AddChatterSteamId(userName, steamId);
                    
@@ -191,7 +187,7 @@ namespace TwitchChat.Code.Commands
                 case FriendResponseStatus.CantRemove:
                     return $"Удаление '{steamId}' из друзей повлечёт за собой баг, так как пользователь ещё не подтвердил заявку в друзья. Нельзя будет добавить его снова пока не заблокировать и потом разблокировать все связи с ним в steam. Для игнорирования этого бага введите в конце команды параметр 'true'";
                 case FriendResponseStatus.Error:
-                    return $"Во время удаления '{steamId}' из друзей произошла ошибка: {response.Result}. Попробуйте позже";
+                    return $"Во время удаления '{steamId}' из друзей произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
                 case FriendResponseStatus.NotInFriends:
                     return $"Пользователь steam '{steamId}' не находится в списке друзей. Статус: {response.Relationship}";
                 default:
@@ -200,20 +196,17 @@ namespace TwitchChat.Code.Commands
 
             switch (response.Relationship)
             {
-                case EFriendRelationship.None:
+                case FriendResponseRelationship.None:
                     SqLiteClient.DeleteChatterSteamId(userName);
                     return $"Пользователь steam '{steamId}' успешно удален из друзей в steam и откреплён от пользователя twitch {userName}";
-                case EFriendRelationship.Max:
-                    return $"Во время удаления '{steamId}' из друзей в steam произошла ошибка: {response.Result}. Попробуйте позже";
-                case EFriendRelationship.SuggestedFriend:
-                case EFriendRelationship.Blocked:
-                case EFriendRelationship.Ignored:
-                case EFriendRelationship.IgnoredFriend:
+                case FriendResponseRelationship.Error:
+                    return $"Во время удаления '{steamId}' из друзей в steam произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
+                case FriendResponseRelationship.Banned:
                     return $"Пользователь steam '{steamId}' находится в черном списке или заблокирован. Очень жаль";
-                case EFriendRelationship.RequestRecipient:
-                case EFriendRelationship.Friend:
-                case EFriendRelationship.RequestInitiator:
-                    SqLiteClient.LogException("DeleteSteamUserError", new Exception($"Twitch:{userName},steam:{steamId},relat:{response.Relationship},res:{response.Result},status:{response.Status}"));
+                case FriendResponseRelationship.Recipient:
+                case FriendResponseRelationship.Friend:
+                case FriendResponseRelationship.Initiator:
+                    SqLiteClient.LogException("DeleteSteamUserError", new Exception($"Twitch:{userName},steam:{steamId},relat:{response.Relationship},res:{response.StatusCode},status:{response.Status}"));
                     return $"Удаление {steamId} вернуло неожиданный ответ...как Вы это сделали? Запишу ка я эту ошибку в базу...Сообщите о ней бродкастеру!";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(response), response, null);

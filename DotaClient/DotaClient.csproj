@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Friend\FriendResponseRelationship.cs" />
     <Compile Include="Friend\FriendResponseStatus.cs" />
     <Compile Include="ClientState.cs" />
     <Compile Include="DebugListener.cs" />
