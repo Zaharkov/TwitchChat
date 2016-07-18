@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace RestClientHelper
+namespace CommonHelper
 {
     public class Configuration
     {

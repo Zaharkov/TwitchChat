@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RestClientHelper
+namespace CommonHelper
 {
     public static class Check
     {

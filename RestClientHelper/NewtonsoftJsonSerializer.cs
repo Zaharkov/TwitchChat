@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using CommonHelper;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Deserializers;

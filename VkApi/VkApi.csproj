@@ -62,6 +62,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\CommonHelper\CommonHelper.csproj">
+      <Project>{50e9e3b8-177f-470c-a0d7-e564c79d8143}</Project>
+      <Name>CommonHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
       <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
       <Name>RestClientHelper</Name>

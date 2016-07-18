@@ -52,22 +52,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SteamListener.cs" />
     <Compile Include="Friend\FriendResponseRelationship.cs" />
     <Compile Include="Friend\FriendResponseStatus.cs" />
     <Compile Include="ClientState.cs" />
-    <Compile Include="DebugListener.cs" />
     <Compile Include="DotaClientApi.cs" />
     <Compile Include="Friend\FriendResponseContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonHelper\CommonHelper.csproj">
+      <Project>{50e9e3b8-177f-470c-a0d7-e564c79d8143}</Project>
+      <Name>CommonHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{4794d8cf-bdae-48f9-b5e9-e62980b69830}</Project>
       <Name>Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
-      <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
-      <Name>RestClientHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\SteamKit\SteamKit2\SteamKit2\SteamKit2.csproj">
       <Project>{beb5bf07-bb56-402a-97a3-a41c6444c6a5}</Project>

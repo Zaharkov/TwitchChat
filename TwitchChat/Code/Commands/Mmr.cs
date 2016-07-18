@@ -1,7 +1,7 @@
-﻿using Database;
+﻿using CommonHelper;
+using Database;
 using Database.Entities;
 using DotaClient;
-using RestClientHelper;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
 

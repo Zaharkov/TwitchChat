@@ -66,13 +66,18 @@
   <ItemGroup>
     <Compile Include="Entities\ChatterData.cs" />
     <Compile Include="Entities\AccessTokenType.cs" />
-    <Compile Include="Partition.cs" />
     <Compile Include="SqLiteClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonHelper\CommonHelper.csproj">
+      <Project>{50e9e3b8-177f-470c-a0d7-e564c79d8143}</Project>
+      <Name>CommonHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />

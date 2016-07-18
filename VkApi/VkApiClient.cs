@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using CommonHelper;
 using RestClientHelper;
 using RestSharp;
 using VkApi.Entities;

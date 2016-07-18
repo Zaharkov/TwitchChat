@@ -1,4 +1,5 @@
-﻿using RestClientHelper;
+﻿using CommonHelper;
+using RestClientHelper;
 using RestSharp;
 using TwitchApi.Entities;
 

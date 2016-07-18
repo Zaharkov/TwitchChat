@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Database
+namespace CommonHelper
 {
     public static class CollectionExtensions
     {

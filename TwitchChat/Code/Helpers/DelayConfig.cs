@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RestClientHelper;
+using CommonHelper;
 
 namespace TwitchChat.Code.Helpers
 {

@@ -73,7 +73,6 @@
     <Compile Include="Code\Commands\Help.cs" />
     <Compile Include="Code\Commands\Mmr.cs" />
     <Compile Include="Code\Commands\Music.cs" />
-    <Compile Include="Code\Helpers\PeriodicTask.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
     <Compile Include="Code\Helpers\DelayConfig.cs" />
     <Compile Include="Code\Timers\Help.cs" />
@@ -157,6 +156,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonHelper\CommonHelper.csproj">
+      <Project>{50e9e3b8-177f-470c-a0d7-e564c79d8143}</Project>
+      <Name>CommonHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{4794d8cf-bdae-48f9-b5e9-e62980b69830}</Project>
       <Name>Database</Name>
@@ -164,10 +167,6 @@
     <ProjectReference Include="..\DotaClient\DotaClient.csproj">
       <Project>{be3021d8-2a45-418c-aabe-877b3b01d746}</Project>
       <Name>DotaClient</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RestClientHelper\RestClientHelper.csproj">
-      <Project>{10a2c777-9bbf-4e12-adc8-71a1bbea2550}</Project>
-      <Name>RestClientHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\TwitchApi\TwitchApi.csproj">
       <Project>{cf15d97a-d0b5-4c4f-8f15-9ab6bae5ec59}</Project>

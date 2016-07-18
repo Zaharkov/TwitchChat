@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using RestClientHelper;
+using CommonHelper;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
 using VkApi;
