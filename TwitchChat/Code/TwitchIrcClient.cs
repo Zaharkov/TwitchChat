@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TwitchApi;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
+using Twitchiedll.IRC.Limits;
 
 namespace TwitchChat.Code
 {
@@ -59,7 +60,7 @@ namespace TwitchChat.Code
             }
 
             if (allMod)
-                MessageHandler.GlobalMessageLimit = MessageHandler.ModeratorUserLimit;
+                MessageHandler.GlobalMessageLimit = MessageLimit.Moderator;
         }
 
         /// <summary>
