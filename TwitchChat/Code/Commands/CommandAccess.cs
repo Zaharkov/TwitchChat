@@ -22,11 +22,13 @@ namespace TwitchChat.Code.Commands
             { Command.RemoveSteam, UserType.Broadcaster }
         };
 
-        private static readonly List<Command> UserAttachedCommands = new List<Command>
+        private static readonly Dictionary<Command, DelayType> CommandDelayType = new Dictionary<Command, DelayType>
         {
-            Command.Help,
-            Command.AddSteam,
-            Command.RemoveSteam
+            { Command.Help, DelayType.User},
+            { Command.AddSteam, DelayType.User},
+            { Command.RemoveSteam, DelayType.User},
+            { Command.MyTime, DelayType.Hybrid},
+            { Command.Шейкер, DelayType.Hybrid}
         };
 
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()
@@ -91,9 +93,12 @@ namespace TwitchChat.Code.Commands
             return true;
         }
 
-        public static bool IsUserAttachedCommand(Command command)
+        public static DelayType GetCommandDelayType(Command command)
         {
-            return UserAttachedCommands.Contains(command);
+            if (CommandDelayType.ContainsKey(command))
+                return CommandDelayType[command];
+
+            return DelayType.Global;
         }
     }
 }

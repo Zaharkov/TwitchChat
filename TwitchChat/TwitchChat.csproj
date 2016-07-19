@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Code\Commands\DelayType.cs" />
     <Compile Include="Code\Commands\SendType.cs" />
     <Compile Include="Code\Commands\CommandAccess.cs" />
     <Compile Include="Code\Commands\DelayDecorator.cs" />

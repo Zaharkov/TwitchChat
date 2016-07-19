@@ -64,17 +64,14 @@ namespace TwitchChat.Code.Commands
                     return null;
             }
 
-            var userAttached = CommandAccess.IsUserAttachedCommand(command);
-
-            var delayDecorator = userAttached
-                ? DelayDecorator.Get(e.Username, command)
-                : DelayDecorator.Get(command);
+            var delayType = CommandAccess.GetCommandDelayType(command);
+            var delayDecorator = DelayDecorator.Get(e.Username, command, delayType);
 
             int needWait;
             if (!delayDecorator.CanExecute(out needWait))
             {
                 sendType = SendType.Whisper;
-                return $"Команда !{command} на {(userAttached ? "пользовательском" : "глобальном")} кулдауне. Вы сможете её повторить через {needWait} {MyTimeCommand.GetSecondsName(needWait)}";
+                return $"Команда !{command} на {(delayType != DelayType.Global ? "пользовательском" : "глобальном")} кулдауне. Вы сможете её повторить через {needWait} {MyTimeCommand.GetSecondsName(needWait)}";
             }
 
             var result = delayDecorator.Execute(commandFunc, e, userModel);
