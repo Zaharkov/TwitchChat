@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using TwitchChat.Code.DelayDecorator;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
 
@@ -65,7 +66,22 @@ namespace TwitchChat.Code.Commands
             }
 
             var delayType = CommandAccess.GetCommandDelayType(command);
-            var delayDecorator = DelayDecorator.Get(e.Username, command, delayType);
+
+            IDelayDecorator delayDecorator;
+            switch (delayType)
+            {
+                case DelayType.User:
+                    delayDecorator = UserDecorator.Get(e.Username, command);
+                    break;
+                case DelayType.Global:
+                    delayDecorator = GlobalDecorator.Get(command);
+                    break;
+                case DelayType.Hybrid:
+                    delayDecorator = HybridDecorator.Get(e.Username, command);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(delayType), delayType, null);
+            }
 
             int needWait;
             if (!delayDecorator.CanExecute(out needWait))
@@ -74,7 +90,7 @@ namespace TwitchChat.Code.Commands
                 return $"Команда !{command} на {(delayType != DelayType.Global ? "пользовательском" : "глобальном")} кулдауне. Вы сможете её повторить через {needWait} {MyTimeCommand.GetSecondsName(needWait)}";
             }
 
-            var result = delayDecorator.Execute(commandFunc, e, userModel);
+            var result = delayDecorator.Execute(() => commandFunc(e, userModel));
 
             if (!string.IsNullOrEmpty(result) && sendType != SendType.Whisper)
                 result = $"БОТ: @{e.Username} {result}";

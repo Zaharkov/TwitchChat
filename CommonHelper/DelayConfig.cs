@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonHelper;
 
-namespace TwitchChat.Code.Helpers
+namespace CommonHelper
 {
     public class DelayConfig<T> where T: struct
     {

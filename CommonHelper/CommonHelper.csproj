@@ -46,6 +46,7 @@
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="DebugListener.cs" />
+    <Compile Include="DelayConfig.cs" />
     <Compile Include="PeriodicTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

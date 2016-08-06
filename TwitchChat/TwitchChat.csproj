@@ -63,9 +63,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Code\Commands\DelayType.cs" />
+    <Compile Include="Code\DelayDecorator\IDelayDecorator.cs" />
     <Compile Include="Code\Commands\SendType.cs" />
     <Compile Include="Code\Commands\CommandAccess.cs" />
-    <Compile Include="Code\Commands\DelayDecorator.cs" />
     <Compile Include="Code\Commands\Command.cs" />
     <Compile Include="Code\Commands\CommandFactory.cs" />
     <Compile Include="Code\Commands\Steam.cs" />
@@ -74,8 +74,11 @@
     <Compile Include="Code\Commands\Help.cs" />
     <Compile Include="Code\Commands\Mmr.cs" />
     <Compile Include="Code\Commands\Music.cs" />
+    <Compile Include="Code\DelayDecorator\BaseDecorator.cs" />
+    <Compile Include="Code\DelayDecorator\GlobalDecorator.cs" />
+    <Compile Include="Code\DelayDecorator\HybridDecorator.cs" />
+    <Compile Include="Code\DelayDecorator\UserDecorator.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
-    <Compile Include="Code\Helpers\DelayConfig.cs" />
     <Compile Include="Code\Timers\Help.cs" />
     <Compile Include="Code\Timers\TimerFactory.cs" />
     <Compile Include="Code\Timers\Timer.cs" />
