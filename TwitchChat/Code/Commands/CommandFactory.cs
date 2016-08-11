@@ -17,7 +17,8 @@ namespace TwitchChat.Code.Commands
             if (!parse)
             {
                 sendType = SendType.Whisper;
-                return $"Команда !{forParse} не поддерживается. Список команд можно посмотреть через команду !{Command.Help}";
+                return null;
+                //return $"Команда !{forParse} не поддерживается. Список команд можно посмотреть через команду !{Command.Help}";
             }
 
             if (!CommandAccess.IsHaveAccess(e, command))
