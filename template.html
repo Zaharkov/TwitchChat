@@ -142,8 +142,8 @@
                           }
                       }
                       
-                      n.settings.hideAnimation = "napoZoomOut";
-                      n.settings.showAnimation = "napoZoomIn";
+                      //n.settings.hideAnimation = "napoZoomOut";
+                      //n.settings.showAnimation = "napoZoomIn";
                       
                       if(e.months == 1)
                       {
@@ -156,19 +156,19 @@
                           var mesEl = $("#alert-message");
                           var data = e;
                         
-                          mesEl.addClass("animated " + n.settings.hideAnimation).one(anim, function(e) {
-                            e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated " + n.settings.hideAnimation);
+                          mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+                            e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
                             
                             widget.ab.setMessageTemplate("добро пожаловать", data);
-                            mesEl.removeClass("hidden").addClass("animated " + n.settings.showAnimation).one(anim, function(e) {
-                              e.target == e.currentTarget && mesEl.removeClass("animated " + n.settings.showAnimation);
+                            mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+                              e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
                             
-                              mesEl.addClass("animated " + n.settings.hideAnimation).one(anim, function(e) {
-                                e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated " + n.settings.hideAnimation);
+                              mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+                                e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
                                 
                                 widget.ab.setMessageTemplate("в комманду!", data);
-                                mesEl.removeClass("hidden").addClass("animated " + n.settings.showAnimation).one(anim, function(e) {
-                                  e.target == e.currentTarget && mesEl.removeClass("animated " + n.settings.showAnimation);
+                                mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+                                  e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
                                 });
                               });
                             });
@@ -188,19 +188,19 @@
                           var mesEl = $("#alert-message");
                           var data = e;
                         
-                          mesEl.addClass("animated " + n.settings.hideAnimation).one(anim, function(e) {
-                            e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated " + n.settings.hideAnimation);
+                          mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+                            e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
                             
                             widget.ab.setMessageTemplate("на {months}", data);
-                            mesEl.removeClass("hidden").addClass("animated " + n.settings.showAnimation).one(anim, function(e) {
-                              e.target == e.currentTarget && mesEl.removeClass("animated " + n.settings.showAnimation);
+                            mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+                              e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
                             
-                              mesEl.addClass("animated " + n.settings.hideAnimation).one(anim, function(e) {
-                                e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated " + n.settings.hideAnimation);
+                              mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+                                e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
                                 
                                 widget.ab.setMessageTemplate(monthsName(data.months) + "!", data);
-                                mesEl.removeClass("hidden").addClass("animated " + n.settings.showAnimation).one(anim, function(e) {
-                                  e.target == e.currentTarget && mesEl.removeClass("animated " + n.settings.showAnimation);
+                                mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+                                  e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
                                 });
                               });
                             });
