@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonHelper;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
@@ -8,6 +9,8 @@ namespace TwitchChat.Code.Commands
 {
     public static class CommandAccess
     {
+        private static readonly List<string> DisabledCommands = Configuration.GetSetting("DisabledCommands").Split(',').Select(t => t.ToUpper()).ToList();
+
         private static readonly Dictionary<Command, UserType> Accesses = new Dictionary<Command, UserType>
         {
             { Command.Global, UserType.Default },
@@ -19,7 +22,8 @@ namespace TwitchChat.Code.Commands
             { Command.Help, UserType.Default },
             { Command.Шейкер, UserType.Default },
             { Command.AddSteam, UserType.Broadcaster },
-            { Command.RemoveSteam, UserType.Broadcaster }
+            { Command.RemoveSteam, UserType.Broadcaster },
+            { Command.Мойписюн, UserType.Default }
         };
 
         private static readonly Dictionary<Command, DelayType> CommandDelayType = new Dictionary<Command, DelayType>
@@ -87,6 +91,9 @@ namespace TwitchChat.Code.Commands
 
         public static bool IsHaveAccess(MessageEventArgs e, Command command)
         {
+            if (DisabledCommands.Contains(command.ToString().ToUpper()))
+                return false;
+
             if (Accesses.ContainsKey(command))
                 return Accesses[command] == UserType.Default || (Accesses[command] & e.UserType) != 0;
 

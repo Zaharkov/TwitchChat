@@ -59,8 +59,8 @@ namespace Tests
         [Test]
         public void UserTest()
         {
-            var test1 = UserDecorator.Get("test3", Command.Help);
-            var test2 = UserDecorator.Get("test4", Command.Help);
+            var test1 = UserDecorator.Get("test3", Command.AddSteam);
+            var test2 = UserDecorator.Get("test4", Command.AddSteam);
 
             Execute(test1, true);
 

@@ -24,7 +24,8 @@ namespace TwitchChat.Code.Commands
             if (!CommandAccess.IsHaveAccess(e, command))
             {
                 sendType = SendType.Whisper;
-                return $"У Вас нет доступа к команде !{command}. Список доступных команд можно посмотреть через команду !{Command.Help}";
+                return null;
+                //return $"У Вас нет доступа к команде !{command}. Список доступных команд можно посмотреть через команду !{Command.Help}";
             }
 
             sendType = SendType.Message;
@@ -62,6 +63,9 @@ namespace TwitchChat.Code.Commands
                     break;
                 case Command.Global:
                     return null;
+                case Command.Мойписюн:
+                    commandFunc = MyBolt.Bolt;
+                    break;
                 default:
                     return null;
             }

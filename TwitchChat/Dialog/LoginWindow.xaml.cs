@@ -31,7 +31,7 @@ namespace TwitchChat.Dialog
                     if (string.IsNullOrEmpty(token))
                     {
                         WbMain.Navigating += OnNavigatingTwitch;
-                        WbMain.Navigate(TwitchApiClient.AuthorizeUrl);
+                        WbMain.Navigate(TwitchApiClient.AuthorizeUrl, null, null, "User-Agent: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; MALNJS)\r\n");
                     }
                     else
                     {
@@ -46,7 +46,7 @@ namespace TwitchChat.Dialog
                     if (string.IsNullOrEmpty(token))
                     {
                         WbMain.Navigating += OnNavigatingVk;
-                        WbMain.Navigate(VkApiClient.AuthorizeUrl);
+                        WbMain.Navigate(VkApiClient.AuthorizeUrl, null, null, "User-Agent: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; MALNJS)\r\n");
                     }
                     else
                     {
@@ -57,7 +57,7 @@ namespace TwitchChat.Dialog
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            } 
+            }
         }
 
         public static void Login(LoginType type)

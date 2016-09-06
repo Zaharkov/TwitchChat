@@ -12,6 +12,7 @@ namespace TwitchChat.Code.Commands
         MyTime,
         Шейкер,
         AddSteam,
-        RemoveSteam
+        RemoveSteam,
+        Мойписюн
     }
 }
