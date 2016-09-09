@@ -34,7 +34,7 @@ namespace Database
             {
                 using (var command = new SQLiteCommand())
                 {
-                    command.CommandText = "CREATE TABLE ChattersInfo (name nvarchar(128), chatName nvarchar(128), type nvarchar(35), seconds bigint, steamId bigint, PRIMARY KEY(name, chatName))";
+                    command.CommandText = "CREATE TABLE ChattersInfo (name nvarchar(128), chatName nvarchar(128), type nvarchar(35), seconds bigint, steamId bigint, quizScore int, PRIMARY KEY(name, chatName))";
                     Execute(command);
                 }
             }
@@ -142,12 +142,12 @@ namespace Database
                     var partionList = partion.ToList();
                     var builder = new StringBuilder();
                     var last = partionList.Last();
-                    builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds, steamId) VALUES");
+                    builder.AppendLine(@"INSERT OR REPLACE INTO ChattersInfo (name, chatName, type, seconds, steamId, quizScore) VALUES");
 
                     var i = 1;
                     foreach (var chatterData in partionList)
                     {
-                        builder.AppendLine($"(@name{i}, @chatName{i}, @type{i}, @seconds{i} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i}), (SELECT steamId FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i})){(last == chatterData ? "" : ",")}");
+                        builder.AppendLine($"(@name{i}, @chatName{i}, @type{i}, @seconds{i} + (SELECT COALESCE(SUM(seconds),0) as secSum FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i}), (SELECT steamId FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i}), (SELECT quizScore FROM ChattersInfo WHERE name = @name{i} AND chatName = @chatName{i})){(last == chatterData ? "" : ",")}");
 
                         command.Parameters.Add(new SQLiteParameter($"@name{i}", chatterData.Name));
                         command.Parameters.Add(new SQLiteParameter($"@chatName{i}", chatterData.ChatName));
@@ -285,6 +285,51 @@ namespace Database
                 command.CommandText = "SELECT * FROM Logs";
                 return Execute(command);
             }
+        }
+
+        public static void AddQuizScore(string name, string chatName)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "UPDATE ChattersInfo SET quizScore = CASE WHEN quizScore IS NULL THEN 1 ELSE quizScore + 1 END WHERE name = @name AND chatName = @chatName";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
+                command.Parameters.Add(new SQLiteParameter("@chatName", chatName));
+
+                Execute(command);
+            }
+        }
+
+        public static KeyValuePair<int, int> GetQuizScore(string name, string chatName)
+        {
+            int count;
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT quizScore FROM ChattersInfo WHERE name = @name AND chatName = @chatName";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
+                command.Parameters.Add(new SQLiteParameter("@chatName", chatName));
+
+                var result = Execute(command);
+                count = result.Count == 0 ? 0 : string.IsNullOrEmpty(result[0]["quizScore"]) ? 0 : int.Parse(result[0]["quizScore"]);
+            }
+
+            var score = 0;
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT (CASE WHEN quizScore IS NULL THEN 0 ELSE quizScore END) as score FROM ChattersInfo GROUP BY quizScore ORDER BY quizScore DESC";
+                command.Parameters.Add(new SQLiteParameter("@name", name));
+                command.Parameters.Add(new SQLiteParameter("@chatName", chatName));
+
+                var result = Execute(command);
+                foreach (var keyValue in result)
+                {
+                    score = keyValue.Key + 1;
+
+                    if (int.Parse(keyValue.Value["score"]) == count)
+                        break;
+                }
+            }
+
+            return new KeyValuePair<int, int>(count, score);
         }
     }
 }

@@ -8,7 +8,6 @@ using Database;
 using Database.Entities;
 using TwitchApi;
 using TwitchApi.Entities;
-using TwitchChat.Code.Helpers;
 using TwitchChat.Controls;
 
 namespace TwitchChat.Code.Timers
@@ -16,10 +15,38 @@ namespace TwitchChat.Code.Timers
     public static class TimerFactory
     {
         private static readonly Dictionary<Timer, int> Config = DelayConfig<Timer>.GetDelayConfig("TimersConfig");
+        private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
 
-        public static List<CancellationTokenSource> InitTimers(ChannelViewModel channelModel)
+        public static List<CancellationTokenSource> GetTimers(ChannelViewModel channelModel)
         {
-            var cancelTokens = new List<CancellationTokenSource>();
+            return CancellationTokenSources.ContainsKey(channelModel) 
+                ? CancellationTokenSources[channelModel] 
+                : new List<CancellationTokenSource>();
+        }
+
+        public static void AddToken(ChannelViewModel channelModel, CancellationTokenSource token)
+        {
+            if (CancellationTokenSources.ContainsKey(channelModel))
+            {
+                if(!CancellationTokenSources[channelModel].Contains(token))
+                    CancellationTokenSources[channelModel].Add(token);
+            }
+            else
+            {
+                CancellationTokenSources.Add(channelModel, new List<CancellationTokenSource> {token});
+            }
+        }
+
+        public static void RemoveToken(ChannelViewModel channelModel, CancellationTokenSource token)
+        {
+            if (CancellationTokenSources.ContainsKey(channelModel) && CancellationTokenSources[channelModel].Contains(token))
+                CancellationTokenSources[channelModel].Remove(token);
+        }
+
+        public static void InitTimers(ChannelViewModel channelModel)
+        {
+            var tokenSources = new List<CancellationTokenSource>();
+            CancellationTokenSources.Add(channelModel, tokenSources);
             foreach (Timer timer in Enum.GetValues(typeof(Timer)))
             {
                 var delay = Config.ContainsKey(timer) ? Config[timer] : Config[Timer.Global];
@@ -65,7 +92,7 @@ namespace TwitchChat.Code.Timers
                                 foreach (var user in newUsers.Chatters[chatterType])
                                 {
                                     if (!group.Any(t => t.Name.Equals(user)))
-                                        Application.Current.Dispatcher.Invoke(() => group.Add(new ChatMemberViewModel { Name = user }));
+                                        Application.Current.Dispatcher.Invoke(() => group.Add(new ChatMemberViewModel(user, channelModel)));
                                 }
                             }
 
@@ -78,11 +105,9 @@ namespace TwitchChat.Code.Timers
                 }
 
                 var cancelToken = new CancellationTokenSource();
-                cancelTokens.Add(cancelToken);
+                tokenSources.Add(cancelToken);
                 PeriodicTaskFactory.Start(action, delay * 1000, cancelToken: cancelToken.Token);
             }
-
-            return cancelTokens;
         }
     }
 }

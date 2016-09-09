@@ -13,6 +13,11 @@ namespace TwitchChat.Code.Commands
         Шейкер,
         AddSteam,
         RemoveSteam,
-        Мойписюн
+        Мойписюн,
+        QuizStart,
+        QuizStop,
+        QuizScore,
+        QuizAnswer,
+        QuizQuestion
     }
 }

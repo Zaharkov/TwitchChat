@@ -66,6 +66,21 @@ namespace TwitchChat.Code.Commands
                 case Command.Мойписюн:
                     commandFunc = MyBolt.Bolt;
                     break;
+                case Command.QuizStart:
+                    commandFunc = QiuzCommand.Start;
+                    break;
+                case Command.QuizStop:
+                    commandFunc = QiuzCommand.Stop;
+                    break;
+                case Command.QuizScore:
+                    commandFunc = QiuzCommand.Score;
+                    break;
+                case Command.QuizAnswer:
+                    commandFunc = QiuzCommand.Answer;
+                    break;
+                case Command.QuizQuestion:
+                    commandFunc = QiuzCommand.Question;
+                    break;
                 default:
                     return null;
             }

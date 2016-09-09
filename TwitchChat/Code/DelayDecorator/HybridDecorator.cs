@@ -49,8 +49,10 @@ namespace TwitchChat.Code.DelayDecorator
 
         public string Execute(Func<string> func)
         {
-            User.Execute(func);
-            return Global.Execute(func);
+            var user = User.Execute(func);
+            Global.Execute(func);
+
+            return user;
         }
     }
 }

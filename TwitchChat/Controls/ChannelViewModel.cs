@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Database;
@@ -22,7 +21,6 @@ namespace TwitchChat.Controls
     public class ChannelViewModel : ViewModelBase
     {
         private readonly TwitchIrcClient _irc;
-        private readonly List<CancellationTokenSource> _cancellationTokens;
 
         //  The badges that are taken from https://api.twitch.tv/kraken/chat/{0}/badges
         private readonly Badges _badges;
@@ -89,7 +87,7 @@ namespace TwitchChat.Controls
 
             _badges = TwitchApiClient.GetBadges(channelName);
 
-            _cancellationTokens = TimerFactory.InitTimers(this);
+            TimerFactory.InitTimers(this);
         }
 
         private void OnRawMessage(string buffer)
@@ -109,7 +107,7 @@ namespace TwitchChat.Controls
                     foreach (var name in e.Names[ChannelName])
                     {
                         if (!group.Members.Any(x => name.Equals(x.Name)))
-                            group.Members.Add(new ChatMemberViewModel { Name = name });
+                            group.Members.Add(new ChatMemberViewModel(name, this));
                     }
                 });
             }
@@ -125,7 +123,7 @@ namespace TwitchChat.Controls
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (!group.Members.Any(x => e.Username.Equals(x.Name)))
-                        group.Members.Add(new ChatMemberViewModel { Name = e.Username });
+                        group.Members.Add(new ChatMemberViewModel(e.Username, this));
                 });
             }
         }
@@ -137,7 +135,7 @@ namespace TwitchChat.Controls
 
             if (user == null)
             {
-                user = new ChatMemberViewModel { Name = name };
+                user = new ChatMemberViewModel(name, this);
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -235,7 +233,7 @@ namespace TwitchChat.Controls
 
         private void Part()
         {
-            foreach (var cancellationToken in _cancellationTokens)
+            foreach (var cancellationToken in TimerFactory.GetTimers(this))
             {
                 cancellationToken.Cancel();
                 cancellationToken.Dispose();

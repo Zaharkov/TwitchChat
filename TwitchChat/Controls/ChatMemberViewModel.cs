@@ -5,9 +5,16 @@ namespace TwitchChat.Controls
     //  This can be expanded to store age and other badge information
     public class ChatMemberViewModel
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
+        public ChannelViewModel Channel { get; private set; }
 
         private Stopwatch Timer { get; } = Stopwatch.StartNew();
+
+        public ChatMemberViewModel(string name, ChannelViewModel channel)
+        {
+            Name = name;
+            Channel = channel;
+        }
 
         public long GetTime()
         {

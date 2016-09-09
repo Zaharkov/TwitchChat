@@ -40,8 +40,8 @@ namespace CommonHelper
             Stopwatch stopWatch = new Stopwatch();
             Action wrapperAction = () =>
             {
-                CheckIfCancelled(cancelToken);
-                action();
+                if(!cancelToken.IsCancellationRequested)
+                    action();
             };
 
             Action mainAction = () =>
@@ -77,7 +77,8 @@ namespace CommonHelper
         {
             TaskCreationOptions subTaskCreationOptions = TaskCreationOptions.AttachedToParent | periodicTaskCreationOptions;
 
-            CheckIfCancelled(cancelToken);
+            if (cancelToken.IsCancellationRequested)
+                return;
 
             if (delayInMilliseconds > 0)
             {
@@ -100,7 +101,8 @@ namespace CommonHelper
                 // executing the action
                 while (true)
                 {
-                    CheckIfCancelled(cancelToken);
+                    if (cancelToken.IsCancellationRequested)
+                        break;
 
                     Task subTask = Task.Factory.StartNew(wrapperAction, cancelToken, subTaskCreationOptions, TaskScheduler.Current);
 
@@ -125,7 +127,14 @@ namespace CommonHelper
                     try
                     {
                         stopWatch.Start();
-                        periodResetEvent.Wait(intervalInMilliseconds, cancelToken);
+                        try
+                        {
+                            periodResetEvent.Wait(intervalInMilliseconds, cancelToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            
+                        }
                         stopWatch.Stop();
                     }
                     finally
@@ -133,23 +142,12 @@ namespace CommonHelper
                         periodResetEvent.Reset();
                     }
 
-                    CheckIfCancelled(cancelToken);
+                    if (cancelToken.IsCancellationRequested)
+                        break;
 
                     if (duration > 0 && stopWatch.ElapsedMilliseconds >= duration) { break; }
                 }
             }
-        }
-
-        /// <summary>
-        /// Checks if cancelled.
-        /// </summary>
-        /// <param name="cancellationToken">The cancel token.</param>
-        private static void CheckIfCancelled(CancellationToken cancellationToken)
-        {
-            if (cancellationToken == null)
-                throw new ArgumentNullException(nameof(cancellationToken));
-
-            cancellationToken.ThrowIfCancellationRequested();
         }
     }
 }

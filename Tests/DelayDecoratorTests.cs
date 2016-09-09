@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using NUnit.Framework;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.DelayDecorator;
+using TwitchChat.Code.Quiz;
 
 namespace Tests
 {
@@ -118,6 +120,13 @@ namespace Tests
             Thread.Sleep(1000);
 
             Execute(test1, true);
+        }
+
+        [Test]
+        public void Test3()
+        {
+            Console.WriteLine(QuizHolder.GetQuestionText());
+            
         }
     }
 }

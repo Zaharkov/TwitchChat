@@ -23,7 +23,12 @@ namespace TwitchChat.Code.Commands
             { Command.Шейкер, UserType.Default },
             { Command.AddSteam, UserType.Broadcaster },
             { Command.RemoveSteam, UserType.Broadcaster },
-            { Command.Мойписюн, UserType.Default }
+            { Command.Мойписюн, UserType.Default },
+            { Command.QuizAnswer, UserType.Default },
+            { Command.QuizQuestion, UserType.Default },
+            { Command.QuizScore, UserType.Default },
+            { Command.QuizStart, UserType.Broadcaster | UserType.Moderator },
+            { Command.QuizStop, UserType.Broadcaster | UserType.Moderator  }
         };
 
         private static readonly Dictionary<Command, DelayType> CommandDelayType = new Dictionary<Command, DelayType>
@@ -32,7 +37,9 @@ namespace TwitchChat.Code.Commands
             { Command.AddSteam, DelayType.User},
             { Command.RemoveSteam, DelayType.User},
             { Command.MyTime, DelayType.Hybrid},
-            { Command.Шейкер, DelayType.Hybrid}
+            { Command.Шейкер, DelayType.Hybrid},
+            { Command.QuizAnswer, DelayType.Hybrid},
+            { Command.QuizScore, DelayType.User}
         };
 
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()

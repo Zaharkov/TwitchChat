@@ -64,6 +64,7 @@
     </ApplicationDefinition>
     <Compile Include="Code\Commands\DelayType.cs" />
     <Compile Include="Code\Commands\MyBolt.cs" />
+    <Compile Include="Code\Commands\Quiz.cs" />
     <Compile Include="Code\DelayDecorator\IDelayDecorator.cs" />
     <Compile Include="Code\Commands\SendType.cs" />
     <Compile Include="Code\Commands\CommandAccess.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="Code\DelayDecorator\HybridDecorator.cs" />
     <Compile Include="Code\DelayDecorator\UserDecorator.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
+    <Compile Include="Code\Quiz\QuizHolder.cs" />
+    <Compile Include="Code\Quiz\QuizCollection.cs" />
     <Compile Include="Code\Timers\Help.cs" />
     <Compile Include="Code\Timers\TimerFactory.cs" />
     <Compile Include="Code\Timers\Timer.cs" />
@@ -185,6 +188,9 @@
       <Project>{9e1c9ce7-e1ea-4644-9517-df4d06fa3f18}</Project>
       <Name>VkApi</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Code\Quiz\questions.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />
