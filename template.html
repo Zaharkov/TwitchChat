@@ -80,10 +80,12 @@
       frameborder="0"
       scrolling="no"
       type="text/html"
-      src="http://www.twitchalerts.com/alert-box/v3/420936F44B5975790754"
-      height="200"
-      width="600">
-      <!-- http://www.twitchalerts.com/alert-box/v3/24C866F0FB0837ECF42C?subscriptions=1&donations=1&hosts=1&bits=1 -->
+      src="http://streamlabs.com/alert-box/v3/24C866F0FB0837ECF42C?subscriptions=1&donations=1&hosts=1&bits=1"
+      height="1000"
+      width="1920">
+	  <!-- height = 200 -->
+	  <!-- height = 600 -->
+      <!-- http://streamlabs.com/alert-box/v3/420936F44B5975790754 -->
     </iframe>
     <script>
       $(document).ready(function() {
@@ -122,6 +124,7 @@
           }
       
           widget.showSubscriptionAlert = function(t) {
+			  var _ = require('lodash');
               var e = t,
                   n = _.cloneDeep(this.types.subscription),
                   i = n.settings.layout || this.globalLayout;
