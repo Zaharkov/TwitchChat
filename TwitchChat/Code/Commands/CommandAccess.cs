@@ -9,7 +9,7 @@ namespace TwitchChat.Code.Commands
 {
     public static class CommandAccess
     {
-        private static readonly List<string> DisabledCommands = Configuration.GetSetting("DisabledCommands").Split(',').Select(t => t.ToUpper()).ToList();
+        private static readonly List<Command> DisabledCommands = Configuration.GetSetting("DisabledCommands").Split(',').Select(t => (Command)Enum.Parse(typeof(Command), t, true)).ToList();
 
         private static readonly Dictionary<Command, UserType> Accesses = new Dictionary<Command, UserType>
         {
@@ -45,7 +45,9 @@ namespace TwitchChat.Code.Commands
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()
         {
             var groupedAccess = new Dictionary<List<Command>, UserType>();
-            var copy = Accesses.ToDictionary(k => k.Key, v => v.Value);
+            var copy = Accesses
+                .Where(t => !DisabledCommands.Contains(t.Key))
+                .ToDictionary(k => k.Key, v => v.Value);
 
             foreach (var access in copy)
             {
@@ -98,7 +100,7 @@ namespace TwitchChat.Code.Commands
 
         public static bool IsHaveAccess(MessageEventArgs e, Command command)
         {
-            if (DisabledCommands.Contains(command.ToString().ToUpper()))
+            if (DisabledCommands.Contains(command))
                 return false;
 
             if (Accesses.ContainsKey(command))

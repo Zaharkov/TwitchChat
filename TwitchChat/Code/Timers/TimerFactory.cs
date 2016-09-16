@@ -75,9 +75,9 @@ namespace TwitchChat.Code.Timers
 
                             foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
                             {
-                                var group = channelModel.GetGroup(chatterType).Members;
+                                var group = channelModel.GetGroup(chatterType);
                                 var forDelete = new List<ChatMemberViewModel>();
-                                foreach (var user in group)
+                                foreach (var user in group.Get())
                                 {
                                     if (!newUsers.Chatters[chatterType].Any(t => t.Equals(user.Name)))
                                     {

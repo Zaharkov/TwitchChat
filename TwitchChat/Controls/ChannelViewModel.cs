@@ -106,8 +106,8 @@ namespace TwitchChat.Controls
                 {
                     foreach (var name in e.Names[ChannelName])
                     {
-                        if (!group.Members.Any(x => name.Equals(x.Name)))
-                            group.Members.Add(new ChatMemberViewModel(name, this));
+                        if (!group.Any(x => name.Equals(x.Name)))
+                            group.Add(new ChatMemberViewModel(name, this));
                     }
                 });
             }
@@ -122,8 +122,8 @@ namespace TwitchChat.Controls
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (!group.Members.Any(x => e.Username.Equals(x.Name)))
-                        group.Members.Add(new ChatMemberViewModel(e.Username, this));
+                    if (!group.Any(x => e.Username.Equals(x.Name)))
+                        group.Add(new ChatMemberViewModel(e.Username, this));
                 });
             }
         }
@@ -131,7 +131,7 @@ namespace TwitchChat.Controls
         private ChatMemberViewModel FindOrJoinUser(string name)
         {
             var group = GetGroup();
-            var user = group.Members.FirstOrDefault(x => name.Equals(x.Name));
+            var user = group.FirstOrDefault(x => name.Equals(x.Name));
 
             if (user == null)
             {
@@ -139,8 +139,8 @@ namespace TwitchChat.Controls
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (!group.Members.Any(x => name.Equals(x.Name)))
-                        group.Members.Add(user);
+                    if (!group.Any(x => name.Equals(x.Name)))
+                        group.Add(user);
                 });
             }
 
@@ -153,13 +153,15 @@ namespace TwitchChat.Controls
             {
                 var group = GetGroup();
 
-                var user = group.Members.FirstOrDefault(x => e.Username.Equals(x.Name));
+                var user = group.FirstOrDefault(x => e.Username.Equals(x.Name));
                 if (user != null)
                 {
                     //  Remove once user is gound and removed
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        group.Members.Remove(user);
+                        var chatterData = new ChatterData(user.Name, ChannelName, ChatterType.Viewers.ToString(), user.GetTimeAndRestart());
+                        SqLiteClient.UpdateChatterInfo(new List<ChatterData> { chatterData });
+                        group.Remove(user);
                     });
                 }
             }
@@ -281,8 +283,8 @@ namespace TwitchChat.Controls
             var listForUpdate = new List<ChatterData>();
             foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
             {
-                var group = GetGroup(chatterType).Members;
-                foreach (var user in group)
+                var group = GetGroup(chatterType);
+                foreach (var user in group.Get())
                 {
                     listForUpdate.Add(new ChatterData(user.Name, ChannelName, chatterType.ToString(), user.GetTimeAndRestart()));
                 }

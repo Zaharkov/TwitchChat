@@ -22,6 +22,8 @@ namespace TwitchApi
         static TwitchApiClient()
         {
             ClientApi = new RestClientBuilder().BaseUri(TwitchApiBaseUrl).Build();
+            ClientApi.AddDefaultHeader("Client-ID", TwitchClientId);
+
             ClientTmi = new RestClientBuilder().BaseUri(TwitchTmiBaseUrl).Build();
         }
 
