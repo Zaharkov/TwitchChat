@@ -24,11 +24,12 @@ namespace TwitchChat.Code.Commands
             { Command.AddSteam, UserType.Broadcaster },
             { Command.RemoveSteam, UserType.Broadcaster },
             { Command.Мойписюн, UserType.Default },
-            { Command.QuizAnswer, UserType.Default },
+            { Command.О, UserType.Default },
             { Command.QuizQuestion, UserType.Default },
             { Command.QuizScore, UserType.Default },
             { Command.QuizStart, UserType.Broadcaster | UserType.Moderator },
-            { Command.QuizStop, UserType.Broadcaster | UserType.Moderator  }
+            { Command.QuizStop, UserType.Broadcaster | UserType.Moderator },
+            { Command.Эба, UserType.Default  }
         };
 
         private static readonly Dictionary<Command, DelayType> CommandDelayType = new Dictionary<Command, DelayType>
@@ -38,8 +39,10 @@ namespace TwitchChat.Code.Commands
             { Command.RemoveSteam, DelayType.User},
             { Command.MyTime, DelayType.Hybrid},
             { Command.Шейкер, DelayType.Hybrid},
-            { Command.QuizAnswer, DelayType.Hybrid},
-            { Command.QuizScore, DelayType.User}
+            { Command.Эба, DelayType.Hybrid},
+            { Command.О, DelayType.Hybrid},
+            { Command.QuizScore, DelayType.User},
+            { Command.Мойписюн, DelayType.Hybrid}
         };
 
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()
@@ -84,7 +87,7 @@ namespace TwitchChat.Code.Commands
                         emptyUserList = grouped.Key;
                 }
 
-                if (!inList)
+                if (!inList && !DisabledCommands.Contains(command))
                 {
                     if (emptyUserList != null)
                         emptyUserList.Add(command);

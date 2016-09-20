@@ -63,6 +63,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Code\Commands\DelayType.cs" />
+    <Compile Include="Code\Commands\Eva.cs" />
     <Compile Include="Code\Commands\MyBolt.cs" />
     <Compile Include="Code\Commands\Quiz.cs" />
     <Compile Include="Code\DelayDecorator\IDelayDecorator.cs" />

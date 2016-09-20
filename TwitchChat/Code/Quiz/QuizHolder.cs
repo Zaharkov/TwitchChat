@@ -25,7 +25,7 @@ namespace TwitchChat.Code.Quiz
             var answer = Question.Value.Value;
             var answerStars = string.Join(" ", answer.Split(' ').Select(GetWordWithStars));
 
-            return $"Вопрос викторины: {Question.Value.Key}. Подсказка: {answerStars}. Для ответа введите: !{Command.QuizAnswer} ответ.";
+            return $"Вопрос викторины: {Question.Value.Key}. Подсказка: {answerStars}. Для ответа введите: !{Command.О} ответ.";
         }
 
         private static string GetWordWithStars(string word)

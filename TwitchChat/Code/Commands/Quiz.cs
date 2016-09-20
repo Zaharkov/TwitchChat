@@ -45,7 +45,7 @@ namespace TwitchChat.Code.Commands
             if (!QuizHolder.IsQuizActive || !QuizHolder.Question.HasValue)
                 return null;
 
-            var answerUser = e.Message.ToUpper().Replace($"!{Command.QuizAnswer}".ToUpper(), "").Trim();
+            var answerUser = e.Message.ToUpper().Replace($"!{Command.О}".ToUpper(), "").Trim();
             var answerQuiz = QuizHolder.Question.Value.Value.ToUpper();
 
             if (answerQuiz == answerUser)

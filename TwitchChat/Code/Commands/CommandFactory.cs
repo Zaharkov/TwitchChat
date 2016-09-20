@@ -75,11 +75,14 @@ namespace TwitchChat.Code.Commands
                 case Command.QuizScore:
                     commandFunc = QiuzCommand.Score;
                     break;
-                case Command.QuizAnswer:
+                case Command.О:
                     commandFunc = QiuzCommand.Answer;
                     break;
                 case Command.QuizQuestion:
                     commandFunc = QiuzCommand.Question;
+                    break;
+                case Command.Эба:
+                    commandFunc = Eva.EvaDavai;
                     break;
                 default:
                     return null;

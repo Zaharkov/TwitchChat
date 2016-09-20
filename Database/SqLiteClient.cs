@@ -121,6 +121,17 @@ namespace Database
             } 
         }
 
+        public static void DeleteToken(AccessTokenType type)
+        {
+            using (var command = new SQLiteCommand())
+            {
+                command.CommandText = "DELETE FROM AccessTokens WHERE type = @tokenType";
+                command.Parameters.Add(new SQLiteParameter("@tokenType", type.ToString()));
+
+                Execute(command);
+            }
+        }
+
         public static Dictionary<int, Dictionary<string, string>> GetTokens()
         {
             using (var command = new SQLiteCommand())

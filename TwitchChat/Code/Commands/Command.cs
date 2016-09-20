@@ -17,7 +17,8 @@ namespace TwitchChat.Code.Commands
         QuizStart,
         QuizStop,
         QuizScore,
-        QuizAnswer,
-        QuizQuestion
+        О,
+        QuizQuestion,
+        Эба
     }
 }
