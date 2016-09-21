@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TwitchChat.Controls
@@ -18,11 +19,11 @@ namespace TwitchChat.Controls
             Members = new ObservableCollection<ChatMemberViewModel>();
         }
 
-        public ObservableCollection<ChatMemberViewModel> Get()
+        public List<ChatMemberViewModel> Get()
         {
             lock (_lock)
             {
-                return Members;
+                return Members.ToList();
             }
         }
 
