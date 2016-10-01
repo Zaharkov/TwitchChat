@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VkApi", "VkApi\VkApi.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestClientHelper", "RestClientHelper\RestClientHelper.csproj", "{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{4794D8CF-BDAE-48F9-B5E9-E62980B69830}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamKit2", "SteamKit\SteamKit2\SteamKit2\SteamKit2.csproj", "{BEB5BF07-BB56-402A-97A3-A41C6444C6A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaClient", "DotaClient\DotaClient.csproj", "{BE3021D8-2A45-418C-AABE-877B3B01D746}"
@@ -22,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonHelper", "CommonHelper\CommonHelper.csproj", "{50E9E3B8-177F-470C-A0D7-E564C79D8143}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{1EDA606E-0675-4769-9007-34F471C977B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,14 +63,6 @@ Global
 		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|Any CPU.Build.0 = Release|Any CPU
 		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|x86.ActiveCfg = Release|Any CPU
 		{10A2C777-9BBF-4E12-ADC8-71A1BBEA2550}.Release|x86.Build.0 = Release|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Debug|x86.Build.0 = Debug|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|x86.ActiveCfg = Release|Any CPU
-		{4794D8CF-BDAE-48F9-B5E9-E62980B69830}.Release|x86.Build.0 = Release|Any CPU
 		{BEB5BF07-BB56-402A-97A3-A41C6444C6A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BEB5BF07-BB56-402A-97A3-A41C6444C6A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEB5BF07-BB56-402A-97A3-A41C6444C6A5}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -111,6 +103,14 @@ Global
 		{1EDA606E-0675-4769-9007-34F471C977B8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1EDA606E-0675-4769-9007-34F471C977B8}.Release|x86.ActiveCfg = Release|Any CPU
 		{1EDA606E-0675-4769-9007-34F471C977B8}.Release|x86.Build.0 = Release|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Debug|x86.Build.0 = Debug|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1C47748-249C-4C5F-A6B4-0537BBEE8EC4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

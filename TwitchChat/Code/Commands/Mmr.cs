@@ -1,6 +1,6 @@
 ﻿using CommonHelper;
-using Database;
-using Database.Entities;
+using Domain.Models;
+using Domain.Repositories;
 using DotaClient;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
@@ -16,7 +16,7 @@ namespace TwitchChat.Code.Commands
             int? soloInt = null;
             int? partyInt = null;
 
-            var soloDb = SqLiteClient.GetNotExpiredToken(AccessTokenType.SoloMmr);
+            var soloDb = AccessTokenRepository.Instance.GetNotExpiredToken(AccessTokenType.SoloMmr);
             if (!string.IsNullOrEmpty(soloDb))
             {
                 int tryParse;
@@ -25,7 +25,7 @@ namespace TwitchChat.Code.Commands
                     soloInt = tryParse;
             }
 
-            var partyDb = SqLiteClient.GetNotExpiredToken(AccessTokenType.PartyMmr);
+            var partyDb = AccessTokenRepository.Instance.GetNotExpiredToken(AccessTokenType.PartyMmr);
             if (!string.IsNullOrEmpty(partyDb))
             {
                 int tryParse;
@@ -56,8 +56,8 @@ namespace TwitchChat.Code.Commands
             solo = solo.HasValue && solo.Value > 0 ? solo : null;
             party = party.HasValue && party.Value > 0 ? party : null;
 
-            SqLiteClient.AddToken(AccessTokenType.SoloMmr, solo?.ToString() ?? "0", Delay);
-            SqLiteClient.AddToken(AccessTokenType.PartyMmr, party?.ToString() ?? "0", Delay);
+            AccessTokenRepository.Instance.AddToken(AccessTokenType.SoloMmr, solo?.ToString() ?? "0", Delay);
+            AccessTokenRepository.Instance.AddToken(AccessTokenType.PartyMmr, party?.ToString() ?? "0", Delay);
         }
 
         private static string BuildString(int? soloInt, int? partyInt)

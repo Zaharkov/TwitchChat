@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
-using Database;
+using Domain.Repositories;
 
 namespace TwitchChat
 {
@@ -32,7 +32,7 @@ namespace TwitchChat
 
             Current.DispatcherUnhandledException += (serder, ee) =>
             {
-                SqLiteClient.LogException("Fatal error in application", ee.Exception);
+                LogRepository.Instance.LogException("Fatal error in application", ee.Exception);
                 _vm.Logout();
             };
 

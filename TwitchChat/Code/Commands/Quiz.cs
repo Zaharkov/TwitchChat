@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CommonHelper;
-using Database;
+using Domain.Repositories;
 using TwitchChat.Code.Quiz;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
@@ -35,7 +35,7 @@ namespace TwitchChat.Code.Commands
 
         public static string Score(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            var score = SqLiteClient.GetQuizScore(userModel.Name, e.Channel);
+            var score = ChatterInfoRepository.Instance.GetQuizScore(userModel.Name, e.Channel);
 
             return $"ты ответил(а) на {score.Key} {GetName(score.Key)}. Позиция в рейтинге - {score.Value}";
         }
@@ -51,7 +51,7 @@ namespace TwitchChat.Code.Commands
             if (answerQuiz == answerUser)
             {
                 QuizHolder.StopQuiz(userModel.Channel);
-                SqLiteClient.AddQuizScore(userModel.Name, e.Channel);
+                ChatterInfoRepository.Instance.AddQuizScore(userModel.Name, e.Channel);
 
                 Task.Run(() =>
                 {

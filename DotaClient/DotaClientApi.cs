@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AE.Net.Mail;
 using CommonHelper;
-using Database;
+using Domain.Repositories;
 using DotaClient.Friend;
 using SteamKit2;
 using SteamKit2.GC;
@@ -171,7 +171,7 @@ namespace DotaClient
             }
             catch (Exception ex)
             {
-                SqLiteClient.LogException("Error while try get MMR", ex);
+                LogRepository.Instance.LogException("Error while try get MMR", ex);
                 Logger.WriteLine($"Error while try get MMR: {ex}");
             }
         }
@@ -198,7 +198,7 @@ namespace DotaClient
             }
             catch (Exception ex)
             {
-                SqLiteClient.LogException("Error while try add steam friend", ex);
+                LogRepository.Instance.LogException("Error while try add steam friend", ex);
                 Logger.WriteLine($"Error while try add steam friend: {ex}");
             }
 
@@ -235,7 +235,7 @@ namespace DotaClient
             }
             catch (Exception ex)
             {
-                SqLiteClient.LogException("Error while try remove steam friend", ex);
+                LogRepository.Instance.LogException("Error while try remove steam friend", ex);
                 Logger.WriteLine($"Error while try remove steam friend: {ex}");
             }
 

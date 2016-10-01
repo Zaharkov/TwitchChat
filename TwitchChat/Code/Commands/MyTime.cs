@@ -1,4 +1,4 @@
-﻿using Database;
+﻿using Domain.Repositories;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
 
@@ -9,7 +9,7 @@ namespace TwitchChat.Code.Commands
         public static string GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var chatTime = userModel.GetTime();
-            var dbTime = SqLiteClient.GetChatterTime(userModel.Name, e.Channel);
+            var dbTime = ChatterInfoRepository.Instance.GetChatterTime(userModel.Name, e.Channel);
 
             var totalTime = chatTime + dbTime;
 

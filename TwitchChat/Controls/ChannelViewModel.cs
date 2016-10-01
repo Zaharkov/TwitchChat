@@ -9,8 +9,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Database;
-using Database.Entities;
+using Domain.Models;
+using Domain.Repositories;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
 using Twitchiedll.IRC;
@@ -159,8 +159,18 @@ namespace TwitchChat.Controls
                     //  Remove once user is gound and removed
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        var chatterData = new ChatterData(user.Name, ChannelName, ChatterType.Viewers.ToString(), user.GetTimeAndRestart());
-                        SqLiteClient.UpdateChatterInfo(new List<ChatterData> { chatterData });
+                        var chatterData = new Domain.Models.ChatterInfo
+                        {
+                            Chatter = new Chatter
+                            {
+                                Name = user.Name,
+                                ChatName = ChannelName,
+                                Type = ChatterType.Viewers.ToString()
+                            },
+                            Seconds = user.GetTimeAndRestart()
+                        };
+
+                        ChatterInfoRepository.Instance.UpdateChatterInfo(new List<Domain.Models.ChatterInfo> { chatterData });
                         group.Remove(user);
                     });
                 }
@@ -280,17 +290,26 @@ namespace TwitchChat.Controls
 
         public void UpdateChattersInfo()
         {
-            var listForUpdate = new List<ChatterData>();
+            var listForUpdate = new List<Domain.Models.ChatterInfo>();
             foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
             {
                 var group = GetGroup(chatterType);
                 foreach (var user in group.Get())
                 {
-                    listForUpdate.Add(new ChatterData(user.Name, ChannelName, chatterType.ToString(), user.GetTimeAndRestart()));
+                    listForUpdate.Add(new Domain.Models.ChatterInfo
+                    {
+                        Chatter = new Chatter
+                        {
+                            Name = user.Name,
+                            ChatName = ChannelName,
+                            Type = chatterType.ToString()
+                        },
+                        Seconds = user.GetTimeAndRestart()
+                    });
                 }
             }
 
-            SqLiteClient.UpdateChatterInfo(listForUpdate);
+            ChatterInfoRepository.Instance.UpdateChatterInfo(listForUpdate);
         }
 
         #endregion

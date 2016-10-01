@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using CommonHelper;
-using Database;
-using Database.Entities;
+using Domain.Models;
+using Domain.Repositories;
 using TwitchApi;
 using TwitchApi.Entities;
 using TwitchChat.Controls;
+using ChatterInfo = Domain.Models.ChatterInfo;
 
 namespace TwitchChat.Code.Timers
 {
@@ -71,7 +72,7 @@ namespace TwitchChat.Code.Timers
                         action = () =>
                         {
                             var newUsers = TwitchApiClient.GetUsersList(channelModel.ChannelName);
-                            var listForUpdate = new List<ChatterData>();
+                            var listForUpdate = new List<ChatterInfo>();
 
                             foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
                             {
@@ -82,7 +83,16 @@ namespace TwitchChat.Code.Timers
                                     if (!newUsers.Chatters[chatterType].Any(t => t.Equals(user.Name)))
                                     {
                                         forDelete.Add(user);
-                                        listForUpdate.Add(new ChatterData(user.Name, channelModel.ChannelName, chatterType.ToString(), user.GetTimeAndRestart()));
+                                        listForUpdate.Add(new ChatterInfo
+                                        {
+                                            Chatter = new Chatter
+                                            {
+                                                Name = user.Name,
+                                                ChatName = channelModel.ChannelName,
+                                                Type = chatterType.ToString()
+                                            },
+                                            Seconds = user.GetTimeAndRestart()
+                                        });
                                     }
                                 }
 
@@ -96,7 +106,7 @@ namespace TwitchChat.Code.Timers
                                 }
                             }
 
-                            SqLiteClient.UpdateChatterInfo(listForUpdate);
+                            ChatterInfoRepository.Instance.UpdateChatterInfo(listForUpdate);
                         };
                         break;
                     }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Navigation;
-using Database;
-using Database.Entities;
+using Domain.Models;
+using Domain.Repositories;
 using TwitchApi;
 using VkApi;
 
@@ -27,7 +27,7 @@ namespace TwitchChat.Dialog
             {
                 case LoginType.Twitch:
                 {
-                    var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Twitch);
+                    var token = AccessTokenRepository.Instance.GetNotExpiredToken(AccessTokenType.Twitch);
                     if (string.IsNullOrEmpty(token))
                     {
                         WbMain.Navigating += OnNavigatingTwitch;
@@ -42,7 +42,7 @@ namespace TwitchChat.Dialog
                 }
                 case LoginType.Vk:
                 {
-                    var token = SqLiteClient.GetNotExpiredToken(AccessTokenType.Vk, 3600 * 12);
+                    var token = AccessTokenRepository.Instance.GetNotExpiredToken(AccessTokenType.Vk, 3600 * 12);
                     if (string.IsNullOrEmpty(token))
                     {
                         WbMain.Navigating += OnNavigatingVk;
@@ -80,7 +80,7 @@ namespace TwitchChat.Dialog
                     {
                         case "access_token":
                             TwitchApiClient.SetToken(values[1]);
-                            SqLiteClient.AddToken(AccessTokenType.Twitch, values[1]);
+                            AccessTokenRepository.Instance.AddToken(AccessTokenType.Twitch, values[1]);
                             break;
                     }
                 }
@@ -97,7 +97,7 @@ namespace TwitchChat.Dialog
                 var code = fragments[1];
 
                 var token = VkApiClient.GetToken(code);
-                SqLiteClient.AddToken(AccessTokenType.Vk, token.AccessToken, token.Expire);
+                AccessTokenRepository.Instance.AddToken(AccessTokenType.Vk, token.AccessToken, token.Expire);
 
                 WbMain.Navigating -= OnNavigatingVk;
                 Close();
