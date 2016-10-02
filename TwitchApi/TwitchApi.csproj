@@ -57,6 +57,9 @@
     <Compile Include="Entities\Server.cs" />
     <Compile Include="Entities\ChatterInfo.cs" />
     <Compile Include="Entities\Servers.cs" />
+    <Compile Include="Entities\Channel.cs" />
+    <Compile Include="Entities\Stream.cs" />
+    <Compile Include="Entities\StreamInfo.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="TwitchApiClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

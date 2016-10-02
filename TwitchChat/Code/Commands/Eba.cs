@@ -6,11 +6,11 @@ using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
-    public static class Eva
+    public static class Eba
     {
         private static readonly Random Rnd = new Random();
 
-        public static string EvaDavai(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static string EbaComeOn(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             string name = null;
             var chatters = new List<ChatMemberViewModel>();

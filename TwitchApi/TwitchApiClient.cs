@@ -95,6 +95,17 @@ namespace TwitchApi
             return ExecuteApi<User>(request);
         }
 
+        public static StreamInfo GetStreamInfo(string name)
+        {
+            Check.ForNullReference(name, nameof(name));
+
+            var request = new RestRequestBuilder($"/kraken/streams/{name}")
+               .Method(Method.GET)
+               .Build();
+
+            return ExecuteApi<StreamInfo>(request);
+        }
+
         private static T ExecuteTmi<T>(IRestRequest request) where T : class, new()
         {
             return Execute<T>(ClientTmi, request);

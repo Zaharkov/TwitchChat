@@ -26,3 +26,4 @@ obj/
 bin/
 packages/
 Output-Debug.txt
+.vs/config/applicationhost.config

@@ -19,6 +19,8 @@ namespace TwitchChat.Code.Commands
         QuizScore,
         О,
         QuizQuestion,
-        Эба
+        Эба,
+        UpTime,
+        Delay
     }
 }

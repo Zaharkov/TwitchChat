@@ -23,11 +23,13 @@ namespace Domain.Repositories
             if (!chattersInfo.Any())
                 return;
 
-            var list = _chatterRepository.GetList(t => chattersInfo.Any(k =>
+            var context = new ChatterInfoRepository();
+
+            var list = context._chatterRepository.GetList(t => chattersInfo.Any(k =>
                 k.Chatter.Name.Equals(t.Name, StringComparison.InvariantCultureIgnoreCase) && 
                 k.Chatter.ChatName.Equals(t.ChatName, StringComparison.InvariantCultureIgnoreCase)
             ));
-            var exists = Table.AsEnumerable().Where(t => list.Any(k => k.Id == t.ChatterId)).ToList();
+            var exists = context.Table.AsEnumerable().Where(t => list.Any(k => k.Id == t.ChatterId)).ToList();
 
             foreach (var chatterInfo in exists)
             {
@@ -39,8 +41,8 @@ namespace Domain.Repositories
                 chattersInfo.Remove(chatter);
             }
 
-            AddOrUpdateRange(exists);
-            AddOrUpdateRange(chattersInfo);
+            context.AddOrUpdateRange(exists);
+            context.AddOrUpdateRange(chattersInfo);
         }
 
         public long GetChatterTime(string name, string chatName)

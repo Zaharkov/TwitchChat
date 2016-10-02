@@ -82,7 +82,13 @@ namespace TwitchChat.Code.Commands
                     commandFunc = QiuzCommand.Question;
                     break;
                 case Command.Эба:
-                    commandFunc = Eva.EvaDavai;
+                    commandFunc = Eba.EbaComeOn;
+                    break;
+                case Command.UpTime:
+                    commandFunc = StreamCommand.GetUpTime;
+                    break;
+                case Command.Delay:
+                    commandFunc = StreamCommand.GetDelay;
                     break;
                 default:
                     return null;

@@ -29,7 +29,9 @@ namespace TwitchChat.Code.Commands
             { Command.QuizScore, UserType.Default },
             { Command.QuizStart, UserType.Broadcaster | UserType.Moderator },
             { Command.QuizStop, UserType.Broadcaster | UserType.Moderator },
-            { Command.Эба, UserType.Default  }
+            { Command.Эба, UserType.Default },
+            { Command.UpTime, UserType.Default },
+            { Command.Delay, UserType.Default }
         };
 
         private static readonly Dictionary<Command, DelayType> CommandDelayType = new Dictionary<Command, DelayType>
