@@ -161,15 +161,7 @@ namespace TwitchChat.Controls
                         group.Remove(user);
                     });
 
-                    var chatterData = new Domain.Models.ChatterInfo
-                    {
-                        Name = user.Name,
-                        ChatName = ChannelName,
-                        Type = ChatterType.Viewers.ToString(),
-                        Seconds = user.GetTimeAndRestart()
-                    };
-
-                    ChatterInfoRepository.Instance.UpdateChatterInfo(ChannelName, new List<Domain.Models.ChatterInfo> { chatterData });
+                    ChatterInfoRepository.Instance.AddSecods(user.Name, ChannelName, user.GetTimeAndRestart());
                 }
             }
         }
@@ -198,6 +190,13 @@ namespace TwitchChat.Controls
                                 break;
                             case SendType.Message:
                                 _irc.Message(ChannelName, result);
+                                var userInfo = _irc.UserStateInfo[_channelName];
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, false, _badges));
+                                    if (Messages.Count > App.Maxmessages)
+                                        Messages.RemoveAt(0);
+                                });
                                 break;
                             case SendType.Whisper:
                                 _irc.Whisper(e.Username, result);
@@ -229,13 +228,14 @@ namespace TwitchChat.Controls
                 Message = Message.Remove(0, 3).TrimStart(' ');
             }
 
+            _irc.Message(_channelName, Message);
+
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, isAction, _badges));
                 if (Messages.Count > App.Maxmessages)
                     Messages.RemoveAt(0);
 
-                _irc.Message(_channelName, Message);
                 Message = string.Empty;
             });
         }

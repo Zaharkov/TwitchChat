@@ -15,14 +15,13 @@ namespace Domain.Repositories
 
         public static ChatterInfoRepository Instance => _instance ?? (_instance = new ChatterInfoRepository());
 
-        public void UpdateChatterInfo(string chatName, List<ChatterInfo> chattersInfo, bool newContext = false)
+        public void UpdateChatterInfo(string chatName, List<ChatterInfo> chattersInfo)
         {
             if (!chattersInfo.Any())
                 return;
 
-            var context = newContext ? new ChatterInfoRepository() : Instance;
             var namesList = chattersInfo.Select(t => t.Name);
-            var exists = context.Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var exists = Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName));
 
             foreach (var chatterInfo in exists)
             {
@@ -38,8 +37,24 @@ namespace Domain.Repositories
                 }
             }
 
-            context.AddOrUpdateRange(exists);
-            context.AddOrUpdateRange(chattersInfo);
+            UpdateRange(exists);
+            AddRange(chattersInfo);
+        }
+
+        public void AddSecods(string name, string chatName, long seconds)
+        {
+            var chatterInfo = Table.FirstOrDefault(t =>
+                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+                ) ?? new ChatterInfo
+                {
+                    Name = name,
+                    ChatName = chatName,
+                    Type = ""
+                };
+
+            chatterInfo.Seconds += seconds;
+            AddOrUpdate(chatterInfo);
         }
 
         public long GetChatterTime(string name, string chatName)
@@ -74,22 +89,22 @@ namespace Domain.Repositories
 
         public void AddChatterSteamId(string name, long steamId)
         {
-            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
             foreach (var chatterInfo in chatters)
                 chatterInfo.SteamId = steamId;
 
-            AddOrUpdateRange(chatters);
+            UpdateRange(chatters);
         }
 
         public void DeleteChatterSteamId(string name)
         {
-            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
             foreach (var chatterInfo in chatters)
                 chatterInfo.SteamId = null;
 
-            AddOrUpdateRange(chatters);
+            UpdateRange(chatters);
         }
 
         public List<ChatterInfo> GetChattersInfo()
@@ -111,6 +126,14 @@ namespace Domain.Repositories
 
             if (chatter != null)
                 Delete(chatter);
+        }
+
+        public void DeleteChatterInfo(string chatName, List<ChatterInfo> chatters)
+        {
+            var namesList = chatters.Select(t => t.Name);
+            var exists = Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName));
+
+            DeleteRange(exists);
         }
 
         public void AddQuizScore(string name, string chatName)

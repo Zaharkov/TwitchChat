@@ -36,7 +36,18 @@ namespace Domain.Repositories
             return Entities.Find(id);
         }
 
-        protected void AddOrUpdateRange(List<T> entities)
+        protected void UpdateRange(IEnumerable<T> entities)
+        {
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities));
+
+            foreach (var entity in entities)
+                Entities.AddOrUpdate(entity);
+
+            Context.SaveChanges();
+        }
+
+        protected void AddRange(List<T> entities)
         {
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));
@@ -44,9 +55,7 @@ namespace Domain.Repositories
             if (!entities.Any())
                 return;
 
-            foreach (var entity in entities)
-                Entities.AddOrUpdate(entity);
-
+            Entities.AddRange(entities);
             Context.SaveChanges();
         }
 
@@ -68,6 +77,15 @@ namespace Domain.Repositories
                 Entities.Attach(entity);
 
             Entities.Remove(entity);
+            Context.SaveChanges();
+        }
+
+        protected void DeleteRange(IEnumerable<T> entities)
+        {
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities));
+
+            Entities.RemoveRange(entities);
             Context.SaveChanges();
         }
     }

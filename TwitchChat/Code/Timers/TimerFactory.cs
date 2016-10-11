@@ -92,17 +92,20 @@ namespace TwitchChat.Code.Timers
                                     }
                                 }
 
-                                foreach (var memberViewModel in forDelete)
-                                    Application.Current.Dispatcher.Invoke(() => group.Remove(memberViewModel));
-
-                                foreach (var user in newUsers.Chatters[chatterType])
+                                Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    if (!group.Any(t => t.Name.Equals(user)))
-                                        Application.Current.Dispatcher.Invoke(() => group.Add(new ChatMemberViewModel(user, channelModel)));
-                                }
+                                    foreach (var memberViewModel in forDelete)
+                                        group.Remove(memberViewModel);
+
+                                    foreach (var user in newUsers.Chatters[chatterType])
+                                    {
+                                        if (!group.Any(t => t.Name.Equals(user)))
+                                            group.Add(new ChatMemberViewModel(user, channelModel));
+                                    }
+                                });
                             }
 
-                            ChatterInfoRepository.Instance.UpdateChatterInfo(channelModel.ChannelName, listForUpdate, true);
+                            ChatterInfoRepository.Instance.UpdateChatterInfo(channelModel.ChannelName, listForUpdate);
                         };
                         break;
                     }
