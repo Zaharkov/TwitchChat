@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Domain.Models;
 using Domain.Repositories;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
@@ -159,20 +158,18 @@ namespace TwitchChat.Controls
                     //  Remove once user is gound and removed
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        var chatterData = new Domain.Models.ChatterInfo
-                        {
-                            Chatter = new Chatter
-                            {
-                                Name = user.Name,
-                                ChatName = ChannelName,
-                                Type = ChatterType.Viewers.ToString()
-                            },
-                            Seconds = user.GetTimeAndRestart()
-                        };
-
-                        ChatterInfoRepository.Instance.UpdateChatterInfo(new List<Domain.Models.ChatterInfo> { chatterData });
                         group.Remove(user);
                     });
+
+                    var chatterData = new Domain.Models.ChatterInfo
+                    {
+                        Name = user.Name,
+                        ChatName = ChannelName,
+                        Type = ChatterType.Viewers.ToString(),
+                        Seconds = user.GetTimeAndRestart()
+                    };
+
+                    ChatterInfoRepository.Instance.UpdateChatterInfo(ChannelName, new List<Domain.Models.ChatterInfo> { chatterData });
                 }
             }
         }
@@ -208,7 +205,7 @@ namespace TwitchChat.Controls
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
                         }
-                    }
+                    }  
                 }
             }
         }
@@ -298,18 +295,15 @@ namespace TwitchChat.Controls
                 {
                     listForUpdate.Add(new Domain.Models.ChatterInfo
                     {
-                        Chatter = new Chatter
-                        {
-                            Name = user.Name,
-                            ChatName = ChannelName,
-                            Type = chatterType.ToString()
-                        },
+                        Name = user.Name,
+                        ChatName = ChannelName,
+                        Type = chatterType.ToString(),
                         Seconds = user.GetTimeAndRestart()
                     });
                 }
             }
 
-            ChatterInfoRepository.Instance.UpdateChatterInfo(listForUpdate);
+            ChatterInfoRepository.Instance.UpdateChatterInfo(ChannelName, listForUpdate);
         }
 
         #endregion

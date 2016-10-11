@@ -7,38 +7,35 @@ namespace Domain.Repositories
 {
     public class ChatterInfoRepository : BaseRepository<ChatterInfo>
     {
-        private readonly ChatterRepository _chatterRepository;
-
         private ChatterInfoRepository()
         {
-            _chatterRepository = ChatterRepository.Instance;
         }
 
         private static ChatterInfoRepository _instance;
 
         public static ChatterInfoRepository Instance => _instance ?? (_instance = new ChatterInfoRepository());
 
-        public void UpdateChatterInfo(List<ChatterInfo> chattersInfo)
+        public void UpdateChatterInfo(string chatName, List<ChatterInfo> chattersInfo, bool newContext = false)
         {
             if (!chattersInfo.Any())
                 return;
 
-            var context = new ChatterInfoRepository();
-
-            var list = context._chatterRepository.GetList(t => chattersInfo.Any(k =>
-                k.Chatter.Name.Equals(t.Name, StringComparison.InvariantCultureIgnoreCase) && 
-                k.Chatter.ChatName.Equals(t.ChatName, StringComparison.InvariantCultureIgnoreCase)
-            ));
-            var exists = context.Table.AsEnumerable().Where(t => list.Any(k => k.Id == t.ChatterId)).ToList();
+            var context = newContext ? new ChatterInfoRepository() : Instance;
+            var namesList = chattersInfo.Select(t => t.Name);
+            var exists = context.Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             foreach (var chatterInfo in exists)
             {
-                var chatter = chattersInfo.First(t => 
-                    t.Chatter.Name.Equals(chatterInfo.Chatter.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    t.Chatter.ChatName.Equals(chatterInfo.Chatter.ChatName, StringComparison.InvariantCultureIgnoreCase)
+                var chatter = chattersInfo.FirstOrDefault(t => 
+                    t.Name.Equals(chatterInfo.Name, StringComparison.InvariantCultureIgnoreCase) &&
+                    t.ChatName.Equals(chatterInfo.ChatName, StringComparison.InvariantCultureIgnoreCase)
                 );
-                chatterInfo.Seconds += chatter.Seconds;
-                chattersInfo.Remove(chatter);
+
+                if (chatter != null)
+                {
+                    chatterInfo.Seconds += chatter.Seconds;
+                    chattersInfo.Remove(chatter);
+                }
             }
 
             context.AddOrUpdateRange(exists);
@@ -48,20 +45,20 @@ namespace Domain.Repositories
         public long GetChatterTime(string name, string chatName)
         {
             var chatter = Table.FirstOrDefault(t => 
-                t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.Chatter.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
             );
             return chatter?.Seconds ?? 0;
         }
 
         public bool IsChatterExist(string name)
         {
-            return Table.Any(t => t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return Table.Any(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public long? GetChatterSteamId(string name)
         {
-            var chatter = Table.FirstOrDefault(t => t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var chatter = Table.FirstOrDefault(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             return chatter?.SteamId;
         }
 
@@ -70,14 +67,14 @@ namespace Domain.Repositories
             var chatter = Table.FirstOrDefault(t => t.SteamId.HasValue && t.SteamId.Value == steamId);
 
             if (chatter != null)
-                name = chatter.Chatter.Name;
+                name = chatter.Name;
 
             return chatter != null;
         }
 
         public void AddChatterSteamId(string name, long steamId)
         {
-            var chatters = Table.Where(t => t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             foreach (var chatterInfo in chatters)
                 chatterInfo.SteamId = steamId;
@@ -87,7 +84,7 @@ namespace Domain.Repositories
 
         public void DeleteChatterSteamId(string name)
         {
-            var chatters = Table.Where(t => t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             foreach (var chatterInfo in chatters)
                 chatterInfo.SteamId = null;
@@ -100,32 +97,36 @@ namespace Domain.Repositories
             return Table.ToList();
         }
 
+        public List<ChatterInfo> GetChattersInfo(Func<ChatterInfo, bool> predicate)
+        {
+            return Table.Where(predicate).ToList();
+        }
+
         public void DeleteChatterInfo(string name, string chatName)
         {
             var chatter = Table.FirstOrDefault(t => 
-                t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.Chatter.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
             );
 
             if (chatter != null)
-            {
                 Delete(chatter);
-                _chatterRepository.DeleteChatter(chatter.Chatter);
-            }
         }
 
         public void AddQuizScore(string name, string chatName)
         {
             var chatterInfo = Table.FirstOrDefault(t =>
-                t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.Chatter.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
             );
 
             if (chatterInfo == null)
             {
                 chatterInfo = new ChatterInfo
                 {
-                    Chatter = _chatterRepository.AddChatter(chatName, name)
+                    Name = name,
+                    ChatName = chatName,
+                    Type = ""
                 };
 
                 AddOrUpdate(chatterInfo);
@@ -138,8 +139,8 @@ namespace Domain.Repositories
         public KeyValuePair<int, int> GetQuizScore(string name, string chatName)
         {
             var chatterInfo = Table.FirstOrDefault(t =>
-                t.Chatter.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.Chatter.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
             );
             var count = chatterInfo?.QuizScore ?? 0;
 

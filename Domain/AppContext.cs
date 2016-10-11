@@ -17,7 +17,6 @@ namespace Domain
 
         public DbSet<Log> Logs { get; set; }
         public DbSet<AccessToken> AccessTokens { get; set; }
-        public DbSet<Chatter> Chatters { get; set; }
         public DbSet<ChatterInfo> ChattersInfo { get; set; }
     }
 }

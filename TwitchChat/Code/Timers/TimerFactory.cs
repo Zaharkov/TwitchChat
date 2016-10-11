@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using CommonHelper;
-using Domain.Models;
 using Domain.Repositories;
 using TwitchApi;
 using TwitchApi.Entities;
@@ -85,12 +84,9 @@ namespace TwitchChat.Code.Timers
                                         forDelete.Add(user);
                                         listForUpdate.Add(new ChatterInfo
                                         {
-                                            Chatter = new Chatter
-                                            {
-                                                Name = user.Name,
-                                                ChatName = channelModel.ChannelName,
-                                                Type = chatterType.ToString()
-                                            },
+                                            Name = user.Name,
+                                            ChatName = channelModel.ChannelName,
+                                            Type = chatterType.ToString(),
                                             Seconds = user.GetTimeAndRestart()
                                         });
                                     }
@@ -106,7 +102,7 @@ namespace TwitchChat.Code.Timers
                                 }
                             }
 
-                            ChatterInfoRepository.Instance.UpdateChatterInfo(listForUpdate);
+                            ChatterInfoRepository.Instance.UpdateChatterInfo(channelModel.ChannelName, listForUpdate, true);
                         };
                         break;
                     }

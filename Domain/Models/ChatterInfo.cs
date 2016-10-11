@@ -7,11 +7,17 @@ namespace Domain.Models
 {
     public class ChatterInfo
     {
-        [Key]
-        public int ChatterId { get; set; }
+        [Key, Column(Order = 0)]
+        [StringLength(255)]
+        public string Name { get; set; }
 
-        [ForeignKey("ChatterId")]
-        public virtual Chatter Chatter { get; set; }
+        [Key, Column(Order = 1)]
+        [StringLength(255)]
+        public string ChatName { get; set; }
+
+        [Required]
+        [StringLength(255)]
+        public string Type { get; set; }
 
         public long? SteamId { get; set; }
 
