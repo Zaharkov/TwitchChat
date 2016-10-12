@@ -86,7 +86,6 @@ namespace TwitchChat.Code.Timers
                                         {
                                             Name = user.Name,
                                             ChatName = channelModel.ChannelName,
-                                            Type = chatterType.ToString(),
                                             Seconds = user.GetTimeAndRestart()
                                         });
                                     }

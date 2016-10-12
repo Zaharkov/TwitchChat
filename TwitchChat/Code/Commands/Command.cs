@@ -21,6 +21,8 @@ namespace TwitchChat.Code.Commands
         QuizQuestion,
         Эба,
         UpTime,
-        Delay
+        Delay,
+        Рулетка,
+        МояРулетка
     }
 }

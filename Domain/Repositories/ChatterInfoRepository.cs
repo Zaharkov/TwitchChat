@@ -7,6 +7,8 @@ namespace Domain.Repositories
 {
     public class ChatterInfoRepository : BaseRepository<ChatterInfo>
     {
+        private readonly RouletteInfoRepository _rouletteInfoRepository = RouletteInfoRepository.Instance;
+
         private ChatterInfoRepository()
         {
         }
@@ -43,27 +45,15 @@ namespace Domain.Repositories
 
         public void AddSecods(string name, string chatName, long seconds)
         {
-            var chatterInfo = Table.FirstOrDefault(t =>
-                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
-                ) ?? new ChatterInfo
-                {
-                    Name = name,
-                    ChatName = chatName,
-                    Type = "Viewers"
-                };
-
+            var chatterInfo = GetOrCreate(name, chatName);
             chatterInfo.Seconds += seconds;
             AddOrUpdate(chatterInfo);
         }
 
         public long GetChatterTime(string name, string chatName)
         {
-            var chatter = Table.FirstOrDefault(t => 
-                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
-            );
-            return chatter?.Seconds ?? 0;
+            var chatter = GetOrCreate(name, chatName);
+            return chatter.Seconds;
         }
 
         public bool IsChatterExist(string name)
@@ -112,6 +102,11 @@ namespace Domain.Repositories
             return Table.ToList();
         }
 
+        public ChatterInfo GetChatterInfo(string name, string chatName)
+        {
+            return GetOrCreate(name, chatName);
+        }
+
         public List<ChatterInfo> GetChattersInfo(Func<ChatterInfo, bool> predicate)
         {
             return Table.Where(predicate).ToList();
@@ -125,7 +120,12 @@ namespace Domain.Repositories
             );
 
             if (chatter != null)
+            {
+                if(chatter.RouletteId.HasValue)
+                    _rouletteInfoRepository.Delete(chatter.RouletteId.Value);
+
                 Delete(chatter);
+            }
         }
 
         public void DeleteChatterInfo(string chatName, List<ChatterInfo> chatters)
@@ -133,28 +133,18 @@ namespace Domain.Repositories
             var namesList = chatters.Select(t => t.Name);
             var exists = Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName));
 
+            foreach (var chatterInfo in exists)
+            {
+                if (chatterInfo.RouletteId.HasValue)
+                    _rouletteInfoRepository.Delete(chatterInfo.RouletteId.Value);
+            }
+
             DeleteRange(exists);
         }
 
         public void AddQuizScore(string name, string chatName)
         {
-            var chatterInfo = Table.FirstOrDefault(t =>
-                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
-            );
-
-            if (chatterInfo == null)
-            {
-                chatterInfo = new ChatterInfo
-                {
-                    Name = name,
-                    ChatName = chatName,
-                    Type = "Viewers"
-                };
-
-                AddOrUpdate(chatterInfo);
-            }
-
+            var chatterInfo = GetOrCreate(name, chatName);
             chatterInfo.QuizScore++;
             AddOrUpdate(chatterInfo);
         }
@@ -179,6 +169,41 @@ namespace Domain.Repositories
             }
 
             return new KeyValuePair<int, int>(count, score);
+        }
+
+        public long GetRouletteId(string name, string chatName)
+        {
+            var chatterInfo = GetOrCreate(name, chatName);
+
+            if (!chatterInfo.RouletteId.HasValue)
+            {
+                var info = _rouletteInfoRepository.Create();
+                chatterInfo.RouletteId = info.Id;
+                AddOrUpdate(chatterInfo);
+            }
+
+            return chatterInfo.RouletteId.Value;
+        }
+
+        private ChatterInfo GetOrCreate(string name, string chatName)
+        {
+            var chatterInfo = Table.FirstOrDefault(t =>
+                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+            );
+
+            if (chatterInfo == null)
+            {
+                chatterInfo = new ChatterInfo
+                {
+                    Name = name,
+                    ChatName = chatName
+                };
+
+                AddOrUpdate(chatterInfo);
+            }
+
+            return chatterInfo;
         }
     }
 }

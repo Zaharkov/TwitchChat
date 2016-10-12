@@ -17,7 +17,7 @@ namespace Tests
 
             if (dd.CanExecute(out wait))
             {
-                dd.Execute(() => "started");
+                dd.Execute(() => SendMessage.GetMessage("started"));
                 result = true;
             }
             else

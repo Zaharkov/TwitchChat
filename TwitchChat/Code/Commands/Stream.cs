@@ -1,34 +1,33 @@
 ﻿using System;
 using TwitchApi;
 using TwitchChat.Controls;
-using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class StreamCommand
     {
-        public static string GetUpTime(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage GetUpTime(ChatMemberViewModel userModel)
         {
             var stream = TwitchApiClient.GetStreamInfo(userModel.Channel.ChannelName);
 
             if (stream.Stream == null)
-                return "стрим уже закончился";
+                return SendMessage.GetMessage("стрим уже закончился");
 
             var time = DateTime.UtcNow.Subtract(stream.Stream.CreatedAt);
 
-            return $"стрим активен уже {(time.Hours > 0 ? $"{time.Hours} {GetHoursName(time.Hours)}, " : "")}{(time.Minutes > 0 ? $"{time.Minutes} {GetMinutesName(time.Minutes)}, " : "")}{time.Seconds} {GetSecondsName(time.Seconds)}";
+            return SendMessage.GetMessage($"стрим активен уже {(time.Hours > 0 ? $"{time.Hours} {GetHoursName(time.Hours)}, " : "")}{(time.Minutes > 0 ? $"{time.Minutes} {GetMinutesName(time.Minutes)}, " : "")}{time.Seconds} {GetSecondsName(time.Seconds)}");
         }
 
-        public static string GetDelay(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage GetDelay(ChatMemberViewModel userModel)
         {
             var stream = TwitchApiClient.GetStreamInfo(userModel.Channel.ChannelName);
 
             if (stream.Stream == null)
-                return "стрим уже закончился";
+                return SendMessage.GetMessage("стрим уже закончился");
 
             var delay = stream.Stream.Delay;
 
-            return $"на стриме стоит задержка в {delay} {GetSecondsName(delay)}";
+            return SendMessage.GetMessage($"на стриме стоит задержка в {delay} {GetSecondsName(delay)}");
         }
 
         private static string GetHoursName(long hours)

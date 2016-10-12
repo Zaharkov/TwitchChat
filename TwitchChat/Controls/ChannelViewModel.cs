@@ -12,6 +12,7 @@ using System.Windows.Input;
 using Domain.Repositories;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
+using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls
@@ -178,32 +179,13 @@ namespace TwitchChat.Controls
 
                 if (IsChatCommand(e))
                 {
-                    SendType type;
-                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username), out type);
+                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username));
 
-                    if (!string.IsNullOrEmpty(result))
+                    while (result != null)
                     {
-                        switch (type)
-                        {
-                            case SendType.None:
-                                break;
-                            case SendType.Message:
-                                _irc.Message(ChannelName, result);
-                                var userInfo = _irc.UserStateInfo[_channelName];
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, false, _badges));
-                                    if (Messages.Count > App.Maxmessages)
-                                        Messages.RemoveAt(0);
-                                });
-                                break;
-                            case SendType.Whisper:
-                                _irc.Whisper(e.Username, result);
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException(nameof(type), type, null);
-                        }
-                    }  
+                        SendMessage(e, result);
+                        result = result.NextMessage;
+                    }
                 }
             }
         }
@@ -211,6 +193,46 @@ namespace TwitchChat.Controls
         private static bool IsChatCommand(MessageEventArgs e)
         {
             return !e.Message.StartsWith("! ") && e.Message.StartsWith("!");
+        }
+
+        private void SendMessage(MessageEventArgs e, SendMessage message)
+        {
+            if (!string.IsNullOrEmpty(message.Message))
+            {
+                var userInfo = _irc.UserStateInfo[_channelName];
+                switch (message.Type)
+                {
+                    case SendType.None:
+                        break;
+                    case SendType.Message:
+
+                        var botMessage = $"БОТ: @{e.Username} {message.Message}";
+
+                        if(e.IsAction)
+                            _irc.Action(ChannelName, botMessage);
+                        else
+                            _irc.Message(ChannelName, botMessage);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, botMessage, userInfo.ColorHex, e.IsAction, _badges));
+                            if (Messages.Count > App.Maxmessages)
+                                Messages.RemoveAt(0);
+                        });
+                        break;
+                    case SendType.Whisper:
+                        _irc.Whisper(e.Username, message.Message);
+                        break;
+                    case SendType.Timeout:
+
+                        if (userInfo.UserType == UserType.Broadcaster || userInfo.UserType == UserType.Moderator)
+                            _irc.Timeout(ChannelName, message.Message, message.Timeout);
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(message.Type), message.Type, null);
+                }
+            }
         }
 
         private void Send()
@@ -296,7 +318,6 @@ namespace TwitchChat.Controls
                     {
                         Name = user.Name,
                         ChatName = ChannelName,
-                        Type = chatterType.ToString(),
                         Seconds = user.GetTimeAndRestart()
                     });
                 }

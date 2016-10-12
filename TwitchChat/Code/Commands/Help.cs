@@ -1,14 +1,12 @@
 ﻿using System.Linq;
 using System.Text;
-using TwitchChat.Controls;
 using Twitchiedll.IRC;
-using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class HelpCommand
     {
-        public static string GetHelp(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage GetHelp()
         {
             var groupedAccess = CommandAccess.GetGroupedAccess();
 
@@ -25,7 +23,7 @@ namespace TwitchChat.Code.Commands
                     : $"{commands} - доступн{ending} для {string.Join(",", grouped.Value)}; ");
             }
 
-            return builder.ToString();
+            return SendMessage.GetWhisper(builder.ToString());
         }
     }
 }

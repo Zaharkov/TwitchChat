@@ -59,7 +59,7 @@ namespace Domain.Repositories
             Context.SaveChanges();
         }
 
-        protected virtual void AddOrUpdate(T entity)
+        protected void AddOrUpdate(T entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));

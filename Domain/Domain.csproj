@@ -75,13 +75,19 @@
     <Compile Include="Migrations\201610110850175_RemoveUnusedColumn.Designer.cs">
       <DependentUpon>201610110850175_RemoveUnusedColumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610122141203_AddRouletteFields.cs" />
+    <Compile Include="Migrations\201610122141203_AddRouletteFields.Designer.cs">
+      <DependentUpon>201610122141203_AddRouletteFields.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccessToken.cs" />
     <Compile Include="Models\AccessTokenType.cs" />
     <Compile Include="Models\ChatterInfo.cs" />
     <Compile Include="Models\Log.cs" />
+    <Compile Include="Models\RouletteInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ChatterInfoRepository.cs" />
+    <Compile Include="Repositories\RouletteInfoRepository.cs" />
     <Compile Include="Repositories\LogRepository.cs" />
     <Compile Include="Repositories\AccessTokenRepository.cs" />
     <Compile Include="Repositories\BaseRepository.cs" />
@@ -104,6 +110,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610110850175_RemoveUnusedColumn.resx">
       <DependentUpon>201610110850175_RemoveUnusedColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610122141203_AddRouletteFields.resx">
+      <DependentUpon>201610122141203_AddRouletteFields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

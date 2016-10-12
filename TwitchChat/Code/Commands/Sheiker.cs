@@ -1,13 +1,10 @@
-﻿using TwitchChat.Controls;
-using Twitchiedll.IRC.Events;
-
-namespace TwitchChat.Code.Commands
+﻿namespace TwitchChat.Code.Commands
 {
     public static class SheikerCommand
     {
-        public static string GetSheiker(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage GetSheiker()
         {
-            return "хей, патимейкер!";
+            return SendMessage.GetMessage("хей, патимейкер!");
         }
     }
 }

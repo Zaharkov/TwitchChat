@@ -6,14 +6,15 @@ namespace TwitchChat.Code.Commands
 {
     public static class MyTimeCommand
     {
-        public static string GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var chatTime = userModel.GetTime();
             var dbTime = ChatterInfoRepository.Instance.GetChatterTime(userModel.Name, e.Channel);
 
             var totalTime = chatTime + dbTime;
 
-            return $"слежу за тобой уже {totalTime} {GetSecondsName(totalTime)}";
+            var message = $"слежу за тобой уже {totalTime} {GetSecondsName(totalTime)}";
+            return SendMessage.GetMessage(message);
         }
 
         public static string GetSecondsName(long seconds)

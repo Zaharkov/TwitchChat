@@ -46,7 +46,7 @@ namespace TwitchChat.Code.DelayDecorator
             return true;
         }
 
-        public string Execute(Func<string> func)
+        public SendMessage Execute(Func<SendMessage> func)
         {
             var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global];
 
@@ -70,7 +70,7 @@ namespace TwitchChat.Code.DelayDecorator
                 return func();
             }
 
-            return null;
+            return SendMessage.None;
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using TwitchApi.Entities;
 using TwitchChat.Controls;
-using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
@@ -10,7 +9,7 @@ namespace TwitchChat.Code.Commands
     {
         private static readonly Random Rnd = new Random();
 
-        public static string EbaComeOn(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage EbaComeOn(ChatMemberViewModel userModel)
         {
             string name = null;
             var chatters = new List<ChatMemberViewModel>();
@@ -22,8 +21,8 @@ namespace TwitchChat.Code.Commands
             }
 
             if (chatters.Count < 5)
-                return null;
-            
+                return SendMessage.None;
+
             while (string.IsNullOrEmpty(name))
             {
                 var chatter = chatters[Rnd.Next(chatters.Count - 1)];
@@ -32,9 +31,11 @@ namespace TwitchChat.Code.Commands
                     name = chatter.Name;
             }
 
-            return string.IsNullOrEmpty(name) 
+            var message =  string.IsNullOrEmpty(name) 
                 ? null 
                 : $"делай ЭБА, делай ЭБА, @{name}, делай ЭБА, @{name} ДАВАААААЙ!";
+
+            return SendMessage.GetMessage(message);
         }
     }
 }

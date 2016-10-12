@@ -8,7 +8,7 @@ namespace TwitchChat.Code.Commands
 {
     public class CommandFactory
     {
-        public static string ExecuteCommand(MessageEventArgs e, ChatMemberViewModel userModel, out SendType sendType)
+        public static SendMessage ExecuteCommand(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var forParse = e.Message.TrimStart('!').Split(' ').First();
             Command command;
@@ -16,21 +16,17 @@ namespace TwitchChat.Code.Commands
 
             if (!parse)
             {
-                sendType = SendType.Whisper;
-                return null;
+                return SendMessage.None;
                 //return $"Команда !{forParse} не поддерживается. Список команд можно посмотреть через команду !{Command.Help}";
             }
 
             if (!CommandAccess.IsHaveAccess(e, command))
             {
-                sendType = SendType.Whisper;
-                return null;
+                return SendMessage.None;
                 //return $"У Вас нет доступа к команде !{command}. Список доступных команд можно посмотреть через команду !{Command.Help}";
             }
 
-            sendType = SendType.Message;
-
-            Func<MessageEventArgs, ChatMemberViewModel, string> commandFunc;
+            Func<SendMessage> commandFunc;
             switch (command)
             {
                 case Command.Music:
@@ -45,53 +41,56 @@ namespace TwitchChat.Code.Commands
                     break;
                 case Command.Help:
                     commandFunc = HelpCommand.GetHelp;
-                    sendType = SendType.Whisper;
                     break;
                 case Command.MyTime:
-                    commandFunc = MyTimeCommand.GetMyTime;
+                    commandFunc = () => MyTimeCommand.GetMyTime(e, userModel);
                     break;
                 case Command.Шейкер:
                     commandFunc = SheikerCommand.GetSheiker;
                     break;
                 case Command.AddSteam:
-                    commandFunc = SteamCommand.AddSteam;
-                    sendType = SendType.Whisper;
+                    commandFunc = () => SteamCommand.AddSteam(e);
                     break;
                 case Command.RemoveSteam:
-                    commandFunc = SteamCommand.RemoveSteam;
-                    sendType = SendType.Whisper;
+                    commandFunc = () => SteamCommand.RemoveSteam(e);
                     break;
                 case Command.Global:
-                    return null;
+                    return SendMessage.None;
                 case Command.Мойписюн:
-                    commandFunc = MyBolt.Bolt;
+                    commandFunc = () => MyBolt.Bolt(userModel);
                     break;
                 case Command.QuizStart:
-                    commandFunc = QiuzCommand.Start;
+                    commandFunc = () => QiuzCommand.Start(userModel);
                     break;
                 case Command.QuizStop:
-                    commandFunc = QiuzCommand.Stop;
+                    commandFunc = () => QiuzCommand.Stop(userModel);
                     break;
                 case Command.QuizScore:
-                    commandFunc = QiuzCommand.Score;
+                    commandFunc = () => QiuzCommand.Score(userModel);
                     break;
                 case Command.О:
-                    commandFunc = QiuzCommand.Answer;
+                    commandFunc = () => QiuzCommand.Answer(e, userModel);
                     break;
                 case Command.QuizQuestion:
                     commandFunc = QiuzCommand.Question;
                     break;
                 case Command.Эба:
-                    commandFunc = Eba.EbaComeOn;
+                    commandFunc = () => Eba.EbaComeOn(userModel);
                     break;
                 case Command.UpTime:
-                    commandFunc = StreamCommand.GetUpTime;
+                    commandFunc = () => StreamCommand.GetUpTime(userModel);
                     break;
                 case Command.Delay:
-                    commandFunc = StreamCommand.GetDelay;
+                    commandFunc = () => StreamCommand.GetDelay(userModel);
+                    break;
+                case Command.Рулетка:
+                    commandFunc = () => RouletteCommand.RouletteTry(e);
+                    break;
+                case Command.МояРулетка:
+                    commandFunc = () => RouletteCommand.RouletteInfo(e);
                     break;
                 default:
-                    return null;
+                    return SendMessage.None;
             }
 
             var delayType = CommandAccess.GetCommandDelayType(command);
@@ -115,16 +114,11 @@ namespace TwitchChat.Code.Commands
             int needWait;
             if (!delayDecorator.CanExecute(out needWait))
             {
-                sendType = SendType.Whisper;
-                return $"Команда !{command} на {(delayType != DelayType.Global ? "пользовательском" : "глобальном")} кулдауне. Вы сможете её повторить через {needWait} {MyTimeCommand.GetSecondsName(needWait)}";
+                var message = $"Команда !{command} на {(delayType != DelayType.Global ? "пользовательском" : "глобальном")} кулдауне. Вы сможете её повторить через {needWait} {MyTimeCommand.GetSecondsName(needWait)}";
+                return SendMessage.GetWhisper(message);
             }
 
-            var result = delayDecorator.Execute(() => commandFunc(e, userModel));
-
-            if (!string.IsNullOrEmpty(result) && sendType != SendType.Whisper)
-                result = $"БОТ: @{e.Username} {result}";
-
-            return result;
+            return delayDecorator.Execute(() => commandFunc());
         }
     }
 }

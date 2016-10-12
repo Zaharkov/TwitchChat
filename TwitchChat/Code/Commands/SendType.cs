@@ -5,6 +5,7 @@ namespace TwitchChat.Code.Commands
     {
         None,
         Message,
-        Whisper
+        Whisper,
+        Timeout
     }
 }

@@ -2,8 +2,6 @@
 using Domain.Models;
 using Domain.Repositories;
 using DotaClient;
-using TwitchChat.Controls;
-using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
@@ -11,7 +9,7 @@ namespace TwitchChat.Code.Commands
     {
         private static readonly int Delay = int.Parse(Configuration.GetSetting("SteamMmrDelay"));
 
-        public static string GetMmr(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage GetMmr()
         {
             int? soloInt = null;
             int? partyInt = null;
@@ -37,16 +35,16 @@ namespace TwitchChat.Code.Commands
             if (!soloInt.HasValue || !partyInt.HasValue)
                 GetMmr(out soloInt, out partyInt);
 
-            return BuildString(soloInt, partyInt);
+            return SendMessage.GetMessage(BuildString(soloInt, soloInt));
         }
 
-        public static string MmrUpdate(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage MmrUpdate()
         {
             int? solo;
             int? party;
             GetMmr(out solo, out party);
 
-            return BuildString(solo, party);
+            return SendMessage.GetMessage(BuildString(solo, party));
         }
 
         private static void GetMmr(out int? solo, out int? party)

@@ -2,7 +2,6 @@
 using Domain.Repositories;
 using DotaClient;
 using DotaClient.Friend;
-using TwitchChat.Controls;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
@@ -10,9 +9,10 @@ namespace TwitchChat.Code.Commands
 {
     public static class SteamCommand
     {
-        public static string AddSteam(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage AddSteam(MessageEventArgs e)
         {
-            return e.UserType.HasFlag(UserType.Broadcaster) ? AddSteamBroadcaster(e.Message) : AddSteamSimple(e.Username, e.Message);
+            var message =  e.UserType.HasFlag(UserType.Broadcaster) ? AddSteamBroadcaster(e.Message) : AddSteamSimple(e.Username, e.Message);
+            return SendMessage.GetWhisper(message);
         }
 
         private static string AddSteamBroadcaster(string message)
@@ -119,9 +119,10 @@ namespace TwitchChat.Code.Commands
             }
         }
 
-        public static string RemoveSteam(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage RemoveSteam(MessageEventArgs e)
         {
-            return e.UserType.HasFlag(UserType.Broadcaster) ? RemoveSteamBroadcaster(e.Message) : RemoveSteamSimple(e.Username, e.Message);
+            var message =  e.UserType.HasFlag(UserType.Broadcaster) ? RemoveSteamBroadcaster(e.Message) : RemoveSteamSimple(e.Username, e.Message);
+            return SendMessage.GetWhisper(message);
         }
 
         private static string RemoveSteamBroadcaster(string message)

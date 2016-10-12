@@ -12,38 +12,37 @@ namespace TwitchChat.Code.Commands
     {
         private static readonly int Delay = int.Parse(Configuration.GetSetting("QuizRestartDelay"));
 
-        public static string Start(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage Start(ChatMemberViewModel userModel)
         {
-            
             QuizHolder.StartNewQuiz(userModel.Channel);
-            return null;
+            return SendMessage.None;
         }
 
-        public static string Stop(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage Stop(ChatMemberViewModel userModel)
         {
             QuizHolder.StopQuiz(userModel.Channel);
-            return null;
+            return SendMessage.None;
         }
 
-        public static string Question(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage Question()
         {
             if (QuizHolder.IsQuizActive && QuizHolder.Question.HasValue)
-                return $"вопрос викторины : {QuizHolder.Question.Value.Key}";
+                return SendMessage.GetMessage($"вопрос викторины : {QuizHolder.Question.Value.Key}");
 
-            return "сейчас викторина выключена";
+            return SendMessage.GetMessage("сейчас викторина выключена");
         }
 
-        public static string Score(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage Score(ChatMemberViewModel userModel)
         {
-            var score = ChatterInfoRepository.Instance.GetQuizScore(userModel.Name, e.Channel);
+            var score = ChatterInfoRepository.Instance.GetQuizScore(userModel.Name, userModel.Channel.ChannelName);
 
-            return $"ты ответил(а) на {score.Key} {GetName(score.Key)}. Позиция в рейтинге - {score.Value}";
+            return SendMessage.GetMessage($"ты ответил(а) на {score.Key} {GetName(score.Key)}. Позиция в рейтинге - {score.Value}");
         }
 
-        public static string Answer(MessageEventArgs e, ChatMemberViewModel userModel)
+        public static SendMessage Answer(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             if (!QuizHolder.IsQuizActive || !QuizHolder.Question.HasValue)
-                return null;
+                return SendMessage.None;
 
             var answerUser = e.Message.ToUpper().Replace($"!{Command.О}".ToUpper(), "").Trim();
             var answerQuiz = QuizHolder.Question.Value.Value.ToUpper();
@@ -59,10 +58,10 @@ namespace TwitchChat.Code.Commands
                     QuizHolder.StartNewQuiz(userModel.Channel);
                 });
 
-                return $"красавчег! Правильный ответ! Перезапуск викторины через {Delay} секунд";
+                return SendMessage.GetMessage($"красавчег! Правильный ответ! Перезапуск викторины через {Delay} секунд");
             }
 
-            return null;
+            return SendMessage.None;
         }
 
         private static string GetName(int seconds)
