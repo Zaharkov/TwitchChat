@@ -12,7 +12,6 @@ using System.Windows.Input;
 using Domain.Repositories;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
-using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls

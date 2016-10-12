@@ -1,4 +1,4 @@
-﻿namespace Twitchiedll.IRC
+﻿namespace TwitchChat.Code
 {
     public enum IrcState
     {

@@ -45,7 +45,7 @@ namespace DotaClient
         private static readonly SteamGameCoordinator GameCoordinator;
         private static readonly CallbackManager CallbackManager;
         private static string _authCode;
-        private static readonly SteamListener Logger = new SteamListener();
+        private static readonly SteamListener Listener = new SteamListener();
 
         private static bool _needWaitFriendList = true;
 
@@ -61,7 +61,7 @@ namespace DotaClient
         {
             SteamClient = new SteamClient();
 
-            DebugLog.AddListener(Logger);
+            DebugLog.AddListener(Listener);
     
             // get our handlers
             User = SteamClient.GetHandler<SteamUser>();
@@ -116,7 +116,7 @@ namespace DotaClient
         private static void Connect()
         {
             _state = ClientState.Connecting;
-            Logger.WriteLine("Connecting to Steam...");
+            Listener.WriteLine("Connecting to Steam...");
     
             // begin the connection to steam
             SteamClient.Connect();
@@ -135,7 +135,7 @@ namespace DotaClient
             var sw = Stopwatch.StartNew();
             var name = typeof(T).FullName;
 
-            Logger.WriteLine($"Getting response for {name}");
+            Listener.WriteLine($"Getting response for {name}");
 
             while (!ResponseHandler.ContainsKey(name) && sw.Elapsed.TotalSeconds < timeout)
             {
@@ -172,7 +172,7 @@ namespace DotaClient
             catch (Exception ex)
             {
                 LogRepository.Instance.LogException("Error while try get MMR", ex);
-                Logger.WriteLine($"Error while try get MMR: {ex}");
+                Listener.WriteLine($"Error while try get MMR: {ex}");
             }
         }
 
@@ -199,7 +199,7 @@ namespace DotaClient
             catch (Exception ex)
             {
                 LogRepository.Instance.LogException("Error while try add steam friend", ex);
-                Logger.WriteLine($"Error while try add steam friend: {ex}");
+                Listener.WriteLine($"Error while try add steam friend: {ex}");
             }
 
             return new FriendResponseContainer((int)EResult.Fail, FriendResponseRelationship.None, FriendResponseStatus.Error);
@@ -236,7 +236,7 @@ namespace DotaClient
             catch (Exception ex)
             {
                 LogRepository.Instance.LogException("Error while try remove steam friend", ex);
-                Logger.WriteLine($"Error while try remove steam friend: {ex}");
+                Listener.WriteLine($"Error while try remove steam friend: {ex}");
             }
 
             return new FriendResponseContainer((int)EResult.Fail, FriendResponseRelationship.Error, FriendResponseStatus.Error);
@@ -304,7 +304,7 @@ namespace DotaClient
 
                 _state = ClientState.Error;
 
-                Logger.WriteLine($"Unable to connect to Steam: {callback.Result}");
+                Listener.WriteLine($"Unable to connect to Steam: {callback.Result}");
     
                 return;
             }
@@ -312,7 +312,7 @@ namespace DotaClient
             _state = ClientState.Logging;
             _loginDate = DateTime.Now;
 
-            Logger.WriteLine($"Connected! Logging '{SteamUser}' into Steam...");
+            Listener.WriteLine($"Connected! Logging '{SteamUser}' into Steam...");
 
             var logOnDetails = new SteamUser.LogOnDetails
             {
@@ -341,7 +341,7 @@ namespace DotaClient
             // after recieving an AccountLogonDenied, we'll be disconnected from steam
             // so after we read an authcode from the user, we need to reconnect to begin the logon flow again
 
-            Logger.WriteLine("Disconnected from Steam, reconnecting...");
+            Listener.WriteLine("Disconnected from Steam, reconnecting...");
 
             if (_disconnectedCount < MaxDisconnectedCount && _state != ClientState.Error && _state != ClientState.Disconnected)
             {
@@ -355,7 +355,7 @@ namespace DotaClient
 
         private static void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
         {
-            Logger.WriteLine("Updating sentryfile...");
+            Listener.WriteLine("Updating sentryfile...");
 
             // write out our sentry file
             // ideally we'd want to write to the filename specified in the callback
@@ -391,7 +391,7 @@ namespace DotaClient
                 SentryFileHash = sentryHash,
             });
 
-            Logger.WriteLine("Done!");
+            Listener.WriteLine("Done!");
         }
 
         // called when the client successfully (or unsuccessfully) logs onto an account
@@ -409,14 +409,14 @@ namespace DotaClient
 
                 _state = ClientState.Error;
 
-                Logger.WriteLine($"Unable to logon to Steam: {callback.Result}");
+                Listener.WriteLine($"Unable to logon to Steam: {callback.Result}");
     
                 return;
             }
 
             _state = ClientState.GettingSession;
 
-            Logger.WriteLine("Logged in! Launching DOTA...");
+            Listener.WriteLine("Logged in! Launching DOTA...");
     
             // we've logged into the account
             // now we need to inform the steam server that we're playing dota (in order to receive GC messages)
@@ -490,7 +490,7 @@ namespace DotaClient
         private static void OnFriendsList(SteamFriends.FriendsListCallback callback)
         {
             _needWaitFriendList = true;
-            Logger.WriteLine("Getted friends list");
+            Listener.WriteLine("Getted friends list");
             AddToResponseHandler(callback.FriendList);
         }
 
@@ -504,7 +504,7 @@ namespace DotaClient
             // this callback is received when the persona state (friend information) of a friend changes
 
             // for this sample we'll simply display the names of the friends
-            Logger.WriteLine($"State change: {callback.Name}");
+            Listener.WriteLine($"State change: {callback.Name}");
         }
 
         // called when a gamecoordinator (GC) message arrives
@@ -520,7 +520,7 @@ namespace DotaClient
                 { ( uint )EDOTAGCMsg.k_EMsgClientToGCGetProfileCardResponse, OnProfileDetails },
             };
 
-            Logger.WriteLine($"Received msg {callback.EMsg}");
+            Listener.WriteLine($"Received msg {callback.EMsg}");
 
             Action<IPacketGCMsg> func;
             if (!messageMap.TryGetValue(callback.EMsg, out func))
@@ -545,7 +545,7 @@ namespace DotaClient
             // this message is used for the GC, while the other is used for general steam messages
             var msg = new ClientGCMsgProtobuf<CMsgClientWelcome>(packetMsg);
 
-            Logger.WriteLine($"GC is welcoming us. Version: {msg.Body.version}");
+            Listener.WriteLine($"GC is welcoming us. Version: {msg.Body.version}");
     
             // at this point, the GC is now ready to accept messages from us
         }

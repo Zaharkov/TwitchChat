@@ -29,14 +29,14 @@ namespace TwitchApi
 
         public static void SetToken(string token)
         {
-            Check.ForNullReference(token);
+            Check.ForEmptyString(token);
 
             _accessToken = token;
         }
 
         public static string GetToken()
         {
-            Check.ForNullReference(_accessToken);
+            Check.ForEmptyString(_accessToken);
 
             return _accessToken;
         }
@@ -53,6 +53,8 @@ namespace TwitchApi
 
         public static ChatterInfo GetUsersList(string channel)
         {
+            Check.ForEmptyString(channel);
+
             var request = new RestRequestBuilder($"/group/user/{channel}/chatters")
                 .Method(Method.GET)
                 .Build();
@@ -62,7 +64,7 @@ namespace TwitchApi
 
         public static Badges GetBadges(string channelName)
         {
-            Check.ForNullReference(channelName);
+            Check.ForEmptyString(channelName);
 
             var request = new RestRequestBuilder($"/kraken/chat/{channelName}/badges")
                 .Method(Method.GET)
@@ -73,7 +75,7 @@ namespace TwitchApi
 
         public static User GetUserByName(string userName)
         {
-            Check.ForNullReference(userName, nameof(userName));
+            Check.ForEmptyString(userName, nameof(userName));
 
             var request = new RestRequestBuilder($"/kraken/users/{userName}")
                .Method(Method.GET)
@@ -84,7 +86,7 @@ namespace TwitchApi
 
         public static User GetUserByToken()
         {
-            Check.ForNullReference(_accessToken, nameof(_accessToken));
+            Check.ForEmptyString(_accessToken, nameof(_accessToken));
 
             var request = new RestRequestBuilder("/kraken/user")
                .Method(Method.GET)
@@ -97,7 +99,7 @@ namespace TwitchApi
 
         public static StreamInfo GetStreamInfo(string name)
         {
-            Check.ForNullReference(name, nameof(name));
+            Check.ForEmptyString(name, nameof(name));
 
             var request = new RestRequestBuilder($"/kraken/streams/{name}")
                .Method(Method.GET)

@@ -27,6 +27,8 @@ namespace TwitchChat.Code
 
         public TwitchIrcClient()
         {
+            Logger = new Logger();
+
             State = IrcState.Connecting;
             //  Get available servers and initialize IrcClient with the first one
             var server = TwitchApiClient.GetServers().ServersList.First();

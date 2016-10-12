@@ -50,7 +50,7 @@ namespace Domain.Repositories
                 {
                     Name = name,
                     ChatName = chatName,
-                    Type = ""
+                    Type = "Viewers"
                 };
 
             chatterInfo.Seconds += seconds;
@@ -149,7 +149,7 @@ namespace Domain.Repositories
                 {
                     Name = name,
                     ChatName = chatName,
-                    Type = ""
+                    Type = "Viewers"
                 };
 
                 AddOrUpdate(chatterInfo);

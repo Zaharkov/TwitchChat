@@ -96,6 +96,7 @@
     <Compile Include="Code\DelayDecorator\HybridDecorator.cs" />
     <Compile Include="Code\DelayDecorator\UserDecorator.cs" />
     <Compile Include="Code\Helpers\ScrollViewerEx.cs" />
+    <Compile Include="Code\Logger.cs" />
     <Compile Include="Code\Quiz\QuizHolder.cs" />
     <Compile Include="Code\Quiz\QuizCollection.cs" />
     <Compile Include="Code\Timers\Help.cs" />

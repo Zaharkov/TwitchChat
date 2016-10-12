@@ -12,7 +12,6 @@ using System.Windows;
 using System.Windows.Input;
 using DotaClient;
 using TwitchChat.Controls;
-using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat
