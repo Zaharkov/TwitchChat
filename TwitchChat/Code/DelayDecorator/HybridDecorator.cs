@@ -47,10 +47,10 @@ namespace TwitchChat.Code.DelayDecorator
             return User.CanExecute(out needWait) && Global.CanExecute(out needWait);
         }
 
-        public SendMessage Execute(Func<SendMessage> func)
+        public SendMessage Execute(Func<SendMessage> func, bool needExec = true)
         {
             var user = User.Execute(func);
-            Global.Execute(func);
+            Global.Execute(func, false);
 
             return user;
         }

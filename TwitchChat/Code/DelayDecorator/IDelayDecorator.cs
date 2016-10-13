@@ -6,6 +6,6 @@ namespace TwitchChat.Code.DelayDecorator
     public interface IDelayDecorator
     {
         bool CanExecute(out int needWait);
-        SendMessage Execute(Func<SendMessage> func);
+        SendMessage Execute(Func<SendMessage> func, bool needExec = true);
     }
 }

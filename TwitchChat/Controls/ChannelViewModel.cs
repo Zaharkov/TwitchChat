@@ -224,10 +224,7 @@ namespace TwitchChat.Controls
                         _irc.Whisper(e.Username, message.Message);
                         break;
                     case SendType.Timeout:
-
-                        if (userInfo.UserType == UserType.Broadcaster || userInfo.UserType == UserType.Moderator)
-                            _irc.Timeout(ChannelName, message.Message, message.Timeout);
-
+                        _irc.Timeout(ChannelName, message.Message, message.Timeout);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(message.Type), message.Type, null);

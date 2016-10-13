@@ -52,10 +52,9 @@ namespace Domain.Repositories
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));
 
-            if (!entities.Any())
-                return;
+            foreach (var entity in entities)
+                Entities.AddOrUpdate(entity);
 
-            Entities.AddRange(entities);
             Context.SaveChanges();
         }
 

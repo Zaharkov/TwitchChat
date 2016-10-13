@@ -46,7 +46,7 @@ namespace TwitchChat.Code.DelayDecorator
             return true;
         }
 
-        public SendMessage Execute(Func<SendMessage> func)
+        public SendMessage Execute(Func<SendMessage> func, bool needExec = true)
         {
             var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global];
 
@@ -61,13 +61,13 @@ namespace TwitchChat.Code.DelayDecorator
             if (_firstTime)
             {
                 _firstTime = false;
-                return func();
+                return needExec ? func() : SendMessage.None;
             }
 
             if (seconds >= delay)
             {
                 _timer.Restart();
-                return func();
+                return needExec ? func() : SendMessage.None;
             }
 
             return SendMessage.None;

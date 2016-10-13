@@ -33,46 +33,26 @@ namespace Domain.Repositories
                 Delete(info);
         }
 
-        public void AddDeath(long id)
+        public List<RouletteInfo> GetTop(int top)
         {
-            var info = Table.First(t => t.Id.Equals(id));
-            info.DeathCount++;
-            AddOrUpdate(info);
+            return Table.OrderBy(t => t.MaxPercent).Take(5).ToList();
         }
 
         public void AddTry(long id)
         {
             var info = Table.First(t => t.Id.Equals(id));
             info.TryCount++;
-            AddOrUpdate(info);
-        }
-
-        public void AddCurrentTry(long id)
-        {
-            var info = Table.First(t => t.Id.Equals(id));
             info.CurrentTry++;
             AddOrUpdate(info);
         }
 
-        public void AddStreak(long id)
+        public void AddDeath(long id)
         {
             var info = Table.First(t => t.Id.Equals(id));
-            info.Streak++;
-
-            if (info.Streak > info.MaxStreak)
-                info.MaxStreak = info.Streak;
-
-            AddOrUpdate(info);
-        }
-
-        public void AddPercent(long id, double percent)
-        {
-            var info = Table.First(t => t.Id.Equals(id));
-            info.Percent *= percent;
-
-            if (info.Percent < info.MaxPercent)
-                info.MaxPercent = info.Percent;
-
+            info.DeathCount++;
+            info.CurrentTry = 0;
+            info.Streak = 0;
+            info.Percent = 1;
             AddOrUpdate(info);
         }
 
@@ -83,17 +63,18 @@ namespace Domain.Repositories
             AddOrUpdate(info);
         }
 
-        public void ResetStreak(long id)
+        public void AddPercent(long id, double percent)
         {
             var info = Table.First(t => t.Id.Equals(id));
-            info.Streak = 0;
-            AddOrUpdate(info);
-        }
+            info.Streak++;
+            info.Percent *= percent;
 
-        public void ResetPercent(long id)
-        {
-            var info = Table.First(t => t.Id.Equals(id));
-            info.Percent = 1;
+            if (info.Percent < info.MaxPercent)
+            {
+                info.MaxStreak = info.Streak;
+                info.MaxPercent = info.Percent;
+            }
+
             AddOrUpdate(info);
         }
 

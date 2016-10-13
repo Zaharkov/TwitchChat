@@ -35,7 +35,7 @@ namespace TwitchChat.Code.Commands
             if (!soloInt.HasValue || !partyInt.HasValue)
                 GetMmr(out soloInt, out partyInt);
 
-            return SendMessage.GetMessage(BuildString(soloInt, soloInt));
+            return SendMessage.GetMessage(BuildString(soloInt, partyInt));
         }
 
         public static SendMessage MmrUpdate()

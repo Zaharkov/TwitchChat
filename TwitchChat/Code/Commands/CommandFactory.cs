@@ -89,6 +89,9 @@ namespace TwitchChat.Code.Commands
                 case Command.МояРулетка:
                     commandFunc = () => RouletteCommand.RouletteInfo(e);
                     break;
+                case Command.ТопРулетки:
+                    commandFunc = RouletteCommand.RouletteGetTop;
+                    break;
                 default:
                     return SendMessage.None;
             }

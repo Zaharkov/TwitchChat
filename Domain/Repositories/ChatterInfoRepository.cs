@@ -22,8 +22,9 @@ namespace Domain.Repositories
             if (!chattersInfo.Any())
                 return;
 
+            var context = new ChatterInfoRepository();
             var namesList = chattersInfo.Select(t => t.Name);
-            var exists = Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName));
+            var exists = context.Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName));
 
             foreach (var chatterInfo in exists)
             {
@@ -39,8 +40,8 @@ namespace Domain.Repositories
                 }
             }
 
-            UpdateRange(exists);
-            AddRange(chattersInfo);
+            context.UpdateRange(exists);
+            context.AddRange(chattersInfo);
         }
 
         public void AddSecods(string name, string chatName, long seconds)
@@ -183,6 +184,11 @@ namespace Domain.Repositories
             }
 
             return chatterInfo.RouletteId.Value;
+        }
+
+        public ChatterInfo GetByRouletteId(long id)
+        {
+            return Table.FirstOrDefault(t => t.RouletteId.HasValue && t.RouletteId.Value.Equals(id)); 
         }
 
         private ChatterInfo GetOrCreate(string name, string chatName)

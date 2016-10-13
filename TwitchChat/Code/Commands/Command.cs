@@ -23,6 +23,7 @@ namespace TwitchChat.Code.Commands
         UpTime,
         Delay,
         Рулетка,
-        МояРулетка
+        МояРулетка,
+        ТопРулетки
     }
 }
