@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Navigation;
 using Domain.Models;
 using Domain.Repositories;
@@ -81,6 +82,7 @@ namespace TwitchChat.Dialog
                         case "access_token":
                             TwitchApiClient.SetToken(values[1]);
                             AccessTokenRepository.Instance.AddToken(AccessTokenType.Twitch, values[1]);
+                            Thread.Sleep(5000); //this need to avoid issue, then token is get, but twitch IRC not pass it
                             break;
                     }
                 }

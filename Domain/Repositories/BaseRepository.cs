@@ -53,7 +53,7 @@ namespace Domain.Repositories
                 throw new ArgumentNullException(nameof(entities));
 
             foreach (var entity in entities)
-                Entities.AddOrUpdate(entity);
+                Entities.Add(entity);
 
             Context.SaveChanges();
         }

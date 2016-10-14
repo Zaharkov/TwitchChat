@@ -28,16 +28,13 @@ namespace Domain.Repositories
 
             foreach (var chatterInfo in exists)
             {
-                var chatter = chattersInfo.FirstOrDefault(t => 
+                var chatter = chattersInfo.Single(t => 
                     t.Name.Equals(chatterInfo.Name, StringComparison.InvariantCultureIgnoreCase) &&
                     t.ChatName.Equals(chatterInfo.ChatName, StringComparison.InvariantCultureIgnoreCase)
                 );
 
-                if (chatter != null)
-                {
-                    chatterInfo.Seconds += chatter.Seconds;
-                    chattersInfo.Remove(chatter);
-                }
+                chatterInfo.Seconds += chatter.Seconds;
+                chattersInfo.Remove(chatter);
             }
 
             context.UpdateRange(exists);
@@ -152,12 +149,7 @@ namespace Domain.Repositories
 
         public KeyValuePair<int, int> GetQuizScore(string name, string chatName)
         {
-            var chatterInfo = Table.FirstOrDefault(t =>
-                t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
-            );
-            var count = chatterInfo?.QuizScore ?? 0;
-
+            var chatterInfo = GetOrCreate(name, chatName);
             var group = Table.GroupBy(t => t.QuizScore).OrderByDescending(t => t.Key);
             var score = 0;
 
@@ -165,11 +157,11 @@ namespace Domain.Repositories
             {
                 score++;
 
-                if(entity.Key == count)
+                if(entity.Key == chatterInfo.QuizScore)
                     break;
             }
 
-            return new KeyValuePair<int, int>(count, score);
+            return new KeyValuePair<int, int>(chatterInfo.QuizScore, score);
         }
 
         public long GetRouletteId(string name, string chatName)
