@@ -88,138 +88,242 @@
       <!-- http://streamlabs.com/alert-box/v3/420936F44B5975790754 -->
     </iframe>
     <script>
-      $(document).ready(function() {
+    $(document).ready(function() {
    
-        var iframe = document.getElementById("iframe");
+		var iframe = document.getElementById("iframe");
 
-        iframe.onload = function() {
+		iframe.onload = function() {
     
-          var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-          var ifstyle = document.getElementById('iframestyle');
-          iframeDocument.head.appendChild(ifstyle);
-          initTransform(iframeDocument);
+			var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+			var ifstyle = document.getElementById('iframestyle');
+			iframeDocument.head.appendChild(ifstyle);
+			initTransform(iframeDocument);
 
-          setTimeout(function(){
-            document.body.style.display = "inline";
-          });
-        };
-      });
-      
-      function initTransform(iframeDocument){
-        var test = iframeDocument.createElement("script");
-        test.textContent = transform.toString() + "; transform();";
-        iframeDocument.body.appendChild(test);
-      }
-      
-      function transform() {
-          
-          function monthsName(months){
-            if (months%10 == 1)
-                return "месяц";
+			setTimeout(function(){
+				document.body.style.display = "inline";
+			});
+		};
+    });
+    
+    function initTransform(iframeDocument){
+		var test = iframeDocument.createElement("script");
+		test.textContent = transform.toString() + "; transform();";
+		iframeDocument.body.appendChild(test);
+    }
+    
+    function transform() {
+        
+        function monthsName(months){
+			if (months%10 == 1)
+				return "месяц";
 
-            if (months%10 == 2 || months%10 == 3 || months%10 == 4)
-                return "месяца";
+			if (months%10 == 2 || months%10 == 3 || months%10 == 4)
+				return "месяца";
 
-            return "месяцев";
-          }
-      
-          widget.showSubscriptionAlert = function(t) {
-			  var _ = require('lodash');
-              var e = t,
-                  n = _.cloneDeep(this.types.subscription),
-                  i = n.settings.layout || this.globalLayout;
-              if (n.enabled) {
-                  var s = this.profanitize(e.message, e.name);
-                  if (e.message = s.message, e.name = s.name, 4 != this.donationPageSettings.profanity_mode || !s.profanity) {
-                      if (n.settings.emotes = t.emotes, s.profanity && 1 == this.donationPageSettings.profanity_mode && (n.settings.ttsEnabled = !1), n.variations && n.variations.length) {
-                          var o = [];
-                          if (_.isUndefined(e.variation) || _.isNull(e.variation)) {
-                              var a = 0;
-                              _.forEach(n.variations, function(t, n) {
-                                  "MIN_MONTHS_SUBSCRIBED" == t.condition ? (t.conditionData = parseInt(t.conditionData), e.count >= t.conditionData && t.conditionData >= a && (t.conditionData > a && (o = []), o.push(t), a = t.conditionData)) : "RANDOM" == t.condition && 0 == a && (t.conditionData = parseInt(t.conditionData), o.push(t))
-                              })
-                          } else n.variations[e.variation] && o.push(n.variations[e.variation]);
-                          if (o.length) {
-                              var r = this.pickVariation(o);
-                              n.settings.imageHref = r.settings.image.href, n.settings.soundHref = r.settings.sound.href, n.settings.messageTemplate = r.settings.text.format, n.settings.soundVolume = r.settings.sound.volume || n.settings.soundVolume, n.settings.textSize = r.settings.text.size || n.settings.textSize, n.settings.textColor = r.settings.text.color || n.settings.textColor, n.settings.specialTextColor = r.settings.text.color2 || n.settings.specialTextColor, n.settings.textAnimation = _.isUndefined(r.settings.text.animation) ? n.settings.textAnimation : r.settings.text.animation, n.settings.font = r.settings.text.font || n.settings.font, n.settings.textThickness = r.settings.text.thickness || n.settings.textThickness, n.settings.textDelay = _.isUndefined(r.settings.textDelay) ? n.settings.textDelay : r.settings.textDelay, n.duration = r.settings.duration || n.duration, n.settings.showAnimation = r.settings.showAnimation || n.settings.showAnimation, n.settings.hideAnimation = r.settings.hideAnimation || n.settings.hideAnimation, i = r.settings.layout || i
-                          }
-                      }
+			return "месяцев";
+        }
+		
+		var alertMessage = $("#alert-message");
+		var alertTitleMessage = document.createElement('div');
+		alertTitleMessage.id = "alert-message-title";
+		alertMessage.before(alertTitleMessage);
+	  
+		widget.ab.setTextSize = function(t) {
+			this.$el.find("#alert-message").css({
+				fontSize: t
+			});
+			
+			this.$el.find("#alert-message-title").css({
+				fontSize: t
+			});
+		};
+		
+		widget.ab.setTextColor = function(t) {
+			this.$el.find("#alert-message").css({
+                color: t
+            });
+			
+			this.$el.find("#alert-message-title").css({
+                color: t
+            });
+		};
+		
+		widget.ab.setSpecialTextColor = function(t) {
+			this.settings.specialTextColor = t, this.$el.find("#alert-message > span").css({
+                color: t,
+                position: "relative"
+            });
+			
+			this.settings.specialTextColor = t, this.$el.find("#alert-message-title > span").css({
+                color: t,
+                position: "relative"
+            });
+		};
+		
+		widget.ab.setTextAnimation = function(t) {
+            this.settings.textAnimation = t, this.$el.find("#alert-message > span > span:first-child span").each(function() {
+                $(this).removeClass().addClass("animated-letter " + t)
+            })
+			
+			this.settings.textAnimation = t, this.$el.find("#alert-message-title > span > span:first-child span").each(function() {
+                $(this).removeClass().addClass("animated-letter " + t)
+            })
+		};
+		
+		widget.ab.setTextThickness = function(t) {
+            this.$el.find("#alert-message").css({
+                fontWeight: t
+            });
+			
+			this.$el.find("#alert-message-title").css({
+                fontWeight: t
+            });
+		};
+		
+		widget.ab.setFont = function(t) {
+            WebFont.load({
+                google: {
+                    families: [t + ":300,400,600,700,800,900"]
+                }
+            }), this.$el.find("#alert-message").css({
+                fontFamily: '"' + t + '"'
+            })
+			
+			WebFont.load({
+                google: {
+                    families: [t + ":300,400,600,700,800,900"]
+                }
+            }), this.$el.find("#alert-message-title").css({
+                fontFamily: '"' + t + '"'
+            })
+		};
+		
+		widget.ab.setMessageTemplate = function(t, e, title) {
+			for (var n in e) {
+                var i = new RegExp("{" + n + "}", "g");
+                t = t.replace(i, '<span data-token="' + n + '">' + e[n] + "</span>");
+				
+				if(title) {
+					title = title.replace(i, '<span data-token="' + n + '">' + e[n] + "</span>")
+				}
+            }
+            this.$el.find("#alert-message").html(t), this.$el.find("#alert-message > span").each(function() {
+                $(this).html($.map($(this).text().split(" "), function(t) {
+                    var e = t.split("");
+                    return "<span>" + $.map(e, function(t) {
+                        return "<span>" + t + "</span>"
+                    }).join("") + "</span>"
+                }).join("<span>&nbsp;</span>"))
+            });
+
+			if(title) {
+				this.$el.find("#alert-message-title").html(title), this.$el.find("#alert-message-title > span").each(function() {
+					$(this).html($.map($(this).text().split(" "), function(t) {
+						var e = t.split("");
+						return "<span>" + $.map(e, function(t) {
+							return "<span>" + t + "</span>"
+						}).join("") + "</span>"
+					}).join("<span>&nbsp;</span>"))
+				});
+			}
+			
+            this.setTextAnimation(this.settings.textAnimation), this.setSpecialTextColor(this.settings.specialTextColor)
+		}
+    
+        widget.showSubscriptionAlert = function(t) {
+			var _ = require('lodash');
+            var e = t,
+                n = _.cloneDeep(this.types.subscription),
+                i = n.settings.layout || this.globalLayout;
+            if (n.enabled) {
+                var s = this.profanitize(e.message, e.name);
+                if (e.message = s.message, e.name = s.name, 4 != this.donationPageSettings.profanity_mode || !s.profanity) {
+                    if (n.settings.emotes = t.emotes, s.profanity && 1 == this.donationPageSettings.profanity_mode && (n.settings.ttsEnabled = !1), n.variations && n.variations.length) {
+                        var o = [];
+                        if (_.isUndefined(e.variation) || _.isNull(e.variation)) {
+                            var a = 0;
+                            _.forEach(n.variations, function(t, n) {
+                                "MIN_MONTHS_SUBSCRIBED" == t.condition ? (t.conditionData = parseInt(t.conditionData), e.count >= t.conditionData && t.conditionData >= a && (t.conditionData > a && (o = []), o.push(t), a = t.conditionData)) : "RANDOM" == t.condition && 0 == a && (t.conditionData = parseInt(t.conditionData), o.push(t))
+                            })
+                        } else n.variations[e.variation] && o.push(n.variations[e.variation]);
+                        if (o.length) {
+                            var r = this.pickVariation(o);
+                            n.settings.imageHref = r.settings.image.href, n.settings.soundHref = r.settings.sound.href, n.settings.messageTemplate = r.settings.text.format, n.settings.soundVolume = r.settings.sound.volume || n.settings.soundVolume, n.settings.textSize = r.settings.text.size || n.settings.textSize, n.settings.textColor = r.settings.text.color || n.settings.textColor, n.settings.specialTextColor = r.settings.text.color2 || n.settings.specialTextColor, n.settings.textAnimation = _.isUndefined(r.settings.text.animation) ? n.settings.textAnimation : r.settings.text.animation, n.settings.font = r.settings.text.font || n.settings.font, n.settings.textThickness = r.settings.text.thickness || n.settings.textThickness, n.settings.textDelay = _.isUndefined(r.settings.textDelay) ? n.settings.textDelay : r.settings.textDelay, n.duration = r.settings.duration || n.duration, n.settings.showAnimation = r.settings.showAnimation || n.settings.showAnimation, n.settings.hideAnimation = r.settings.hideAnimation || n.settings.hideAnimation, i = r.settings.layout || i
+                        }
+                    }
+                    
+                    if(e.months == 1)
+                    {
+						var newDur = Math.floor(n.duration / 2);
+						var result = this.showAlert(n.settings, e, n.duration, i);
+						widget.ab.setMessageTemplate("Привет", e, "{name}");
+						
+						setTimeout(function() {
+							var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
+							var mesEl = $("#alert-message");
+							var data = e;
+						
+							mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+								e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+								
+								widget.ab.setMessageTemplate("добро пожаловать", data);
+								mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+									e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
+									
+									setTimeout(function() {
+										mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+											e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+											
+											widget.ab.setMessageTemplate("в команду!", data);
+											mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+												e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
+											});
+										});
+									}, 1000);
+								});
+							});
+						}, newDur - 2000);
+                    
+						return result, this.delay + n.duration;
+                    }
+                    else 
+                    {
+						var newDur = Math.floor(n.duration / 2);
+						var result = this.showAlert(n.settings, e, n.duration, i);
+						widget.ab.setMessageTemplate("Ресабнулся", e, "{name}");
                       
-                      //n.settings.hideAnimation = "napoZoomOut";
-                      //n.settings.showAnimation = "napoZoomIn";
+						setTimeout(function() {
+							var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
+							var mesEl = $("#alert-message");
+							var data = e;
+						
+							mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+							e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+							
+							widget.ab.setMessageTemplate("на {months}", data);
+								mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+									e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
+									
+									setTimeout(function() {
+										mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
+											e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+											
+											widget.ab.setMessageTemplate(monthsName(data.months) + "!", data);
+											mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
+												e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
+											});
+										});
+									}, 1000);
+								});
+							});
+						}, newDur - 2000);
                       
-                      if(e.months == 1)
-                      {
-                        n.settings.messageTemplate = "Привет, {name}";
-                        var newDur = Math.floor(n.duration / 2);
-                        var result = this.showAlert(n.settings, e, n.duration, i);
-                      
-                        setTimeout(function() {
-                          var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
-                          var mesEl = $("#alert-message");
-                          var data = e;
-                        
-                          mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
-                            e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
-                            
-                            widget.ab.setMessageTemplate("добро пожаловать", data);
-                            mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
-                              e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-                              
-                              setTimeout(function() {
-                                mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
-                                  e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
-                                  
-                                  widget.ab.setMessageTemplate("в комманду!", data);
-                                  mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
-                                    e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-                                  });
-                                });
-                              }, 1000);
-                            });
-                          });
-                        }, newDur - 2000);
-                      
-                        return result, this.delay + n.duration;
-                      }
-                      else 
-                      {
-                        n.settings.messageTemplate = "{name} ресабнулся";
-                        var newDur = Math.floor(n.duration / 2);
-                        var result = this.showAlert(n.settings, e, n.duration, i);
-                        
-                        setTimeout(function() {
-                          var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
-                          var mesEl = $("#alert-message");
-                          var data = e;
-                        
-                          mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
-                            e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
-                            
-                            widget.ab.setMessageTemplate("на {months}", data);
-                            mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
-                              e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-                              
-                              setTimeout(function() {
-                                mesEl.addClass("animated napoZoomOut").one(anim, function(e) {
-                                  e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
-                                  
-                                  widget.ab.setMessageTemplate(monthsName(data.months) + "!", data);
-                                  mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function(e) {
-                                    e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-                                  });
-                                });
-                              }, 1000);
-                            });
-                          });
-                        }, newDur - 2000);
-                        
-                        return result, this.delay + n.duration;
-                      }
-                  }
-              }
-          }
-      }
+						return result, this.delay + n.duration;
+                    }
+                }
+            }
+        }
+    }
     </script>
   </body>
 </html>
