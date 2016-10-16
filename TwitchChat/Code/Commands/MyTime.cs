@@ -19,13 +19,13 @@ namespace TwitchChat.Code.Commands
 
         public static string GetSecondsName(long seconds)
         {
+            if (seconds % 100 > 10 && seconds % 100 < 20)
+                return "секунд";
+
             if (seconds % 10 == 1)
                 return "секунду";
 
             if (seconds%10 != 2 && seconds%10 != 3 && seconds%10 != 4)
-                return "секунд";
-
-            if (seconds % 100 > 11 && seconds % 100 < 15)
                 return "секунд";
 
             return "секунды";

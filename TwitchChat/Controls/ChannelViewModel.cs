@@ -311,6 +311,17 @@ namespace TwitchChat.Controls
                 var group = GetGroup(chatterType);
                 foreach (var user in group.Get())
                 {
+                    var exists = listForUpdate.FirstOrDefault(t => 
+                        t.Name.Equals(user.Name, StringComparison.InvariantCultureIgnoreCase) && 
+                        t.ChatName.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase)
+                    );
+
+                    if (exists != null)
+                    {
+                        exists.Seconds += user.GetTimeAndRestart();
+                        continue;
+                    }
+
                     listForUpdate.Add(new Domain.Models.ChatterInfo
                     {
                         Name = user.Name,

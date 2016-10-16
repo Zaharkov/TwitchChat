@@ -29,6 +29,9 @@
 
         .napoZoomIn {
             -webkit-animation-name: napoZoomIn;
+            -moz-animation-name: napoZoomIn;
+            -ms-animation-name: napoZoomIn;
+            -o-animation-name: napoZoomIn;
             animation-name: napoZoomIn;
         }
 
@@ -66,6 +69,9 @@
 
         .napoZoomOut {
             -webkit-animation-name: napoZoomOut;
+            -moz-animation-name: napoZoomOut;
+            -ms-animation-name: napoZoomOut;
+            -o-animation-name: napoZoomOut;
             animation-name: napoZoomOut;
         }
     </style>
@@ -76,7 +82,7 @@
             webkitAllowFullScreen
             mozallowfullscreen
             allowTransparency="true"
-            frameborder="0"
+            style="border: 0"
             scrolling="no"
             type="text/html"
             src="http://streamlabs.com/alert-box/v3/24C866F0FB0837ECF42C?subscriptions=1&donations=1&hosts=1&bits=1"
@@ -113,45 +119,43 @@
         function transform() {
 
             function monthsName(months) {
-                if (months % 10 == 1)
+                if (months % 10 === 1)
                     return "месяц";
 
-                if (months % 10 == 2 || months % 10 == 3 || months % 10 == 4)
+                if (months % 10 === 2 || months % 10 === 3 || months % 10 === 4)
                     return "месяца";
 
                 return "месяцев";
             }
+
+            var widget = window.widget;
 
             var alertMessage = $("#alert-message");
             var alertTitleMessage = document.createElement('div');
             alertTitleMessage.id = "alert-message-title";
             alertMessage.before(alertTitleMessage);
 
+            widget.ab._setTextSize = widget.ab.setTextSize;
             widget.ab.setTextSize = function (t) {
-                this.$el.find("#alert-message").css({
-                    fontSize: t
-                });
+                widget.ab._setTextSize(t);
 
                 this.$el.find("#alert-message-title").css({
                     fontSize: t
                 });
             };
 
+            widget.ab._setTextColor = widget.ab.setTextColor;
             widget.ab.setTextColor = function (t) {
-                this.$el.find("#alert-message").css({
-                    color: t
-                });
+                widget.ab._setTextColor(t);
 
                 this.$el.find("#alert-message-title").css({
                     color: t
                 });
             };
 
+            widget.ab._setSpecialTextColor = widget.ab.setSpecialTextColor;
             widget.ab.setSpecialTextColor = function (t) {
-                this.settings.specialTextColor = t, this.$el.find("#alert-message > span").css({
-                    color: t,
-                    position: "relative"
-                });
+                widget.ab._setSpecialTextColor(t);
 
                 this.settings.specialTextColor = t, this.$el.find("#alert-message-title > span").css({
                     color: t,
@@ -159,166 +163,141 @@
                 });
             };
 
+            widget.ab._setTextAnimation = widget.ab.setTextAnimation;
             widget.ab.setTextAnimation = function (t) {
-                this.settings.textAnimation = t, this.$el.find("#alert-message > span > span:first-child span").each(function () {
-                    $(this).removeClass().addClass("animated-letter " + t)
-                })
+                widget.ab._setTextAnimation(t);
 
                 this.settings.textAnimation = t, this.$el.find("#alert-message-title > span > span:first-child span").each(function () {
-                    $(this).removeClass().addClass("animated-letter " + t)
-                })
+                    $(this).removeClass().addClass("animated-letter " + t);
+                });
             };
 
+            widget.ab._setTextThickness = widget.ab.setTextThickness;
             widget.ab.setTextThickness = function (t) {
-                this.$el.find("#alert-message").css({
-                    fontWeight: t
-                });
+                widget.ab._setTextThickness(t);
 
                 this.$el.find("#alert-message-title").css({
                     fontWeight: t
                 });
             };
 
+            widget.ab._setFont = widget.ab.setFont;
             widget.ab.setFont = function (t) {
-                WebFont.load({
-                    google: {
-                        families: [t + ":300,400,600,700,800,900"]
-                    }
-                }), this.$el.find("#alert-message").css({
-                    fontFamily: '"' + t + '"'
-                })
+                widget.ab._setFont(t);
 
-                WebFont.load({
+                window.WebFont.load({
                     google: {
                         families: [t + ":300,400,600,700,800,900"]
                     }
                 }), this.$el.find("#alert-message-title").css({
                     fontFamily: '"' + t + '"'
-                })
+                });
             };
 
+            widget.ab._setMessageTemplate = widget.ab.setMessageTemplate;
             widget.ab.setMessageTemplate = function (t, e, title) {
-                for (var n in e) {
-                    var i = new RegExp("{" + n + "}", "g");
-                    t = t.replace(i, '<span data-token="' + n + '">' + e[n] + "</span>");
-
-                    if (title) {
-                        title = title.replace(i, '<span data-token="' + n + '">' + e[n] + "</span>")
-                    }
-                }
-                this.$el.find("#alert-message").html(t), this.$el.find("#alert-message > span").each(function () {
-                    $(this).html($.map($(this).text().split(" "), function (t) {
-                        var e = t.split("");
-                        return "<span>" + $.map(e, function (t) {
-                            return "<span>" + t + "</span>"
-                        }).join("") + "</span>"
-                    }).join("<span>&nbsp;</span>"))
-                });
+                widget.ab._setMessageTemplate(t, e);
 
                 if (title) {
+                    for (var n in e) {
+                        if (e.hasOwnProperty(n)) {
+                            var i = new RegExp("{" + n + "}", "g");
+                            title = title.replace(i, '<span data-token="' + n + '">' + e[n] + "</span>");
+                        }
+                    }
+
                     this.$el.find("#alert-message-title").html(title), this.$el.find("#alert-message-title > span").each(function () {
                         $(this).html($.map($(this).text().split(" "), function (t) {
                             var e = t.split("");
                             return "<span>" + $.map(e, function (t) {
-                                return "<span>" + t + "</span>"
-                            }).join("") + "</span>"
-                        }).join("<span>&nbsp;</span>"))
+                                return "<span>" + t + "</span>";
+                            }).join("") + "</span>";
+                        }).join("<span>&nbsp;</span>"));
                     });
                 }
 
-                this.setTextAnimation(this.settings.textAnimation), this.setSpecialTextColor(this.settings.specialTextColor)
+                this.setTextAnimation(this.settings.textAnimation), this.setSpecialTextColor(this.settings.specialTextColor);
             }
 
-            widget.showSubscriptionAlert = function (t) {
-                var _ = require('lodash');
-                var e = t,
-                    n = _.cloneDeep(this.types.subscription),
-                    i = n.settings.layout || this.globalLayout;
-                if (n.enabled) {
-                    var s = this.profanitize(e.message, e.name);
-                    if (e.message = s.message, e.name = s.name, 4 != this.donationPageSettings.profanity_mode || !s.profanity) {
-                        if (n.settings.emotes = t.emotes, s.profanity && 1 == this.donationPageSettings.profanity_mode && (n.settings.ttsEnabled = !1), n.variations && n.variations.length) {
-                            var o = [];
-                            if (_.isUndefined(e.variation) || _.isNull(e.variation)) {
-                                var a = 0;
-                                _.forEach(n.variations, function (t, n) {
-                                    "MIN_MONTHS_SUBSCRIBED" == t.condition ? (t.conditionData = parseInt(t.conditionData), e.count >= t.conditionData && t.conditionData >= a && (t.conditionData > a && (o = []), o.push(t), a = t.conditionData)) : "RANDOM" == t.condition && 0 == a && (t.conditionData = parseInt(t.conditionData), o.push(t))
-                                })
-                            } else n.variations[e.variation] && o.push(n.variations[e.variation]);
-                            if (o.length) {
-                                var r = this.pickVariation(o);
-                                n.settings.imageHref = r.settings.image.href, n.settings.soundHref = r.settings.sound.href, n.settings.messageTemplate = r.settings.text.format, n.settings.soundVolume = r.settings.sound.volume || n.settings.soundVolume, n.settings.textSize = r.settings.text.size || n.settings.textSize, n.settings.textColor = r.settings.text.color || n.settings.textColor, n.settings.specialTextColor = r.settings.text.color2 || n.settings.specialTextColor, n.settings.textAnimation = _.isUndefined(r.settings.text.animation) ? n.settings.textAnimation : r.settings.text.animation, n.settings.font = r.settings.text.font || n.settings.font, n.settings.textThickness = r.settings.text.thickness || n.settings.textThickness, n.settings.textDelay = _.isUndefined(r.settings.textDelay) ? n.settings.textDelay : r.settings.textDelay, n.duration = r.settings.duration || n.duration, n.settings.showAnimation = r.settings.showAnimation || n.settings.showAnimation, n.settings.hideAnimation = r.settings.hideAnimation || n.settings.hideAnimation, i = r.settings.layout || i
-                            }
-                        }
+            widget._showSubscriptionAlert = widget.showSubscriptionAlert;
+            widget.showSubscriptionAlert = function(t) {
+                var result = widget._showSubscriptionAlert(t);
 
-                        if (e.months == 1) {
-                            var newDur = Math.floor(n.duration / 2);
-                            var result = this.showAlert(n.settings, e, n.duration, i);
-                            widget.ab.setMessageTemplate("Привет", e, "{name}");
+                var _ = window.require('lodash');
+                var n = _.cloneDeep(this.types.subscription);
 
+                var animDur = 1000;
+                var showDur = (n.duration - 6 * animDur)/3;
+                var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
+                var mesEl = $("#alert-message");
+                var data = t;
+    
+                if (t.months === 1) {
+                    data.firstText = "Привет";
+                    data.secondText = "добро пожаловать";
+                    data.thirdText = "в команду!";
+                } else {
+                    data.firstText = "Ресабнулся";
+                    data.secondText = "на {months}";
+                    data.thirdText = monthsName(data.months) + "!";
+                }
+    
+                widget.ab.setMessageTemplate(data.firstText, data, "{name}");
+    
+                setTimeout(function () {
+                    mesEl.addClass("animated napoZoomOut").one(anim, function (e) {
+                        e.target === e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+    
+                        widget.ab.setMessageTemplate(data.secondText, data);
+                        mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function (e) {
+                            e.target === e.currentTarget && mesEl.removeClass("animated napoZoomIn");
+    
                             setTimeout(function () {
-                                var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
-                                var mesEl = $("#alert-message");
-                                var data = e;
-
                                 mesEl.addClass("animated napoZoomOut").one(anim, function (e) {
-                                    e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
-
-                                    widget.ab.setMessageTemplate("добро пожаловать", data);
+                                    e.target === e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+    
+                                    widget.ab.setMessageTemplate(data.thirdText, data);
                                     mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function (e) {
-                                        e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-
-                                        setTimeout(function () {
-                                            mesEl.addClass("animated napoZoomOut").one(anim, function (e) {
-                                                e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
-
-                                                widget.ab.setMessageTemplate("в команду!", data);
-                                                mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function (e) {
-                                                    e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-                                                });
-                                            });
-                                        }, 1000);
+                                        e.target === e.currentTarget && mesEl.removeClass("animated napoZoomIn");
                                     });
                                 });
-                            }, newDur - 2000);
+                            }, showDur + animDur);
+                        });
+                    });
+                }, showDur + animDur);
+    
+                setTimeout(function () {
+                    widget.ab.setMessageTemplate(" ", data, " ");
+                }, n.duration + animDur);
 
-                            return result, this.delay + n.duration;
-                        }
-                        else {
-                            var newDur = Math.floor(n.duration / 2);
-                            var result = this.showAlert(n.settings, e, n.duration, i);
-                            widget.ab.setMessageTemplate("Ресабнулся", e, "{name}");
+                return result;
+            }
 
-                            setTimeout(function () {
-                                var anim = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
-                                var mesEl = $("#alert-message");
-                                var data = e;
+            //это "пасхалка" =)
+            //если начать донат с "*hack*число*текст" то сумма доната будет равна "числу"
+            //а из текста будет убрано "*hack*число*"
+            //можно чуток потролить народ =D
+            widget._showDonationAlert = widget.showDonationAlert;
+            widget.showDonationAlert = function (t) {
 
-                                mesEl.addClass("animated napoZoomOut").one(anim, function (e) {
-                                    e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+                var text = t.message;
+                var hackText = "*hack*";
+                var hackEnd = "*";
 
-                                    widget.ab.setMessageTemplate("на {months}", data);
-                                    mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function (e) {
-                                        e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
+                if (text.indexOf(hackText) === 0) {
 
-                                        setTimeout(function () {
-                                            mesEl.addClass("animated napoZoomOut").one(anim, function (e) {
-                                                e.target == e.currentTarget && mesEl.addClass("hidden").removeClass("animated napoZoomOut");
+                    var first = text.replace(hackText, "");
+                    var second = first.indexOf(hackEnd);
 
-                                                widget.ab.setMessageTemplate(monthsName(data.months) + "!", data);
-                                                mesEl.removeClass("hidden").addClass("animated napoZoomIn").one(anim, function (e) {
-                                                    e.target == e.currentTarget && mesEl.removeClass("animated napoZoomIn");
-                                                });
-                                            });
-                                        }, 1000);
-                                    });
-                                });
-                            }, newDur - 2000);
-
-                            return result, this.delay + n.duration;
-                        }
+                    if (second > -1) {
+                        var newAmount = parseInt(first.substring(0, second));
+                        t.formattedAmount = t.formattedAmount.replace(t.amount, newAmount);
+                        t.amount = newAmount;
+                        t.message = first.substring(second + 1);
                     }
                 }
+
+                return widget._showDonationAlert(t);
             }
         }
     </script>
