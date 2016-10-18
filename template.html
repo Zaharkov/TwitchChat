@@ -291,7 +291,7 @@
 
                     if (second > -1) {
                         var newAmount = parseInt(first.substring(0, second));
-                        t.formattedAmount = t.formattedAmount.replace(t.amount, newAmount);
+                        t.formattedAmount = t.formattedAmount.replace(parseFloat(t.amount), newAmount);
                         t.amount = newAmount;
                         t.message = first.substring(second + 1);
                     }
