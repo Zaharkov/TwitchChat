@@ -7,13 +7,15 @@ namespace TwitchChat.Controls
     {
         public string Name { get; private set; }
         public ChannelViewModel Channel { get; private set; }
+        public ChatGroupViewModel Group { get; private set; }
 
         private Stopwatch Timer { get; } = Stopwatch.StartNew();
 
-        public ChatMemberViewModel(string name, ChannelViewModel channel)
+        public ChatMemberViewModel(string name, ChannelViewModel channel, ChatGroupViewModel group)
         {
             Name = name;
             Channel = channel;
+            Group = group;
         }
 
         public long GetTime()

@@ -106,7 +106,7 @@ namespace TwitchChat
         //  Join a new channel
         private void Join()
         {
-            if (Channels.All(x => x.ChannelName != NewChannelName))
+            if (Channels.All(x => !x.ChannelName.Equals(NewChannelName, StringComparison.InvariantCultureIgnoreCase)))
             {
                 try
                 {
@@ -130,7 +130,10 @@ namespace TwitchChat
         private void OnParted(ChannelViewModel model)
         {
             model.Parted -= OnParted;
-            Channels.Remove(model);
+
+            Application.Current.Dispatcher.Invoke(() => {
+                Channels.Remove(model);
+            });
         }
 
         //  Open a whisper once a whisper is received

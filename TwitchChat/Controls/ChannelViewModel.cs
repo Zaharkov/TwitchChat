@@ -69,13 +69,13 @@ namespace TwitchChat.Controls
             _irc.OnRawMessage += OnRawMessage;
             _irc.OnMessage += OnMessage;
             //_irc.OnRoomState;
-            //_irc.OnMode; TODO move to moderator list
+            _irc.OnMode += OnMode;
             _irc.OnNames += OnNames;
             _irc.OnJoin += OnJoin;
             _irc.OnPart += OnPart;
             //_irc.OnNotice;
-            //_irc.OnSubscribe; TODO 
-            //_irc.OnClearChat; TODO
+            _irc.OnSubscribe += OnSubscribe;
+            //_irc.OnClearChat;
 
             _channelName = channelName;
 
@@ -99,14 +99,15 @@ namespace TwitchChat.Controls
             if (e.Names.ContainsKey(ChannelName))
             {
                 //  Add names to general viewer group
+                var allChatters = GetAllChatters();
                 var group = GetGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     foreach (var name in e.Names[ChannelName])
                     {
-                        if (!group.Any(x => name.Equals(x.Name)))
-                            group.Add(new ChatMemberViewModel(name, this));
+                        if (!allChatters.Any(x => name.Equals(x.Name)))
+                            group.Add(new ChatMemberViewModel(name, this, group));
                     }
                 });
             }
@@ -114,52 +115,77 @@ namespace TwitchChat.Controls
 
         private void OnJoin(JoinEventArgs e)
         {
-            if (e.Channel == ChannelName)
+            if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
             {
                 //  Add names to general viewer group
+                var allChatters = GetAllChatters();
                 var group = GetGroup();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (!group.Any(x => e.Username.Equals(x.Name)))
-                        group.Add(new ChatMemberViewModel(e.Username, this));
+                    if (!allChatters.Any(x => e.Username.Equals(x.Name)))
+                        group.Add(new ChatMemberViewModel(e.Username, this, group));
                 });
             }
         }
 
-        private ChatMemberViewModel FindOrJoinUser(string name)
+        private ChatMemberViewModel FindOrJoinUser(string name, UserType type)
         {
-            var group = GetGroup();
-            var user = group.FirstOrDefault(x => name.Equals(x.Name));
+            var mapType = Map(type);
+            var group = GetGroup(mapType);
+            var allChatters = GetAllChatters();
+            var user = allChatters.FirstOrDefault(x => name.Equals(x.Name));
 
             if (user == null)
             {
-                user = new ChatMemberViewModel(name, this);
+                user = new ChatMemberViewModel(name, this, group);
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (!group.Any(x => name.Equals(x.Name)))
+                    if (!allChatters.Any(x => name.Equals(x.Name)))
                         group.Add(user);
+                });
+            }
+            else if(user.Group.Name != mapType.ToString())
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    user.Group.Remove(user);
+                    group.Add(user);
                 });
             }
 
             return user;
         }
 
+        private ChatterType Map(UserType type)
+        {
+            if (type.HasFlag(UserType.Admin))
+                return ChatterType.Admins;
+
+            if (type.HasFlag(UserType.Globalmoderator))
+                return ChatterType.GlobalMods;
+
+            if (type.HasFlag(UserType.Staff))
+                return ChatterType.Staff;
+
+            if (type.HasFlag(UserType.Moderator) || type.HasFlag(UserType.Broadcaster))
+                return ChatterType.Moderators;
+
+            return ChatterType.Viewers;
+        }
+
         private void OnPart(PartEventArgs e)
         {
-            if (e.Channel == ChannelName)
+            if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
             {
-                var group = GetGroup();
+                var group = GetAllChatters();
 
                 var user = group.FirstOrDefault(x => e.Username.Equals(x.Name));
                 if (user != null)
                 {
                     //  Remove once user is gound and removed
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        group.Remove(user);
-                    });
+                    Application.Current.Dispatcher.Invoke(() => { group.Remove(user); });
 
                     ChatterInfoRepository.Instance.AddSecods(user.Name, ChannelName, user.GetTimeAndRestart());
                 }
@@ -168,7 +194,7 @@ namespace TwitchChat.Controls
 
         private void OnMessage(MessageEventArgs e)
         {
-            if (e.Channel == ChannelName)
+            if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -179,7 +205,7 @@ namespace TwitchChat.Controls
 
                 if (IsChatCommand(e))
                 {
-                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username));
+                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username, e.UserType));
 
                     while (result != null)
                     {
@@ -187,6 +213,62 @@ namespace TwitchChat.Controls
                         result = result.NextMessage;
                     }
                 }
+            }
+        }
+
+        private void OnMode(ModeEventArgs e)
+        {
+            if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (e.AddingMode)
+                {
+                    var allChatters = GetAllChatters();
+                    var modGroup = GetGroup(ChatterType.Moderators);
+                    var user = allChatters.FirstOrDefault(x => e.Username.Equals(x.Name));
+
+                    if (user == null)
+                    {
+                        user = new ChatMemberViewModel(e.Username, this, modGroup);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            if (!allChatters.Any(x => e.Username.Equals(x.Name)))
+                                modGroup.Add(user);
+                        });
+                    }
+                    else if (user.Group.Name != ChatterType.Moderators.ToString())
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            user.Group.Remove(user);
+                            modGroup.Add(user);
+                        });
+                    }
+                }
+            }
+        }
+
+        public void OnSubscribe(SubscriberEventArgs e)
+        {
+            if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                string message;
+                if (e.Months == 1)
+                    message = $"Пополнение в стаде медведей! Приветствуем {e.Username}!!! napoSub napoSub napoSub";
+                else if (e.Months < 12)
+                    message = $"От реподписки у {e.Username} растет пиписька/сиськи!!! napoSub napoSub napoSub";
+                else
+                    message = $"{e.Username} с нами уже больше года!!! napoLove napoMurr napoMeow napoSub napoSub napoSub";
+
+                _irc.Message(ChannelName, message);
+                var userInfo = _irc.UserStateInfo[_channelName];
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, message, userInfo.ColorHex, false, _badges));
+                    if (Messages.Count > App.Maxmessages)
+                        Messages.RemoveAt(0);
+                });
             }
         }
 
@@ -208,7 +290,7 @@ namespace TwitchChat.Controls
 
                         var botMessage = $"БОТ: @{e.Username} {message.Message}";
 
-                        if(e.IsAction)
+                        if (e.IsAction)
                             _irc.Action(ChannelName, botMessage);
                         else
                             _irc.Message(ChannelName, botMessage);
@@ -274,13 +356,13 @@ namespace TwitchChat.Controls
             _irc.OnRawMessage -= OnRawMessage;
             _irc.OnMessage -= OnMessage;
             //_irc.OnRoomState;
-            //_irc.OnMode; TODO move to moderator list
+            _irc.OnMode -= OnMode;
             _irc.OnNames -= OnNames;
             _irc.OnJoin -= OnJoin;
             _irc.OnPart -= OnPart;
             //_irc.OnNotice;
-            //_irc.OnSubscribe; TODO 
-            //_irc.OnClearChat; TODO
+            _irc.OnSubscribe -= OnSubscribe;
+            //_irc.OnClearChat;
 
             //  Raise the event.  MainWindowViewModel uses this to remove from list of channels
             Parted?.Invoke(this);
@@ -289,6 +371,15 @@ namespace TwitchChat.Controls
         #region Helpers
 
         //  Helper to get and create groups
+        public List<ChatMemberViewModel> GetAllChatters()
+        {
+            var allChaters = new List<ChatMemberViewModel>();
+            foreach (var chatGroupViewModel in ChatGroups)
+                allChaters.AddRange(chatGroupViewModel.Get());
+
+            return allChaters;
+        }
+
         public ChatGroupViewModel GetGroup(ChatterType type = ChatterType.Viewers)
         {
             //  Attempt to get group
@@ -296,7 +387,7 @@ namespace TwitchChat.Controls
             if (group == null)
             {
                 //  Create group if it doesnt exist
-                group = new ChatGroupViewModel {Name = type.ToString()};
+                group = new ChatGroupViewModel { Name = type.ToString() };
 
                 Application.Current.Dispatcher.Invoke(() => { ChatGroups.Add(group); });
             }
@@ -306,29 +397,20 @@ namespace TwitchChat.Controls
         public void UpdateChattersInfo()
         {
             var listForUpdate = new List<Domain.Models.ChatterInfo>();
-            foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
+            foreach (var user in GetAllChatters())
             {
-                var group = GetGroup(chatterType);
-                foreach (var user in group.Get())
+                var exists = listForUpdate.FirstOrDefault(t => t.Name.Equals(user.Name, StringComparison.InvariantCultureIgnoreCase) && t.ChatName.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase));
+
+                if (exists != null)
                 {
-                    var exists = listForUpdate.FirstOrDefault(t => 
-                        t.Name.Equals(user.Name, StringComparison.InvariantCultureIgnoreCase) && 
-                        t.ChatName.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase)
-                    );
-
-                    if (exists != null)
-                    {
-                        exists.Seconds += user.GetTimeAndRestart();
-                        continue;
-                    }
-
-                    listForUpdate.Add(new Domain.Models.ChatterInfo
-                    {
-                        Name = user.Name,
-                        ChatName = ChannelName,
-                        Seconds = user.GetTimeAndRestart()
-                    });
+                    exists.Seconds += user.GetTimeAndRestart();
+                    continue;
                 }
+
+                listForUpdate.Add(new Domain.Models.ChatterInfo
+                {
+                    Name = user.Name, ChatName = ChannelName, Seconds = user.GetTimeAndRestart()
+                });
             }
 
             ChatterInfoRepository.Instance.UpdateChatterInfo(ChannelName, listForUpdate);

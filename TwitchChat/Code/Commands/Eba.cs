@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using TwitchApi.Entities;
 using TwitchChat.Controls;
 
 namespace TwitchChat.Code.Commands
@@ -12,13 +10,7 @@ namespace TwitchChat.Code.Commands
         public static SendMessage EbaComeOn(ChatMemberViewModel userModel)
         {
             string name = null;
-            var chatters = new List<ChatMemberViewModel>();
-
-            foreach (ChatterType chatterType in Enum.GetValues(typeof(ChatterType)))
-            {
-                var group = userModel.Channel.GetGroup(chatterType);
-                chatters.AddRange(group.Get());
-            }
+            var chatters = userModel.Channel.GetAllChatters();
 
             if (chatters.Count < 5)
                 return SendMessage.None;

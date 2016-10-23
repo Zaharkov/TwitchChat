@@ -57,7 +57,7 @@ namespace TwitchChat.Code.Commands
                 case Command.Global:
                     return SendMessage.None;
                 case Command.Мойписюн:
-                    commandFunc = () => MyBolt.Bolt(userModel);
+                    commandFunc = () => MyBolt.Bolt(e);
                     break;
                 case Command.QuizStart:
                     commandFunc = () => QiuzCommand.Start(userModel);

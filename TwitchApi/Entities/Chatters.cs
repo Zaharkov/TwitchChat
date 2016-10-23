@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace TwitchApi.Entities
@@ -25,21 +26,14 @@ namespace TwitchApi.Entities
         [JsonProperty("viewers")]
         public List<string> Viewers { get; set; }
 
-        public List<string> this[ChatterType name]
+        public Dictionary<string, ChatterType> GetAll()
         {
-            get
-            {
-                switch (name)
-                {
-                    case ChatterType.Moderators: return Moderators;
-                    case ChatterType.Staff: return Staff;
-                    case ChatterType.Admins: return Admins;
-                    case ChatterType.GlobalMods: return GlobalMods;
-                    case ChatterType.Viewers: return Viewers;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(name), name, null);
-                }
-            }
+            return Viewers.Select(t => new KeyValuePair<string, ChatterType>(t, ChatterType.Viewers))
+                .Concat(Moderators.Select(t => new KeyValuePair<string, ChatterType>(t, ChatterType.Moderators)))
+                .Concat(Staff.Select(t => new KeyValuePair<string, ChatterType>(t, ChatterType.Staff)))
+                .Concat(Admins.Select(t => new KeyValuePair<string, ChatterType>(t, ChatterType.Admins)))
+                .Concat(GlobalMods.Select(t => new KeyValuePair<string, ChatterType>(t, ChatterType.GlobalMods)))
+                .ToDictionary(k => k.Key, v => v.Value);
         }
     }
 }
