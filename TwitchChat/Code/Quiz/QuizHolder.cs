@@ -58,31 +58,16 @@ namespace TwitchChat.Code.Quiz
                     channelView.Client.Message(channelView.ChannelName, text);
             };
 
-            var cancelToken = new CancellationTokenSource();
-
-            if (TokenSources.ContainsKey(channelView))
-                TokenSources[channelView] = cancelToken;
-            else
-                TokenSources.Add(channelView, cancelToken);
-
-            TimerFactory.AddToken(channelView, cancelToken);
-            PeriodicTaskFactory.Start(action, Delay * 1000, cancelToken: cancelToken.Token);
+            var cancelToken = TimerFactory.Start(channelView, action, Delay*1000);
+            TokenSources.Add(channelView, cancelToken);
         }
 
         public static void StopQuiz(ChannelViewModel channelView)
         {
             if (TokenSources.ContainsKey(channelView))
             {
-                var token = TokenSources[channelView];
-
-                if (!token.IsCancellationRequested)
-                {
-                    token.Cancel();
-                    token.Dispose();
-                }
-
+                TimerFactory.Stop(channelView, TokenSources[channelView]);
                 TokenSources.Remove(channelView);
-                TimerFactory.RemoveToken(channelView, token);
             }
 
             IsQuizActive = false;

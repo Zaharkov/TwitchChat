@@ -15,37 +15,55 @@ namespace TwitchChat.Code.Timers
     {
         private static readonly Dictionary<Timer, int> Config = DelayConfig<Timer>.GetDelayConfig("TimersConfig");
         private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
+        private static readonly object LockObject = new object();
 
         public static List<CancellationTokenSource> GetTimers(ChannelViewModel channelModel)
         {
-            return CancellationTokenSources.ContainsKey(channelModel) 
-                ? CancellationTokenSources[channelModel] 
-                : new List<CancellationTokenSource>();
-        }
-
-        public static void AddToken(ChannelViewModel channelModel, CancellationTokenSource token)
-        {
-            if (CancellationTokenSources.ContainsKey(channelModel))
+            lock (LockObject)
             {
-                if(!CancellationTokenSources[channelModel].Contains(token))
-                    CancellationTokenSources[channelModel].Add(token);
-            }
-            else
-            {
-                CancellationTokenSources.Add(channelModel, new List<CancellationTokenSource> {token});
+                return CancellationTokenSources.ContainsKey(channelModel)
+                    ? CancellationTokenSources[channelModel]
+                    : new List<CancellationTokenSource>();
             }
         }
 
-        public static void RemoveToken(ChannelViewModel channelModel, CancellationTokenSource token)
+        public static CancellationTokenSource Start(ChannelViewModel channelModel, Action action, int intervalInMilliseconds)
         {
-            if (CancellationTokenSources.ContainsKey(channelModel) && CancellationTokenSources[channelModel].Contains(token))
-                CancellationTokenSources[channelModel].Remove(token);
+            lock (LockObject)
+            {
+                var tokenSource = new CancellationTokenSource();
+
+                if (CancellationTokenSources.ContainsKey(channelModel) && 
+                    !CancellationTokenSources[channelModel].Contains(tokenSource))
+                    CancellationTokenSources[channelModel].Add(tokenSource);
+                else
+                    CancellationTokenSources.Add(channelModel, new List<CancellationTokenSource> {tokenSource});
+
+                PeriodicTaskFactory.Start(action, intervalInMilliseconds, cancelToken: tokenSource.Token);
+                return tokenSource;
+            }
+        }
+
+        public static void Stop(ChannelViewModel channelModel, CancellationTokenSource tokenSource)
+        {
+            lock (LockObject)
+            {
+                if (CancellationTokenSources.ContainsKey(channelModel) &&
+                    CancellationTokenSources[channelModel].Contains(tokenSource))
+                {
+                    if (!tokenSource.IsCancellationRequested)
+                    {
+                        tokenSource.Cancel();
+                        tokenSource.Dispose();
+                    }
+
+                    CancellationTokenSources[channelModel].Remove(tokenSource);
+                }
+            }
         }
 
         public static void InitTimers(ChannelViewModel channelModel)
         {
-            var tokenSources = new List<CancellationTokenSource>();
-            CancellationTokenSources.Add(channelModel, tokenSources);
             foreach (Timer timer in Enum.GetValues(typeof(Timer)))
             {
                 var delay = Config.ContainsKey(timer) ? Config[timer] : Config[Timer.Global];
@@ -123,9 +141,7 @@ namespace TwitchChat.Code.Timers
                         throw new ArgumentOutOfRangeException();
                 }
 
-                var cancelToken = new CancellationTokenSource();
-                tokenSources.Add(cancelToken);
-                PeriodicTaskFactory.Start(action, delay * 1000, cancelToken: cancelToken.Token);
+                Start(channelModel, action, delay*1000);
             }
         }
     }
