@@ -17,41 +17,41 @@ namespace TwitchChat.Code.Commands
             if (!parse)
             {
                 return SendMessage.None;
-                //return $"Команда !{forParse} не поддерживается. Список команд можно посмотреть через команду !{Command.Help}";
+                //return $"Команда !{forParse} не поддерживается. Список команд можно посмотреть через команду !{Command.Помощь}";
             }
 
             if (!CommandAccess.IsHaveAccess(e, command))
             {
                 return SendMessage.None;
-                //return $"У Вас нет доступа к команде !{command}. Список доступных команд можно посмотреть через команду !{Command.Help}";
+                //return $"У Вас нет доступа к команде !{command}. Список доступных команд можно посмотреть через команду !{Command.Помощь}";
             }
 
             Func<SendMessage> commandFunc;
             switch (command)
             {
-                case Command.Music:
-                case Command.Song:
+                case Command.Музыка:
+                case Command.Песня:
                     commandFunc = MusicCommand.GetMusic;
                     break;
-                case Command.Mmr:
+                case Command.Ммр:
                     commandFunc = MmrCommand.GetMmr;
                     break;
-                case Command.MmrUpdate:
+                case Command.МмрОбновить:
                     commandFunc = MmrCommand.MmrUpdate;
                     break;
-                case Command.Help:
+                case Command.Помощь:
                     commandFunc = HelpCommand.GetHelp;
                     break;
-                case Command.MyTime:
+                case Command.МоеВремя:
                     commandFunc = () => MyTimeCommand.GetMyTime(e, userModel);
                     break;
                 case Command.Шейкер:
                     commandFunc = SheikerCommand.GetSheiker;
                     break;
-                case Command.AddSteam:
+                case Command.ДобавитьСтим:
                     commandFunc = () => SteamCommand.AddSteam(e);
                     break;
-                case Command.RemoveSteam:
+                case Command.УбратьСтим:
                     commandFunc = () => SteamCommand.RemoveSteam(e);
                     break;
                 case Command.Global:
@@ -59,28 +59,28 @@ namespace TwitchChat.Code.Commands
                 case Command.Мойписюн:
                     commandFunc = () => MyBolt.Bolt(e);
                     break;
-                case Command.QuizStart:
+                case Command.ВикторинаСтарт:
                     commandFunc = () => QiuzCommand.Start(userModel);
                     break;
-                case Command.QuizStop:
+                case Command.ВикторинаСтоп:
                     commandFunc = () => QiuzCommand.Stop(userModel);
                     break;
-                case Command.QuizScore:
+                case Command.МояВикторина:
                     commandFunc = () => QiuzCommand.Score(userModel);
                     break;
                 case Command.О:
                     commandFunc = () => QiuzCommand.Answer(e, userModel);
                     break;
-                case Command.QuizQuestion:
+                case Command.ВикторинаВопрос:
                     commandFunc = QiuzCommand.Question;
                     break;
                 case Command.Эба:
                     commandFunc = () => Eba.EbaComeOn(userModel);
                     break;
-                case Command.UpTime:
+                case Command.Аптайм:
                     commandFunc = () => StreamCommand.GetUpTime(userModel);
                     break;
-                case Command.Delay:
+                case Command.Задержка:
                     commandFunc = () => StreamCommand.GetDelay(userModel);
                     break;
                 case Command.Рулетка:

@@ -20,7 +20,7 @@ namespace TwitchChat.Code.Commands
             var split = message.Split(' ');
 
             if (split.Length != 3)
-                return $"Некорректный синтаксис. Введите '!{Command.AddSteam} %TwitchName% %SteamId%'. Где %TwitchName% имя пользователя twitch, а %SteamId% - номер пользователя в steam. Его можно найти на профиле DotaBuff в адресе страницы";
+                return $"Некорректный синтаксис. Введите '!{Command.ДобавитьСтим} %TwitchName% %SteamId%'. Где %TwitchName% имя пользователя twitch, а %SteamId% - номер пользователя в steam. Его можно найти на профиле DotaBuff в адресе страницы";
 
             var twitchName = split[1];
 
@@ -57,7 +57,7 @@ namespace TwitchChat.Code.Commands
             var split = message.Split(' ');
 
             if (split.Length != 2)
-                return $"Некорректный синтаксис. Введите '!{Command.AddSteam} %SteamId%'. Где %SteamId% - номер пользователя в steam. Его можно найти на профиле DotaBuff в адресе страницы";
+                return $"Некорректный синтаксис. Введите '!{Command.ДобавитьСтим} %SteamId%'. Где %SteamId% - номер пользователя в steam. Его можно найти на профиле DotaBuff в адресе страницы";
 
             long msgSteamId;
             if (!long.TryParse(split[1], out msgSteamId))
@@ -130,7 +130,7 @@ namespace TwitchChat.Code.Commands
             var split = message.Split(' ');
 
             if (split.Length < 2 && split.Length > 3)
-                return $"Некорректный синтаксис. Введите '!{Command.RemoveSteam} %User%'. Где %User% - или имя пользователя twitch или номер пользователя в steam (его можно найти на профиле DotaBuff в адресе страницы)";
+                return $"Некорректный синтаксис. Введите '!{Command.УбратьСтим} %User%'. Где %User% - или имя пользователя twitch или номер пользователя в steam (его можно найти на профиле DotaBuff в адресе страницы)";
 
             var ignoreBug = split.Length == 3 && split[2] == "true";
 
