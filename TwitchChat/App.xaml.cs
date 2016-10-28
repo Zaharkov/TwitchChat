@@ -1,6 +1,8 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Domain.Repositories;
+using Domain.Utils;
 
 namespace TwitchChat
 {
@@ -19,6 +21,11 @@ namespace TwitchChat
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            Task.Run(() =>
+            {
+                Backup.MakeBackUp();
+            });
+
             var mainWindow = new MainWindow();
             _vm = new MainWindowViewModel();
             _vm.Whispers.CollectionChanged += Whispers_CollectionChanged;

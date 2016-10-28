@@ -95,6 +95,7 @@
     <Compile Include="Repositories\LogRepository.cs" />
     <Compile Include="Repositories\AccessTokenRepository.cs" />
     <Compile Include="Repositories\BaseRepository.cs" />
+    <Compile Include="Utils\Backup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

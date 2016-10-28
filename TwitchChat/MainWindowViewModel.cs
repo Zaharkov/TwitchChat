@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using CommonHelper;
 using DotaClient;
 using TwitchChat.Controls;
 using Twitchiedll.IRC.Events;
@@ -18,6 +19,8 @@ namespace TwitchChat
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private static readonly bool WhisperOn = bool.Parse(Configuration.GetSetting("WhisperOn"));
+
         //  Main IRC client
         private readonly TwitchIrcClient _irc;
 
@@ -139,6 +142,9 @@ namespace TwitchChat
         //  Open a whisper once a whisper is received
         private void OnWhisper(MessageEventArgs e)
         {
+            if (!WhisperOn)
+                return;
+
             Application.Current.Dispatcher.Invoke(() =>
             {
                 if (!Whispers.Any(x => x.UserName.Equals(e.Username)))
@@ -149,6 +155,13 @@ namespace TwitchChat
         //  Start a new private message
         private void Whisper()
         {
+            if (!WhisperOn)
+            {
+                MessageBox.Show("Whispers is off");
+                NewWhisperUserName = string.Empty;
+                return;
+            }
+
             if (!Whispers.Any(x => x.UserName.Equals(NewWhisperUserName)))
             {
                 try
