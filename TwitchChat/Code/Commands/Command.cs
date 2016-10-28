@@ -25,6 +25,7 @@ namespace TwitchChat.Code.Commands
         Рулетка,
         МояРулетка,
         ТопРулетки,
-        Дуэль
+        Дуэль,
+        Принять
     }
 }

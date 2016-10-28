@@ -72,5 +72,11 @@ namespace TwitchChat.Code.DelayDecorator
 
             return SendMessage.None;
         }
+
+        public void RestartTimer()
+        {
+            if (_timer.IsRunning)
+                _timer.Restart();
+        }
     }
 }

@@ -11,9 +11,7 @@ namespace Domain.Repositories
         {
         }
 
-        private static AccessTokenRepository _instance;
-
-        public static AccessTokenRepository Instance => _instance ?? (_instance = new AccessTokenRepository());
+        public static AccessTokenRepository Instance => new AccessTokenRepository();
 
         public void AddToken(AccessTokenType type, string value, int? expire = null)
         {

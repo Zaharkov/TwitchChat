@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using CommonHelper;
 using Domain.Repositories;
@@ -17,6 +18,18 @@ namespace TwitchChat.Code.Timers
         private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
         private static readonly object LockObject = new object();
 
+        private static void AddToken(ChannelViewModel channelModel, CancellationTokenSource tokenSource)
+        {
+            lock (LockObject)
+            {
+                if (CancellationTokenSources.ContainsKey(channelModel) &&
+                    !CancellationTokenSources[channelModel].Contains(tokenSource))
+                    CancellationTokenSources[channelModel].Add(tokenSource);
+                else
+                    CancellationTokenSources.Add(channelModel, new List<CancellationTokenSource> {tokenSource});
+            }
+        }
+
         public static List<CancellationTokenSource> GetTimers(ChannelViewModel channelModel)
         {
             lock (LockObject)
@@ -29,19 +42,17 @@ namespace TwitchChat.Code.Timers
 
         public static CancellationTokenSource Start(ChannelViewModel channelModel, Action action, int intervalInMilliseconds)
         {
-            lock (LockObject)
-            {
-                var tokenSource = new CancellationTokenSource();
+            var tokenSource = new CancellationTokenSource();
+            AddToken(channelModel, tokenSource);
+            PeriodicTaskFactory.Start(action, intervalInMilliseconds, cancelToken: tokenSource.Token);
+            return tokenSource;
+        }
 
-                if (CancellationTokenSources.ContainsKey(channelModel) && 
-                    !CancellationTokenSources[channelModel].Contains(tokenSource))
-                    CancellationTokenSources[channelModel].Add(tokenSource);
-                else
-                    CancellationTokenSources.Add(channelModel, new List<CancellationTokenSource> {tokenSource});
-
-                PeriodicTaskFactory.Start(action, intervalInMilliseconds, cancelToken: tokenSource.Token);
-                return tokenSource;
-            }
+        public static Task RunOnce(ChannelViewModel channelModel, Action action)
+        {
+            var tokenSource = new CancellationTokenSource();
+            AddToken(channelModel, tokenSource);
+            return PeriodicTaskFactory.Start(action, cancelToken: tokenSource.Token, maxIterations: 1);
         }
 
         public static void Stop(ChannelViewModel channelModel, CancellationTokenSource tokenSource)

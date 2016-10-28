@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using TwitchChat.Code.Commands;
 
 namespace TwitchChat.Code.DelayDecorator
@@ -9,7 +9,7 @@ namespace TwitchChat.Code.DelayDecorator
         private IDelayDecorator User { get; }
         private IDelayDecorator Global { get; }
 
-        private static readonly Dictionary<Command, Dictionary<string, HybridDecorator>> HybridInstances = new Dictionary<Command, Dictionary<string, HybridDecorator>>();
+        private static readonly ConcurrentDictionary<Command, ConcurrentDictionary<string, HybridDecorator>> HybridInstances = new ConcurrentDictionary<Command, ConcurrentDictionary<string, HybridDecorator>>();
 
         private HybridDecorator(IDelayDecorator user, IDelayDecorator global)
         {
@@ -29,15 +29,16 @@ namespace TwitchChat.Code.DelayDecorator
 
                 var hybridDecorator = new HybridDecorator(userDecorator, globalDecorator);
 
-                HybridInstances[command].Add(username, hybridDecorator);
+                HybridInstances[command].AddOrUpdate(username, hybridDecorator, (k, v) => hybridDecorator);
 
                 return hybridDecorator;
             }
 
             var decorator = new HybridDecorator(userDecorator, globalDecorator);
-            var hybrid = new Dictionary<string, HybridDecorator> { { username, decorator } };
+            var hybrid = new ConcurrentDictionary<string, HybridDecorator>();
+            hybrid.AddOrUpdate(username, decorator, (k, v) => decorator);
 
-            HybridInstances.Add(command, hybrid);
+            HybridInstances.AddOrUpdate(command, hybrid, (k, v) => hybrid);
 
             return decorator;
         }
@@ -53,6 +54,12 @@ namespace TwitchChat.Code.DelayDecorator
             Global.Execute(func, false);
 
             return user;
+        }
+
+        public void RestartTimer()
+        {
+            User.RestartTimer();
+            Global.RestartTimer();
         }
     }
 }

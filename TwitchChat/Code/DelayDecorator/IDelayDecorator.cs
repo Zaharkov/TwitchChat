@@ -7,5 +7,6 @@ namespace TwitchChat.Code.DelayDecorator
     {
         bool CanExecute(out int needWait);
         SendMessage Execute(Func<SendMessage> func, bool needExec = true);
+        void RestartTimer();
     }
 }

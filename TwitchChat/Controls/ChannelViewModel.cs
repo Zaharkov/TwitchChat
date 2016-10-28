@@ -87,6 +87,7 @@ namespace TwitchChat.Controls
             _badges = TwitchApiClient.GetBadges(channelName);
 
             TimerFactory.InitTimers(this);
+            RouletteInfoRepository.Instance.ResetAllDuelNames();
         }
 
         private void OnRawMessage(string buffer)
@@ -206,12 +207,7 @@ namespace TwitchChat.Controls
                 if (IsChatCommand(e))
                 {
                     var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username, e.UserType));
-
-                    while (result != null)
-                    {
-                        SendMessage(e, result);
-                        result = result.NextMessage;
-                    }
+                    SendMessage(e, result);
                 }
             }
         }
@@ -277,40 +273,47 @@ namespace TwitchChat.Controls
             return !e.Message.StartsWith("! ") && e.Message.StartsWith("!");
         }
 
-        private void SendMessage(MessageEventArgs e, SendMessage message)
+        public void SendMessage(MessageEventArgs e, SendMessage message)
         {
-            if (!string.IsNullOrEmpty(message.Message))
+            while (message != null)
             {
-                var userInfo = _irc.UserStateInfo[_channelName];
-                switch (message.Type)
+                if (!string.IsNullOrEmpty(message.Message))
                 {
-                    case SendType.None:
-                        break;
-                    case SendType.Message:
+                    var userInfo = _irc.UserStateInfo[_channelName];
+                    switch (message.Type)
+                    {
+                        case SendType.None:
+                            break;
+                        case SendType.Message:
 
-                        var botMessage = $"БОТ: @{e.Username} {message.Message}";
+                            var botMessage = $"БОТ: {(e != null ? "@" + e.Username : "")} {message.Message}";
 
-                        if (e.IsAction)
-                            _irc.Action(ChannelName, botMessage);
-                        else
-                            _irc.Message(ChannelName, botMessage);
+                            if (e != null && e.IsAction)
+                                _irc.Action(ChannelName, botMessage);
+                            else
+                                _irc.Message(ChannelName, botMessage);
 
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, botMessage, userInfo.ColorHex, e.IsAction, _badges));
-                            if (Messages.Count > App.Maxmessages)
-                                Messages.RemoveAt(0);
-                        });
-                        break;
-                    case SendType.Whisper:
-                        _irc.Whisper(e.Username, message.Message);
-                        break;
-                    case SendType.Timeout:
-                        _irc.Timeout(ChannelName, message.Message, message.Timeout);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(message.Type), message.Type, null);
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, botMessage,
+                                    userInfo.ColorHex, e?.IsAction ?? false, _badges));
+                                if (Messages.Count > App.Maxmessages)
+                                    Messages.RemoveAt(0);
+                            });
+                            break;
+                        case SendType.Whisper:
+                            if(e != null)
+                                _irc.Whisper(e.Username, message.Message);
+                            break;
+                        case SendType.Timeout:
+                            _irc.Timeout(ChannelName, message.Message, message.Timeout);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(message.Type), message.Type, null);
+                    }
                 }
+
+                message = message.NextMessage;
             }
         }
 

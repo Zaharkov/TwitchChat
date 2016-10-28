@@ -34,7 +34,9 @@ namespace TwitchChat.Code.Commands
             { Command.Задержка, UserType.Default },
             { Command.Рулетка, UserType.Default },
             { Command.МояРулетка, UserType.Default },
-            { Command.ТопРулетки, UserType.Default }
+            { Command.ТопРулетки, UserType.Default },
+            { Command.Дуэль, UserType.Default },
+            { Command.Принять, UserType.Default }
         };
 
         private static readonly Dictionary<Command, DelayType> CommandDelayType = new Dictionary<Command, DelayType>
@@ -50,7 +52,9 @@ namespace TwitchChat.Code.Commands
             { Command.Мойписюн, DelayType.Hybrid},
             { Command.Рулетка, DelayType.Hybrid},
             { Command.МояРулетка, DelayType.Hybrid},
-            { Command.ТопРулетки, DelayType.Global }
+            { Command.ТопРулетки, DelayType.Global },
+            { Command.Дуэль, DelayType.Hybrid },
+            { Command.Принять, DelayType.Hybrid }
         };
 
         public static Dictionary<List<Command>, UserType> GetGroupedAccess()

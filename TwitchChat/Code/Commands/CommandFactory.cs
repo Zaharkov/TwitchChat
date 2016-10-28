@@ -2,6 +2,7 @@
 using System.Linq;
 using TwitchChat.Code.DelayDecorator;
 using TwitchChat.Controls;
+using Twitchiedll.IRC;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
@@ -92,6 +93,12 @@ namespace TwitchChat.Code.Commands
                 case Command.ТопРулетки:
                     commandFunc = RouletteCommand.RouletteGetTop;
                     break;
+                case Command.Дуэль:
+                    commandFunc = () => DuelCommand.Duel(e, userModel);
+                    break;
+                case Command.Принять:
+                    commandFunc = () => DuelCommand.DuelStart(e, userModel);
+                    break;
                 default:
                     return SendMessage.None;
             }
@@ -113,6 +120,9 @@ namespace TwitchChat.Code.Commands
                 default:
                     throw new ArgumentOutOfRangeException(nameof(delayType), delayType, null);
             }
+
+            if (e.UserType.HasFlag(UserType.Broadcaster))
+                return commandFunc();
 
             int needWait;
             if (!delayDecorator.CanExecute(out needWait))

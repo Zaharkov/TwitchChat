@@ -30,5 +30,11 @@ namespace Domain.Models
 
         [DefaultValue(typeof(double), "1")]
         public double MaxPercent { get; set; }
+
+        [StringLength(255)]
+        public string DuelName { get; set; }
+
+        [DefaultValue(typeof(int), "0")]
+        public int DuelScore { get; set; }
     }
 }

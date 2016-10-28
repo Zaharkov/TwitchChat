@@ -11,9 +11,7 @@ namespace Domain.Repositories
         {
         }
 
-        private static LogRepository _instance;
-
-        public static LogRepository Instance => _instance ?? (_instance = new LogRepository());
+        public static LogRepository Instance => new LogRepository();
 
         public void LogException(string message, Exception e)
         {

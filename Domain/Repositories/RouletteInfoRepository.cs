@@ -10,9 +10,7 @@ namespace Domain.Repositories
         {
         }
 
-        private static RouletteInfoRepository _instance;
-
-        public static RouletteInfoRepository Instance => _instance ?? (_instance = new RouletteInfoRepository());
+        public static RouletteInfoRepository Instance => new RouletteInfoRepository();
 
         public RouletteInfo Create()
         {
@@ -56,6 +54,15 @@ namespace Domain.Repositories
             AddOrUpdate(info);
         }
 
+        public void Reset(long id)
+        {
+            var info = Table.First(t => t.Id.Equals(id));
+            info.CurrentTry = 0;
+            info.Streak = 0;
+            info.Percent = 1;
+            AddOrUpdate(info);
+        }
+
         public void ResetCurrentTry(long id)
         {
             var info = Table.First(t => t.Id.Equals(id));
@@ -86,6 +93,37 @@ namespace Domain.Repositories
         public List<RouletteInfo> GetList()
         {
             return Table.ToList();
+        }
+
+        public void SetDuelName(long id, string duelName)
+        {
+            var info = Table.First(t => t.Id.Equals(id));
+            info.DuelName = duelName;
+            AddOrUpdate(info);
+        }
+
+        public void RemoveDuelName(long id)
+        {
+            var info = Table.First(t => t.Id.Equals(id));
+            info.DuelName = null;
+            AddOrUpdate(info);
+        }
+
+        public void AddDuelScore(long id)
+        {
+            var info = Table.First(t => t.Id.Equals(id));
+            info.DuelScore++;
+            AddOrUpdate(info);
+        }
+
+        public void ResetAllDuelNames()
+        {
+            var exists = Table.Where(t => t.DuelName != null);
+
+            foreach (var rouletteInfo in exists)
+                rouletteInfo.DuelName = null;
+
+            UpdateRange(exists);
         }
     }
 }

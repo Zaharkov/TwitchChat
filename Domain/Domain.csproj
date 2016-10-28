@@ -79,6 +79,10 @@
     <Compile Include="Migrations\201610122141203_AddRouletteFields.Designer.cs">
       <DependentUpon>201610122141203_AddRouletteFields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610271921200_AddDuelFields.cs" />
+    <Compile Include="Migrations\201610271921200_AddDuelFields.Designer.cs">
+      <DependentUpon>201610271921200_AddDuelFields.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccessToken.cs" />
     <Compile Include="Models\AccessTokenType.cs" />
@@ -113,6 +117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610122141203_AddRouletteFields.resx">
       <DependentUpon>201610122141203_AddRouletteFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610271921200_AddDuelFields.resx">
+      <DependentUpon>201610271921200_AddDuelFields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
