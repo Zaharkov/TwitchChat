@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonHelper;
-using Twitchiedll.IRC;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands

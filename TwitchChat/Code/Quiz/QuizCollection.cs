@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace TwitchChat.Code.Quiz
 {
@@ -13,32 +12,20 @@ namespace TwitchChat.Code.Quiz
 
         static QuizCollection()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            const string resourceName = "TwitchChat.Code.Quiz.questions.txt";
+            var lines = File.ReadAllLines("Code\\Quiz\\questions.txt");
 
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            foreach (var question in lines)
             {
-                if(stream == null)
-                    throw new NullReferenceException();
+                var q = question.Split('*');
 
-                using (var reader = new StreamReader(stream))
-                {
-                    var questions = reader.ReadToEnd().Split('\n');
+                if (q.Length < 2)
+                    continue;
 
-                    foreach (var question in questions)
-                    {
-                        var q = question.Replace("\r", "").Split('*');
+                if (Questions.ContainsKey(q[0]))
+                    continue;
 
-                        if (q.Length < 2)
-                            continue;
-
-                        if (Questions.ContainsKey(q[0]))
-                            continue;
-
-                        Questions.Add(q[0], q[1]);
-                    }
-                }
-            } 
+                Questions.Add(q[0], q[1]);
+            }
         }
 
         public static KeyValuePair<string, string> GetNew()

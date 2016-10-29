@@ -29,5 +29,10 @@ namespace Domain.Repositories
         {
             return Table.ToList();
         }
+
+        public void DeleteLogs()
+        {
+            DeleteRange(Table);
+        }
     }
 }

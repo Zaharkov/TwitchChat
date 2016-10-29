@@ -2,11 +2,14 @@
 using Domain.Models;
 using Domain.Repositories;
 using DotaClient;
+using TwitchChat.Texts;
+using TwitchChat.Texts.Entities;
 
 namespace TwitchChat.Code.Commands
 {
     public static class MmrCommand
     {
+        private static readonly Mmr Texts = TextsHolder.Texts.Mmr;
         private static readonly int Delay = int.Parse(Configuration.GetSetting("SteamMmrDelay"));
 
         public static SendMessage GetMmr()
@@ -60,8 +63,8 @@ namespace TwitchChat.Code.Commands
 
         private static string BuildString(int? soloInt, int? partyInt)
         {
-            var solo = soloInt.HasValue && soloInt.Value > 0 ? $"Одиночный рейтинг равен: {soloInt.Value}" : "Одиночный рейтинг не доступен";
-            var party = partyInt.HasValue && partyInt.Value > 0 ? $"Групповой рейтинг равен: {partyInt.Value}" : "Групповой рейтинг не доступен";
+            var solo = soloInt.HasValue && soloInt.Value > 0 ? string.Format(Texts.Solo, soloInt.Value) : Texts.NoSolo;
+            var party = partyInt.HasValue && partyInt.Value > 0 ? string.Format(Texts.Solo, partyInt.Value) : Texts.NoParty;
 
             return $"{solo}. {party}";
         }

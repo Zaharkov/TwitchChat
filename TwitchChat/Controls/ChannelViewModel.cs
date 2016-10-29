@@ -12,7 +12,7 @@ using System.Windows.Input;
 using Domain.Repositories;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
-using Twitchiedll.IRC;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls
@@ -248,29 +248,13 @@ namespace TwitchChat.Controls
         {
             if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
             {
-                string message;
-                if (e.Months == 1)
-                    message = $"Пополнение в стаде медведей! Приветствуем {e.Username}!!! napoSub napoSub napoSub";
-                else if (e.Months < 12)
-                    message = $"От реподписки у {e.Username} растет пиписька/сиськи!!! napoSub napoSub napoSub";
-                else
-                    message = $"{e.Username} с нами уже больше года!!! napoLove napoMurr napoMeow napoSub napoSub napoSub";
-
-                _irc.Message(ChannelName, message);
-                var userInfo = _irc.UserStateInfo[_channelName];
-
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, message, userInfo.ColorHex, false, _badges));
-                    if (Messages.Count > App.Maxmessages)
-                        Messages.RemoveAt(0);
-                });
+                SendMessage(null, OnSubscriberCommand.OnSubscriber(e));
             }
         }
 
         private static bool IsChatCommand(MessageEventArgs e)
         {
-            return !e.Message.StartsWith("! ") && e.Message.StartsWith("!");
+            return !e.Message.StartsWith($"{TwitchConstName.Command} ") && e.Message.StartsWith(TwitchConstName.Command.ToString());
         }
 
         public void SendMessage(MessageEventArgs e, SendMessage message)
@@ -286,7 +270,7 @@ namespace TwitchChat.Controls
                             break;
                         case SendType.Message:
 
-                            var botMessage = $"БОТ: {(e != null ? "@" + e.Username : "")} {message.Message}";
+                            var botMessage = $"БОТ: {(e != null ? TwitchConstName.UserStartName + e.Username : "")} {message.Message}";
 
                             if (e != null && e.IsAction)
                                 _irc.Action(ChannelName, botMessage);
@@ -325,7 +309,7 @@ namespace TwitchChat.Controls
             var userInfo = _irc.UserStateInfo[_channelName];
 
             var isAction = false;
-            if (Message.StartsWith("/me"))
+            if (Message.StartsWith(TwitchConstName.Action))
             {
                 isAction = true;
                 Message = Message.Remove(0, 3).TrimStart(' ');

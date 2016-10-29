@@ -4,6 +4,8 @@ using CommonHelper;
 using Domain.Repositories;
 using TwitchChat.Code.Quiz;
 using TwitchChat.Controls;
+using TwitchChat.Texts;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
@@ -11,6 +13,7 @@ namespace TwitchChat.Code.Commands
     public static class QiuzCommand
     {
         private static readonly int Delay = int.Parse(Configuration.GetSetting("QuizRestartDelay"));
+        private static readonly Texts.Entities.Quiz Texts = TextsHolder.Texts.Quiz;
 
         public static SendMessage Start(ChatMemberViewModel userModel)
         {
@@ -27,16 +30,18 @@ namespace TwitchChat.Code.Commands
         public static SendMessage Question()
         {
             if (QuizHolder.IsQuizActive && QuizHolder.Question.HasValue)
-                return SendMessage.GetMessage($"вопрос викторины : {QuizHolder.Question.Value.Key}");
-
-            return SendMessage.GetMessage("сейчас викторина выключена");
+            {
+                var message = string.Format(Texts.Question, QuizHolder.Question.Value.Key, QuizHolder.GetAnswer(QuizHolder.Question.Value.Value), Command.О);
+                return SendMessage.GetMessage(message);
+            }
+            return SendMessage.GetMessage(Texts.Off);
         }
 
         public static SendMessage Score(ChatMemberViewModel userModel)
         {
             var score = ChatterInfoRepository.Instance.GetQuizScore(userModel.Name, userModel.Channel.ChannelName);
-
-            return SendMessage.GetMessage($"ты ответил(а) на {score.Key} {GetName(score.Key)}. Позиция в рейтинге - {score.Value}");
+            var message = string.Format(Texts.Score, string.Format(Texts.Answers, score.Key, GetName(score.Key)), score.Value);
+            return SendMessage.GetMessage(message);
         }
 
         public static SendMessage Answer(MessageEventArgs e, ChatMemberViewModel userModel)
@@ -44,7 +49,7 @@ namespace TwitchChat.Code.Commands
             if (!QuizHolder.IsQuizActive || !QuizHolder.Question.HasValue)
                 return SendMessage.None;
 
-            var answerUser = e.Message.ToUpper().Replace($"!{Command.О}".ToUpper(), "").Trim();
+            var answerUser = e.Message.ToUpper().Replace($"{TwitchConstName.Command}{Command.О}".ToUpper(), "").Trim();
             var answerQuiz = QuizHolder.Question.Value.Value.ToUpper();
 
             if (answerQuiz == answerUser)
@@ -58,7 +63,7 @@ namespace TwitchChat.Code.Commands
                     QuizHolder.StartNewQuiz(userModel.Channel);
                 });
 
-                return SendMessage.GetMessage($"красавчег! Правильный ответ! Перезапуск викторины через {Delay} секунд");
+                return SendMessage.GetMessage(string.Format(Texts.RightAnswer, Delay));
             }
 
             return SendMessage.None;

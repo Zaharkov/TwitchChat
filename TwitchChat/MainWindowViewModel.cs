@@ -11,8 +11,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using CommonHelper;
+using Domain.Repositories;
 using DotaClient;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat
@@ -97,13 +99,20 @@ namespace TwitchChat
 
         private void OnError(Exception e)
         {
-            throw e;
+            LogRepository.Instance.LogException("Error in listener", e);
         }
 
         private void OnDisconnect()
         {
-            Logout();
-            MessageBox.Show("Server was disconnected");
+            if (_irc.State != IrcState.Closed)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show("Server was disconnected. All chats and whispers will be close");
+                });
+
+                Logout();
+            }
         }
 
         //  Join a new channel
@@ -122,7 +131,7 @@ namespace TwitchChat
                 }
                 catch (ErrorResponseDataException ex)
                 {
-                    if ((int)ex.Status == 422)
+                    if (ex.Status == HttpStatusCode.NotFound)
                         MessageBox.Show("Channel not found");
                 }  
             }
@@ -218,8 +227,7 @@ namespace TwitchChat
 
             DotaClientApi.Disconnect();
 
-            if (_irc.State == IrcState.Registered)
-                _irc.Quit();
+            _irc.Quit();
         }
     }
 }

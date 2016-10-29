@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Twitchiedll.IRC.Enums;
 
 namespace TwitchChat.Dialog
 {
@@ -85,7 +86,7 @@ namespace TwitchChat.Dialog
             var color = userInfo.Equals(default(KeyValuePair<string, UserStateEventArgs>)) ? null : userInfo.Value.ColorHex;
 
             var isAction = false;
-            if (Message.StartsWith("/me"))
+            if (Message.StartsWith(TwitchConstName.Action))
             {
                 isAction = true;
                 Message = Message.Remove(0, 3).TrimStart(' ');

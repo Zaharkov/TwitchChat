@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TwitchApi;
 using Twitchiedll.IRC;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 using Twitchiedll.IRC.Limits;
 
@@ -15,7 +16,6 @@ namespace TwitchChat.Code
         private readonly string _server;
         private readonly int _port;
 
-        public IrcState State { get; private set; }
         public string User { get; set; }
         public Dictionary<string, UserStateEventArgs> UserStateInfo = new Dictionary<string, UserStateEventArgs>();
 
@@ -29,7 +29,6 @@ namespace TwitchChat.Code
         {
             Logger = new Logger();
 
-            State = IrcState.Connecting;
             //  Get available servers and initialize IrcClient with the first one
             var server = TwitchApiClient.GetServers().ServersList.First();
 
@@ -37,14 +36,11 @@ namespace TwitchChat.Code
             _port = server.Port;
 
             Connect(_server, _port);
-            State = IrcState.Connected;
         }
 
         public void Reconnect()
         {
-            State = IrcState.Connecting;
             Connect(_server, _port);
-            State = IrcState.Connected;
         }
 
         private void OnGetUserState(UserStateEventArgs state)
@@ -72,21 +68,16 @@ namespace TwitchChat.Code
         /// <param name="pass">Oath token obtained with chat_login scope</param>
         public override void Login(string user, string pass)
         {
-            State = IrcState.Registering;
             User = user;
             base.Login(user, pass);
             OnUserState += OnGetUserState;
             Run();
-
-            State = IrcState.Registered;
         }
 
-        public override void Quit()
+        public void Quit()
         {
-            State = IrcState.Closing;
-            base.Quit();
+            Dispose();
             _listenTask.Wait();
-            State = IrcState.Closed;
         }
 
         private void Run()
@@ -99,19 +90,10 @@ namespace TwitchChat.Code
                 }
                 catch (Exception ex)
                 {
-                    State = IrcState.Error;
                     OnError?.Invoke(ex);
                 }
-                finally
-                {
-                    Dispose();
-                }
 
-                if (State != IrcState.Closing)
-                {
-                    State = IrcState.Disconnected;
-                    OnDisconnect?.Invoke();
-                }
+                OnDisconnect?.Invoke();
             });
         }
     }

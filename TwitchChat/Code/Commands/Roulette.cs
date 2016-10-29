@@ -2,13 +2,16 @@
 using System.Text;
 using CommonHelper;
 using Domain.Repositories;
-using Twitchiedll.IRC;
+using TwitchChat.Texts;
+using TwitchChat.Texts.Entities;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class RouletteCommand
     {
+        private static readonly Roulette Texts = TextsHolder.Texts.Roulette;
         private static readonly int RouletteTimeout = int.Parse(Configuration.GetSetting("RouletteTimeout"));
         private static readonly int RouletteTop = int.Parse(Configuration.GetSetting("RouletteTop"));
 
@@ -16,10 +19,10 @@ namespace TwitchChat.Code.Commands
         {
             if (e.UserType.HasFlag(UserType.Broadcaster) || e.UserType.HasFlag(UserType.Admin) ||
                 e.UserType.HasFlag(UserType.Globalmoderator) || e.UserType.HasFlag(UserType.Staff))
-                return SendMessage.GetMessage("бессмертного пони нельзя убить!");
+                return SendMessage.GetMessage(Texts.Admin);
 
             if (e.UserType.HasFlag(UserType.Moderator))
-                return SendMessage.GetMessage("ты это...меч выкинь...не нужен он тебе");
+                return SendMessage.GetMessage(Texts.Moder);
 
             var rouletteId = ChatterInfoRepository.Instance.GetRouletteId(e.Username, e.Channel);
             var currentTry = RouletteInfoRepository.Instance.Get(rouletteId).CurrentTry;
@@ -39,32 +42,32 @@ namespace TwitchChat.Code.Commands
                 {
                     RouletteInfoRepository.Instance.ResetCurrentTry(rouletteId);
                     RouletteInfoRepository.Instance.AddPercent(rouletteId, 0.05);
-                    return SendMessage.GetMessage("осечка! невероятное везение...крутанем барабан ещё раз!");
+                    return SendMessage.GetMessage(Texts.Misfire);
                 }
 
                 RouletteInfoRepository.Instance.AddDeath(rouletteId);
-                return SendMessage.GetTimeout(e.Username, RouletteTimeout).AddMessage(SendMessage.GetMessage($"пристрелил(а) себя на {currentTry} раз! Помянем napoCry"));
+                var message = SendMessage.GetMessage(string.Format(Texts.Death, currentTry));
+                return SendMessage.GetTimeout(e.Username, RouletteTimeout).AddMessage(message);
             }
 
             RouletteInfoRepository.Instance.AddPercent(rouletteId, percent);
 
-            return SendMessage.GetMessage($"на {currentTry} раз тебе повезло! Посмотрим, повезет ли в следующий...");
+            return SendMessage.GetMessage(string.Format(Texts.Luck, currentTry));
         }
 
         public static SendMessage RouletteInfo(MessageEventArgs e)
         {
             if (e.UserType.HasFlag(UserType.Broadcaster) || e.UserType.HasFlag(UserType.Admin) ||
                 e.UserType.HasFlag(UserType.Globalmoderator) || e.UserType.HasFlag(UserType.Staff))
-                return SendMessage.GetMessage("бессмертного пони нельзя убить!");
+                return SendMessage.GetMessage(Texts.Admin);
 
             if (e.UserType.HasFlag(UserType.Moderator))
-                return SendMessage.GetMessage("ты это...меч выкинь...не нужен он тебе");
+                return SendMessage.GetMessage(Texts.Moder);
 
             var rouletteId = ChatterInfoRepository.Instance.GetRouletteId(e.Username, e.Channel);
             var roulette = RouletteInfoRepository.Instance.Get(rouletteId);
 
-            var message = $"Всего попыток: {roulette.TryCount}. Смертей: {roulette.DeathCount}. Макс стрик: {roulette.MaxStreak} ({roulette.MaxPercent.ToString("0.####%")}). Текущий стрик: {roulette.Streak} ({roulette.Percent.ToString("0.####%")}). Выйграно дуэлей: {roulette.DeathCount}";
-
+            var message = string.Format(Texts.Stats, roulette.TryCount, roulette.DeathCount, roulette.MaxStreak, roulette.MaxPercent.ToString("0.####%"), roulette.Streak, roulette.Percent.ToString("0.####%"), roulette.DeathCount);
             return SendMessage.GetMessage(message);
         }
 
@@ -73,7 +76,7 @@ namespace TwitchChat.Code.Commands
             var top = RouletteInfoRepository.Instance.GetTop(RouletteTop);
 
             var builder = new StringBuilder();
-            builder.Append("топ везунчиков:");
+            builder.Append(Texts.TopStart);
 
             for (var i = 1; i <= top.Count; i++)
             {
@@ -81,7 +84,10 @@ namespace TwitchChat.Code.Commands
                 var chatter = ChatterInfoRepository.Instance.GetByRouletteId(info.Id);
 
                 if (chatter != null)
-                    builder.Append($" {i}. @{chatter.Name} - {info.MaxPercent.ToString("0.####%")}({info.MaxStreak})");
+                {
+                    var message = string.Format(Texts.TopUser, i, chatter.Name, info.MaxPercent.ToString("0.####%"), info.MaxStreak);
+                    builder.Append(message);
+                }
             }
 
             return SendMessage.GetMessage(builder.ToString());

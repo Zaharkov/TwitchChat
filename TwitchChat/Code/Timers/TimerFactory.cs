@@ -7,6 +7,7 @@ using System.Windows;
 using CommonHelper;
 using Domain.Repositories;
 using TwitchApi;
+using TwitchChat.Code.Commands;
 using TwitchChat.Controls;
 using ChatterInfo = Domain.Models.ChatterInfo;
 
@@ -89,7 +90,7 @@ namespace TwitchChat.Code.Timers
                     {
                         action = () =>
                         {
-                            var text = Help.GetHelpTimerText();
+                            var text = HelpCommand.GetHelpTimerText();
                             channelModel.Client.Message(channelModel.ChannelName, text);
                         };
                         break;

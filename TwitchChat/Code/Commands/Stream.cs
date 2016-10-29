@@ -1,21 +1,30 @@
 ﻿using System;
 using TwitchApi;
 using TwitchChat.Controls;
+using TwitchChat.Texts;
+using TwitchChat.Texts.Entities;
 
 namespace TwitchChat.Code.Commands
 {
     public static class StreamCommand
     {
+        private static readonly Stream Texts = TextsHolder.Texts.Stream;
+
         public static SendMessage GetUpTime(ChatMemberViewModel userModel)
         {
             var stream = TwitchApiClient.GetStreamInfo(userModel.Channel.ChannelName);
 
             if (stream.Stream == null)
-                return SendMessage.GetMessage("стрим уже закончился");
+                return SendMessage.GetMessage(Texts.End);
 
             var time = DateTime.UtcNow.Subtract(stream.Stream.CreatedAt);
 
-            return SendMessage.GetMessage($"стрим активен уже {(time.Hours > 0 ? $"{time.Hours} {GetHoursName(time.Hours)}, " : "")}{(time.Minutes > 0 ? $"{time.Minutes} {GetMinutesName(time.Minutes)}, " : "")}{time.Seconds} {GetSecondsName(time.Seconds)}");
+            var message = string.Format(Texts.Active,
+                time.Hours > 0 ? string.Format(Texts.Hours, time.Hours, GetHoursName(time.Hours)) : "",
+                time.Minutes > 0 ? string.Format(Texts.Minutes, time.Minutes, GetMinutesName(time.Minutes)) : "",
+                string.Format(Texts.Seconds, time.Seconds, GetSecondsName(time.Seconds))
+            );
+            return SendMessage.GetMessage(message);
         }
 
         public static SendMessage GetDelay(ChatMemberViewModel userModel)
@@ -23,11 +32,11 @@ namespace TwitchChat.Code.Commands
             var stream = TwitchApiClient.GetStreamInfo(userModel.Channel.ChannelName);
 
             if (stream.Stream == null)
-                return SendMessage.GetMessage("стрим уже закончился");
+                return SendMessage.GetMessage(Texts.End);
 
             var delay = stream.Stream.Delay;
 
-            return SendMessage.GetMessage($"на стриме стоит задержка в {delay} {GetSecondsName(delay)}");
+            return SendMessage.GetMessage(string.Format(Texts.Delay, string.Format(Texts.Seconds, delay, GetSecondsName(delay))));
         }
 
         private static string GetHoursName(long hours)

@@ -1,6 +1,6 @@
 ﻿using TwitchApi.Entities;
 using System.Collections.ObjectModel;
-using Twitchiedll.IRC;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Controls

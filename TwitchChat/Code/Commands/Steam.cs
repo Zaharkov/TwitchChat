@@ -2,16 +2,23 @@
 using Domain.Repositories;
 using DotaClient;
 using DotaClient.Friend;
-using Twitchiedll.IRC;
+using TwitchChat.Texts;
+using TwitchChat.Texts.Entities;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class SteamCommand
     {
+        private static readonly Steam Texts = TextsHolder.Texts.Steam;
+
         public static SendMessage AddSteam(MessageEventArgs e)
         {
-            var message =  e.UserType.HasFlag(UserType.Broadcaster) ? AddSteamBroadcaster(e.Message) : AddSteamSimple(e.Username, e.Message);
+            var message =  e.UserType.HasFlag(UserType.Broadcaster) 
+                ? AddSteamBroadcaster(e.Message) 
+                : AddSteamSimple(e.Username, e.Message);
+
             return SendMessage.GetWhisper(message);
         }
 
@@ -20,25 +27,28 @@ namespace TwitchChat.Code.Commands
             var split = message.Split(' ');
 
             if (split.Length != 3)
-                return $"Некорректный синтаксис. Введите '!{Command.ДобавитьСтим} %TwitchName% %SteamId%'. Где %TwitchName% имя пользователя twitch, а %SteamId% - номер пользователя в steam. Его можно найти на профиле DotaBuff в адресе страницы";
+                return string.Format(Texts.IncorrectAddSyntaxAdmin, Command.ДобавитьСтим);
 
             var twitchName = split[1];
 
+            if (twitchName.StartsWith(TwitchConstName.UserStartName.ToString()))
+                twitchName = twitchName.TrimStart(TwitchConstName.UserStartName);
+
             if (!ChatterInfoRepository.Instance.IsChatterExist(twitchName))
-                return $"Пользователя twitch {twitchName} пока не в базе данных. Подождите сутки для обновления данных";
+                return string.Format(Texts.NotIntoDataBase, twitchName);
 
             var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(twitchName);
 
             if (sqlSteamId.HasValue)
-                return $"Пользователь twitch {twitchName} уже привязан к пользователю в steam (Id:{sqlSteamId.Value})";
+                return string.Format(Texts.UserAlreadyAttached, twitchName, sqlSteamId.Value); 
 
             long msgSteamId;
             if (!long.TryParse(split[2], out msgSteamId))
-                return $"Номер пользователя в steam должен быть обычным числом. Передано '{split[2]}'";
+                return string.Format(Texts.NotNumber, split[2]);
 
             var name = "";
             if (ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, ref name))
-                return $"Номер пользователя в steam '{msgSteamId}' уже привязан к одному из пользователей в twitch";
+                return string.Format(Texts.SteamAlreadyAttached, msgSteamId);
 
             var result = DotaClientApi.AddFriend(Convert.ToUInt32(msgSteamId));
             return HandleAddResponse(result, msgSteamId, twitchName);
@@ -47,25 +57,25 @@ namespace TwitchChat.Code.Commands
         private static string AddSteamSimple(string userName, string message)
         {
             if(!ChatterInfoRepository.Instance.IsChatterExist(userName))
-                return $"Пользователя twitch {userName} пока не в базе данных. Подождите сутки для обновления данных";
+                return string.Format(Texts.NotIntoDataBase, userName);
 
             var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName);
 
             if (sqlSteamId.HasValue)
-                return $"Пользователь twitch {message} уже привязан к пользователю в steam (Id:{sqlSteamId.Value})";
+                return string.Format(Texts.UserAlreadyAttached, userName, sqlSteamId.Value);
 
             var split = message.Split(' ');
 
             if (split.Length != 2)
-                return $"Некорректный синтаксис. Введите '!{Command.ДобавитьСтим} %SteamId%'. Где %SteamId% - номер пользователя в steam. Его можно найти на профиле DotaBuff в адресе страницы";
+                return string.Format(Texts.IncorrectAddSyntaxUser, Command.ДобавитьСтим);
 
             long msgSteamId;
             if (!long.TryParse(split[1], out msgSteamId))
-                return $"Номер пользователя в steam должен быть обычным числом. Передано '{split[1]}'";
+                return string.Format(Texts.NotNumber, split[1]);
 
             var name = "";
             if (ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, ref name))
-                return $"Номер пользователя в steam '{msgSteamId}' уже привязан к одному из пользователей в twitch";
+                return string.Format(Texts.SteamAlreadyAttached, msgSteamId);
 
             var result = DotaClientApi.AddFriend(Convert.ToUInt32(msgSteamId));
             return HandleAddResponse(result, msgSteamId, userName);
@@ -83,12 +93,12 @@ namespace TwitchChat.Code.Commands
                 case FriendResponseStatus.Error:
                 {
                     if(response.StatusCode == 41) // Ignored = 41
-                        return $"Похоже пользователь steam {steamId} уже был ранее удален из друзей без подтверждения заявки. Это вызывает баг в steam, который можно исправить, если заблокировать и потом разблокировать все связи с ним в steam";
+                        return string.Format(Texts.AddBugAfterDelete, steamId);
 
-                    return $"Во время добавления '{steamId}' произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
-                }
+                    return string.Format(Texts.AddBug, steamId, response.StatusCode);
+                } 
                 case FriendResponseStatus.NotInFriends:
-                    return $"Пользователь steam '{steamId}' не находится в списке друзей. Статус: {response.Relationship}";
+                    return string.Format(Texts.NotInFriends, steamId, response.Relationship);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(response.Status), response.Status, null);
             }
@@ -97,22 +107,22 @@ namespace TwitchChat.Code.Commands
             {
                 case FriendResponseRelationship.None:
                 case FriendResponseRelationship.Error:
-                    return $"Во время добавления '{steamId}' в steam произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
+                    return string.Format(Texts.AddBug, steamId, response.StatusCode);
                 case FriendResponseRelationship.Banned:
-                    return $"Пользователь steam '{steamId}' находится в черном списке или заблокирован. Очень жаль";
+                    return string.Format(Texts.InBlackList, steamId);
                 case FriendResponseRelationship.Recipient:
-                    return $"Уже был запрос в друзья со стороны пользователя steam '{steamId}', но подтверждение заявки не сработало. Попробуйте позже";
+                    return string.Format(Texts.AlreadyInRequest, steamId);
                 case FriendResponseRelationship.Friend:
                     ChatterInfoRepository.Instance.AddChatterSteamId(userName, steamId);
-                    return $"Пользователь steam '{steamId}' уже находится в списке друзей. Теперь он привязан к Вам";
+                    return string.Format(Texts.AlreadyInFriends, steamId);
                 case FriendResponseRelationship.Initiator:
                 {
                     ChatterInfoRepository.Instance.AddChatterSteamId(userName, steamId);
                    
                     if (response.Status == FriendResponseStatus.AlreadyAdded)
-                        return $"Запрос на добавление в список друзей уже был отослан ранее. Теперь пользователь steam '{steamId}' привязан к Вам. Зайдите в steam и подтвердите заявку";
+                        return string.Format(Texts.AlreadyNeedConfirm, steamId);
 
-                    return $"Запрос на добавление в список друзей отослан. Теперь пользователь steam '{steamId}' привязан к Вам. Зайдите в steam и подтвердите заявку";
+                    return string.Format(Texts.NeedConfirm, steamId);
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(response), response, null);
@@ -121,7 +131,10 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage RemoveSteam(MessageEventArgs e)
         {
-            var message =  e.UserType.HasFlag(UserType.Broadcaster) ? RemoveSteamBroadcaster(e.Message) : RemoveSteamSimple(e.Username, e.Message);
+            var message =  e.UserType.HasFlag(UserType.Broadcaster) 
+                ? RemoveSteamBroadcaster(e.Message) 
+                : RemoveSteamSimple(e.Username, e.Message);
+
             return SendMessage.GetWhisper(message);
         }
 
@@ -130,7 +143,7 @@ namespace TwitchChat.Code.Commands
             var split = message.Split(' ');
 
             if (split.Length < 2 && split.Length > 3)
-                return $"Некорректный синтаксис. Введите '!{Command.УбратьСтим} %User%'. Где %User% - или имя пользователя twitch или номер пользователя в steam (его можно найти на профиле DotaBuff в адресе страницы)";
+                return string.Format(Texts.IncorrectRemoveSyntaxAdmin, Command.УбратьСтим);
 
             var ignoreBug = split.Length == 3 && split[2] == "true";
 
@@ -140,7 +153,7 @@ namespace TwitchChat.Code.Commands
             {
                 var name = "";
                 if (!ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, ref name))
-                    return $"Номер пользователя в steam '{msgSteamId}' не привязан ни к одному из пользователей в twitch";
+                    return string.Format(Texts.NotAttachedSteam, msgSteamId);
 
                 result = DotaClientApi.RemoveFriend(Convert.ToUInt32(msgSteamId), ignoreBug);
                 return HandleRemoveResponse(result, msgSteamId, name);
@@ -148,13 +161,16 @@ namespace TwitchChat.Code.Commands
 
             var userName = split[1];
 
+            if (userName.StartsWith(TwitchConstName.UserStartName.ToString()))
+                userName = userName.TrimStart(TwitchConstName.UserStartName);
+
             if (!ChatterInfoRepository.Instance.IsChatterExist(userName))
-                return $"Пользователя twitch {userName} пока не в базе данных. Подождите сутки для обновления данных";
+                return string.Format(Texts.NotIntoDataBase, userName);
 
             var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName);
 
             if (!sqlSteamId.HasValue)
-                return $"Пользователь twitch {userName} не привязан к пользователю в steam";
+                return string.Format(Texts.NotAttachedUser, userName);
 
             result = DotaClientApi.RemoveFriend(Convert.ToUInt32(sqlSteamId.Value), ignoreBug);
             return HandleRemoveResponse(result, sqlSteamId.Value, userName);
@@ -163,12 +179,12 @@ namespace TwitchChat.Code.Commands
         private static string RemoveSteamSimple(string userName, string message)
         {
             if (!ChatterInfoRepository.Instance.IsChatterExist(userName))
-                return $"Пользователя twitch {userName} пока не в базе данных. Подождите сутки для обновления данных";
+                return string.Format(Texts.NotIntoDataBase, userName);
 
             var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName);
-
+            
             if (!sqlSteamId.HasValue)
-                return $"Пользователь twitch {userName} не привязан к пользователю в steam";
+                return string.Format(Texts.NotAttachedUser, userName);
 
             var split = message.Split(' ');
             var ignoreBug = split.Length == 2 && split[1] == "true";
@@ -186,11 +202,11 @@ namespace TwitchChat.Code.Commands
                 case FriendResponseStatus.AlreadyAdded:
                     break;
                 case FriendResponseStatus.CantRemove:
-                    return $"Удаление '{steamId}' из друзей повлечёт за собой баг, так как пользователь ещё не подтвердил заявку в друзья. Нельзя будет добавить его снова пока не заблокировать и потом разблокировать все связи с ним в steam. Для игнорирования этого бага введите в конце команды параметр 'true'";
+                    return string.Format(Texts.RemoveBugAfterDelete, steamId);
                 case FriendResponseStatus.Error:
-                    return $"Во время удаления '{steamId}' из друзей произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
+                    return string.Format(Texts.RemoveBug, steamId, response.StatusCode);
                 case FriendResponseStatus.NotInFriends:
-                    return $"Пользователь steam '{steamId}' не находится в списке друзей. Статус: {response.Relationship}";
+                    return string.Format(Texts.NotInFriends, steamId, response.Relationship);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(response.Status), response.Status, null);
             }
@@ -199,16 +215,17 @@ namespace TwitchChat.Code.Commands
             {
                 case FriendResponseRelationship.None:
                     ChatterInfoRepository.Instance.DeleteChatterSteamId(userName);
-                    return $"Пользователь steam '{steamId}' успешно удален из друзей в steam и откреплён от пользователя twitch {userName}";
+                    return string.Format(Texts.Removed, steamId);
                 case FriendResponseRelationship.Error:
-                    return $"Во время удаления '{steamId}' из друзей в steam произошла ошибка с кодом: {response.StatusCode}. Попробуйте позже";
+                    return string.Format(Texts.RemoveBug, steamId, response.StatusCode);
                 case FriendResponseRelationship.Banned:
-                    return $"Пользователь steam '{steamId}' находится в черном списке или заблокирован. Очень жаль";
+                    return string.Format(Texts.InBlackList, steamId);
                 case FriendResponseRelationship.Recipient:
                 case FriendResponseRelationship.Friend:
                 case FriendResponseRelationship.Initiator:
-                    LogRepository.Instance.LogException("DeleteSteamUserError", new Exception($"Twitch:{userName},steam:{steamId},relat:{response.Relationship},res:{response.StatusCode},status:{response.Status}"));
-                    return $"Удаление {steamId} вернуло неожиданный ответ...как Вы это сделали? Запишу ка я эту ошибку в базу...Сообщите о ней бродкастеру!";
+                    var ex = new Exception($"Twitch:{userName},steam:{steamId},relat:{response.Relationship},res:{response.StatusCode},status:{response.Status}");
+                    LogRepository.Instance.LogException("DeleteSteamUserError", ex);
+                    return string.Format(Texts.Wtf, steamId);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(response), response, null);
             }

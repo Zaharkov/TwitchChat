@@ -582,7 +582,7 @@ namespace DotaClient
         {
             if (_state == ClientState.Logged)
             {
-                _checkForCallbacksToken.Cancel();
+                _checkForCallbacksToken?.Cancel();
                 _state = ClientState.Disconnected;
                 SteamClient.Disconnect();
             }

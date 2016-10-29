@@ -1,11 +1,15 @@
 ﻿using Domain.Repositories;
 using TwitchChat.Controls;
+using TwitchChat.Texts;
+using TwitchChat.Texts.Entities;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class MyTimeCommand
     {
+        private static readonly MyTime Texts = TextsHolder.Texts.MyTime;
+
         public static SendMessage GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var chatTime = userModel.GetTime();
@@ -13,7 +17,7 @@ namespace TwitchChat.Code.Commands
 
             var totalTime = chatTime + dbTime;
 
-            var message = $"слежу за тобой уже {totalTime} {GetSecondsName(totalTime)}";
+            var message = string.Format(Texts.Time, string.Format(Texts.Seconds, totalTime, GetSecondsName(totalTime)));
             return SendMessage.GetMessage(message);
         }
 

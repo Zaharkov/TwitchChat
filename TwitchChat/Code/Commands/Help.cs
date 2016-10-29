@@ -1,29 +1,36 @@
 ﻿using System.Linq;
 using System.Text;
-using Twitchiedll.IRC;
+using TwitchChat.Texts;
+using Twitchiedll.IRC.Enums;
 
 namespace TwitchChat.Code.Commands
 {
     public static class HelpCommand
     {
+        private static readonly Texts.Entities.Help Texts = TextsHolder.Texts.Help;
+
         public static SendMessage GetHelp()
+        {
+            return SendMessage.GetWhisper(GetHelpTimerText());
+        }
+
+        public static string GetHelpTimerText()
         {
             var groupedAccess = CommandAccess.GetGroupedAccess();
 
             var builder = new StringBuilder();
+            builder.Append(Texts.StartMessage);
 
             foreach (var grouped in groupedAccess)
             {
-                var commands = string.Join(",", grouped.Key.Select(t => $"!{t}"));
-
-                var ending = grouped.Key.Count > 1 ? "ы" : "а";
+                var commands = string.Join(",", grouped.Key.Select(t => $"{TwitchConstName.Command}{t}"));
 
                 builder.Append(grouped.Value == UserType.Default
-                    ? $"{commands} - доступн{ending} всем; "
-                    : $"{commands} - доступн{ending} для {string.Join(",", grouped.Value)}; ");
+                    ? string.Format(Texts.DefaultMessage, commands)
+                    : string.Format(Texts.CustomMessage, commands, string.Join(",", grouped.Value)));
             }
 
-            return SendMessage.GetWhisper(builder.ToString());
+            return builder.ToString();
         }
     }
 }

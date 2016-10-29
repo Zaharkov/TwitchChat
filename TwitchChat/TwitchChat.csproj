@@ -54,6 +54,10 @@
       <HintPath>..\packages\EntityFramework.SqlServerCompact.6.1.3\lib\net45\EntityFramework.SqlServerCompact.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -78,6 +82,7 @@
     <Compile Include="Code\Commands\DelayType.cs" />
     <Compile Include="Code\Commands\Eba.cs" />
     <Compile Include="Code\Commands\Duel.cs" />
+    <Compile Include="Code\Commands\Subscribe.cs" />
     <Compile Include="Code\Commands\Roulette.cs" />
     <Compile Include="Code\Commands\SendMessage.cs" />
     <Compile Include="Code\Commands\Stream.cs" />
@@ -102,7 +107,6 @@
     <Compile Include="Code\Logger.cs" />
     <Compile Include="Code\Quiz\QuizHolder.cs" />
     <Compile Include="Code\Quiz\QuizCollection.cs" />
-    <Compile Include="Code\Timers\Help.cs" />
     <Compile Include="Code\Timers\TimerFactory.cs" />
     <Compile Include="Code\Timers\Timer.cs" />
     <Compile Include="Controls\ChannelViewModel.cs" />
@@ -113,8 +117,24 @@
     <Compile Include="Dialog\WhisperWindowViewModel.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="MessageViewModel.cs" />
+    <Compile Include="Texts\Entities\Duel.cs" />
+    <Compile Include="Texts\Entities\Global.cs" />
+    <Compile Include="Texts\Entities\Mmr.cs" />
+    <Compile Include="Texts\Entities\MonthText.cs" />
+    <Compile Include="Texts\Entities\Music.cs" />
+    <Compile Include="Texts\Entities\MyTime.cs" />
+    <Compile Include="Texts\Entities\MyBolt.cs" />
+    <Compile Include="Texts\Entities\Eba.cs" />
+    <Compile Include="Texts\Entities\Sheiker.cs" />
+    <Compile Include="Texts\Entities\Steam.cs" />
+    <Compile Include="Texts\Entities\Roulette.cs" />
+    <Compile Include="Texts\Entities\Stream.cs" />
+    <Compile Include="Texts\Entities\Subscribe.cs" />
+    <Compile Include="Texts\Entities\Quiz.cs" />
+    <Compile Include="Texts\Entities\Help.cs" />
+    <Compile Include="Texts\Entities\Text.cs" />
+    <Compile Include="Texts\TextsHolder.cs" />
     <Compile Include="ViewModel\DelegateCommand.cs" />
-    <Compile Include="Code\IrcState.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="Controls\Channel.xaml">
@@ -176,6 +196,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Texts\texts.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -209,9 +232,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Code\Quiz\questions.txt" />
+    <None Include="Code\Quiz\questions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Texts_4texts_1json__JSONSchema="http://json.schemastore.org/component" />
+    </VisualStudio>
+  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

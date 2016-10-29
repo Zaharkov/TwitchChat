@@ -2,30 +2,28 @@
 using System.Linq;
 using TwitchChat.Code.DelayDecorator;
 using TwitchChat.Controls;
-using Twitchiedll.IRC;
+using TwitchChat.Texts;
+using TwitchChat.Texts.Entities;
+using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public class CommandFactory
     {
+        private static readonly Global Texts = TextsHolder.Texts.Global;
+
         public static SendMessage ExecuteCommand(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            var forParse = e.Message.TrimStart('!').Split(' ').First();
+            var forParse = e.Message.TrimStart(TwitchConstName.Command).Split(' ').First();
             Command command;
             var parse = Enum.TryParse(forParse, true, out command);
 
             if (!parse)
-            {
                 return SendMessage.None;
-                //return $"Команда !{forParse} не поддерживается. Список команд можно посмотреть через команду !{Command.Помощь}";
-            }
 
             if (!CommandAccess.IsHaveAccess(e, command))
-            {
                 return SendMessage.None;
-                //return $"У Вас нет доступа к команде !{command}. Список доступных команд можно посмотреть через команду !{Command.Помощь}";
-            }
 
             Func<SendMessage> commandFunc;
             switch (command)
@@ -127,7 +125,7 @@ namespace TwitchChat.Code.Commands
             int needWait;
             if (!delayDecorator.CanExecute(out needWait))
             {
-                var message = $"Команда !{command} на {(delayType != DelayType.Global ? "пользовательском" : "глобальном")} кулдауне. Вы сможете её повторить через {needWait} {MyTimeCommand.GetSecondsName(needWait)}";
+                var message = string.Format(Texts.Cooldown, command, delayType != DelayType.Global ? Texts.UserCd : Texts.GlobalCd, string.Format(Texts.Seconds, needWait, MyTimeCommand.GetSecondsName(needWait)));
                 return SendMessage.GetWhisper(message);
             }
 

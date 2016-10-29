@@ -6,6 +6,7 @@ using CommonHelper;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
 using TwitchChat.Controls;
+using TwitchChat.Texts;
 
 namespace TwitchChat.Code.Quiz
 {
@@ -13,6 +14,7 @@ namespace TwitchChat.Code.Quiz
     {
         private static readonly Dictionary<ChannelViewModel, CancellationTokenSource> TokenSources = new Dictionary<ChannelViewModel, CancellationTokenSource>();
         private static readonly int Delay = int.Parse(Configuration.GetSetting("QuizDelay"));
+        private static readonly Texts.Entities.Quiz Texts = TextsHolder.Texts.Quiz;
 
         public static bool IsQuizActive { get; private set; }
         public static KeyValuePair<string, string>? Question { get; private set; }
@@ -22,10 +24,13 @@ namespace TwitchChat.Code.Quiz
             if (!IsQuizActive || !Question.HasValue)
                 return null;
 
-            var answer = Question.Value.Value;
-            var answerStars = string.Join(" ", answer.Split(' ').Select(GetWordWithStars));
+            return string.Format(Texts.Question, Question.Value.Key, GetAnswer(Question.Value.Value), Command.О);
+        }
 
-            return $"Вопрос викторины: {Question.Value.Key}. Подсказка: {answerStars}. Для ответа введите: !{Command.О} ответ.";
+        public static string GetAnswer(string answer)
+        {
+            var answerStars = string.Join(" ", answer.Split(' ').Select(GetWordWithStars));
+            return answerStars;
         }
 
         private static string GetWordWithStars(string word)
