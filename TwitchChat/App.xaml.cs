@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using Domain.Repositories;
 using Domain.Utils;
@@ -40,6 +41,12 @@ namespace TwitchChat
             Current.DispatcherUnhandledException += (serder, ee) =>
             {
                 LogRepository.Instance.LogException("Fatal error in application", ee.Exception);
+
+                if(File.Exists("LastError.txt"))
+                    File.Delete("LastError.txt");
+
+                File.AppendAllText("LastError.txt", ee.Exception.ToString());
+
                 _vm.Logout();
             };
 

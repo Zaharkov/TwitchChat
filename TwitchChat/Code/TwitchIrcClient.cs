@@ -77,7 +77,7 @@ namespace TwitchChat.Code
         public void Quit()
         {
             Dispose();
-            _listenTask.Wait();
+            _listenTask?.Wait();
         }
 
         private void Run()
