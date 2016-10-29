@@ -4,46 +4,46 @@ namespace TwitchChat.Texts.Entities
 {
     public class Text
     {
-        [JsonProperty("help")]
+        [JsonProperty("help", Required = Required.Always)]
         public Help Help { get; set; }
 
-        [JsonProperty("quiz")]
+        [JsonProperty("quiz", Required = Required.Always)]
         public Quiz Quiz { get; set; }
 
-        [JsonProperty("subscribe")]
+        [JsonProperty("subscribe", Required = Required.Always)]
         public Subscribe Subscribe { get; set; }
 
-        [JsonProperty("stream")]
+        [JsonProperty("stream", Required = Required.Always)]
         public Stream Stream { get; set; }
 
-        [JsonProperty("steam")]
+        [JsonProperty("steam", Required = Required.Always)]
         public Steam Steam { get; set; }
 
-        [JsonProperty("sheiker")]
+        [JsonProperty("sheiker", Required = Required.Always)]
         public Sheiker Sheiker { get; set; }
 
-        [JsonProperty("roulette")]
+        [JsonProperty("roulette", Required = Required.Always)]
         public Roulette Roulette { get; set; }
 
-        [JsonProperty("myTime")]
+        [JsonProperty("myTime", Required = Required.Always)]
         public MyTime MyTime { get; set; }
 
-        [JsonProperty("myBolt")]
+        [JsonProperty("myBolt", Required = Required.Always)]
         public MyBolt MyBolt { get; set; }
 
-        [JsonProperty("music")]
+        [JsonProperty("music", Required = Required.Always)]
         public Music Music { get; set; }
 
-        [JsonProperty("mmr")]
+        [JsonProperty("mmr", Required = Required.Always)]
         public Mmr Mmr { get; set; }
 
-        [JsonProperty("eba")]
+        [JsonProperty("eba", Required = Required.Always)]
         public Eba Eba { get; set; }
 
-        [JsonProperty("duel")]
+        [JsonProperty("duel", Required = Required.Always)]
         public Duel Duel { get; set; }
 
-        [JsonProperty("global")]
+        [JsonProperty("global", Required = Required.Always)]
         public Global Global { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace TwitchChat.Texts.Entities
 {
     public class Eba
     {
-        [JsonProperty("do")]
+        [JsonProperty("do", Required = Required.Always)]
         public string Do { get; set; }
     }
 }

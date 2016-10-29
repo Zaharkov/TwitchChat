@@ -4,16 +4,16 @@ namespace TwitchChat.Texts.Entities
 {
     public class Global
     {
-        [JsonProperty("cooldown")]
+        [JsonProperty("cooldown", Required = Required.Always)]
         public string Cooldown { get; set; }
 
-        [JsonProperty("globalCD")]
+        [JsonProperty("globalCD", Required = Required.Always)]
         public string GlobalCd { get; set; }
 
-        [JsonProperty("userCD")]
+        [JsonProperty("userCD", Required = Required.Always)]
         public string UserCd { get; set; }
 
-        [JsonProperty("seconds")]
+        [JsonProperty("seconds", Required = Required.Always)]
         public string Seconds { get; set; }
     }
 }

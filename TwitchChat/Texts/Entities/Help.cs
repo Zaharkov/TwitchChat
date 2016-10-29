@@ -4,13 +4,13 @@ namespace TwitchChat.Texts.Entities
 {
     public class Help
     {
-        [JsonProperty("startMessage")]
+        [JsonProperty("startMessage", Required = Required.Always)]
         public string StartMessage { get; set; }
 
-        [JsonProperty("defaultMessage")]
+        [JsonProperty("defaultMessage", Required = Required.Always)]
         public string DefaultMessage { get; set; }
 
-        [JsonProperty("customMessage")]
+        [JsonProperty("customMessage", Required = Required.Always)]
         public string CustomMessage { get; set; }
     }
 }

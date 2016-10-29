@@ -4,28 +4,28 @@ namespace TwitchChat.Texts.Entities
 {
     public class Roulette
     {
-        [JsonProperty("admin")]
+        [JsonProperty("admin", Required = Required.Always)]
         public string Admin { get; set; }
 
-        [JsonProperty("moder")]
+        [JsonProperty("moder", Required = Required.Always)]
         public string Moder { get; set; }
 
-        [JsonProperty("misfire")]
+        [JsonProperty("misfire", Required = Required.Always)]
         public string Misfire { get; set; }
 
-        [JsonProperty("death")]
+        [JsonProperty("death", Required = Required.Always)]
         public string Death { get; set; }
 
-        [JsonProperty("luck")]
+        [JsonProperty("luck", Required = Required.Always)]
         public string Luck { get; set; }
 
-        [JsonProperty("stats")]
+        [JsonProperty("stats", Required = Required.Always)]
         public string Stats { get; set; }
 
-        [JsonProperty("topStart")]
+        [JsonProperty("topStart", Required = Required.Always)]
         public string TopStart { get; set; }
 
-        [JsonProperty("topUser")]
+        [JsonProperty("topUser", Required = Required.Always)]
         public string TopUser { get; set; }
     }
 }

@@ -4,16 +4,16 @@ namespace TwitchChat.Texts.Entities
 {
     public class MyBolt
     {
-        [JsonProperty("admin")]
+        [JsonProperty("admin", Required = Required.Always)]
         public string Admin { get; set; }
 
-        [JsonProperty("user")]
+        [JsonProperty("user", Required = Required.Always)]
         public string User { get; set; }
 
-        [JsonProperty("min")]
+        [JsonProperty("min", Required = Required.Always)]
         public int Min { get; set; }
         
-        [JsonProperty("max")]
+        [JsonProperty("max", Required = Required.Always)]
         public int Max { get; set; }
     }
 }

@@ -4,22 +4,22 @@ namespace TwitchChat.Texts.Entities
 {
     public class Stream
     {
-        [JsonProperty("end")]
+        [JsonProperty("end", Required = Required.Always)]
         public string End { get; set; }
 
-        [JsonProperty("active")]
+        [JsonProperty("active", Required = Required.Always)]
         public string Active { get; set; }
 
-        [JsonProperty("hours")]
+        [JsonProperty("hours", Required = Required.Always)]
         public string Hours { get; set; }
 
-        [JsonProperty("minutes")]
+        [JsonProperty("minutes", Required = Required.Always)]
         public string Minutes { get; set; }
 
-        [JsonProperty("seconds")]
+        [JsonProperty("seconds", Required = Required.Always)]
         public string Seconds { get; set; }
 
-        [JsonProperty("delay")]
+        [JsonProperty("delay", Required = Required.Always)]
         public string Delay { get; set; }
     }
 }

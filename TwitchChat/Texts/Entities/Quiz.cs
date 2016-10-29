@@ -4,19 +4,19 @@ namespace TwitchChat.Texts.Entities
 {
     public class Quiz
     {
-        [JsonProperty("question")]
+        [JsonProperty("question", Required = Required.Always)]
         public string Question { get; set; }
 
-        [JsonProperty("off")]
+        [JsonProperty("off", Required = Required.Always)]
         public string Off { get; set; }
 
-        [JsonProperty("score")]
+        [JsonProperty("score", Required = Required.Always)]
         public string Score { get; set; }
 
-        [JsonProperty("answers")]
+        [JsonProperty("answers", Required = Required.Always)]
         public string Answers { get; set; }
 
-        [JsonProperty("rightAnswer")]
+        [JsonProperty("rightAnswer", Required = Required.Always)]
         public string RightAnswer { get; set; }
     }
 }

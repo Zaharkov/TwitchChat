@@ -4,58 +4,58 @@ namespace TwitchChat.Texts.Entities
 {
     public class Duel
     {
-        [JsonProperty("alreadyInDuel")]
+        [JsonProperty("alreadyInDuel", Required = Required.Always)]
         public string AlreadyInDuel { get; set; }
 
-        [JsonProperty("incorrectSyntax")]
+        [JsonProperty("incorrectSyntax", Required = Required.Always)]
         public string IncorrectSyntax { get; set; }
 
-        [JsonProperty("noInChat")]
+        [JsonProperty("noInChat", Required = Required.Always)]
         public string NoInChat { get; set; }
 
-        [JsonProperty("roulette")]
+        [JsonProperty("roulette", Required = Required.Always)]
         public string Roulette { get; set; }
 
-        [JsonProperty("needConfirm")]
+        [JsonProperty("needConfirm", Required = Required.Always)]
         public string NeedConfirm { get; set; }
 
-        [JsonProperty("targetAlreadyInDuel")]
+        [JsonProperty("targetAlreadyInDuel", Required = Required.Always)]
         public string TargetAlreadyInDuel { get; set; }
 
-        [JsonProperty("noConfirm")]
+        [JsonProperty("noConfirm", Required = Required.Always)]
         public string NoConfirm { get; set; }
 
-        [JsonProperty("start")]
+        [JsonProperty("start", Required = Required.Always)]
         public string Start { get; set; }
 
-        [JsonProperty("incorrectSyntaxStart")]
+        [JsonProperty("incorrectSyntaxStart", Required = Required.Always)]
         public string IncorrectSyntaxStart { get; set; }
 
-        [JsonProperty("adminVsModer")]
+        [JsonProperty("adminVsModer", Required = Required.Always)]
         public string AdminVsModer { get; set; }
 
-        [JsonProperty("adminVsUser")]
+        [JsonProperty("adminVsUser", Required = Required.Always)]
         public string AdminVsUser { get; set; }
 
-        [JsonProperty("moderVsModer")]
+        [JsonProperty("moderVsModer", Required = Required.Always)]
         public string ModerVsModer { get; set; }
 
-        [JsonProperty("moderVsUser")]
+        [JsonProperty("moderVsUser", Required = Required.Always)]
         public string ModerVsUser { get; set; }
 
-        [JsonProperty("win")]
+        [JsonProperty("win", Required = Required.Always)]
         public string Win { get; set; }
 
-        [JsonProperty("confirm")]
+        [JsonProperty("confirm", Required = Required.Always)]
         public string Confirm { get; set; }
 
-        [JsonProperty("misfire")]
+        [JsonProperty("misfire", Required = Required.Always)]
         public string Misfire { get; set; }
 
-        [JsonProperty("death")]
+        [JsonProperty("death", Required = Required.Always)]
         public string Death { get; set; }
 
-        [JsonProperty("luck")]
+        [JsonProperty("luck", Required = Required.Always)]
         public string Luck { get; set; }
     }
 }

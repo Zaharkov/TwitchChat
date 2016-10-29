@@ -4,13 +4,13 @@ namespace TwitchChat.Texts.Entities
 {
     public class MonthText
     {
-        [JsonProperty("start")]
+        [JsonProperty("start", Required = Required.Always)]
         public int Start { get; set; }
 
-        [JsonProperty("end")]
+        [JsonProperty("end", Required = Required.Always)]
         public int End { get; set; }
 
-        [JsonProperty("text")]
+        [JsonProperty("text", Required = Required.Always)]
         public string Text { get; set; }
     }
 }

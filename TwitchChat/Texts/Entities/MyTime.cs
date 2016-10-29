@@ -4,10 +4,10 @@ namespace TwitchChat.Texts.Entities
 {
     public class MyTime
     {
-        [JsonProperty("time")]
+        [JsonProperty("time", Required = Required.Always)]
         public string Time { get; set; }
 
-        [JsonProperty("seconds")]
+        [JsonProperty("seconds", Required = Required.Always)]
         public string Seconds { get; set; }
     }
 }
