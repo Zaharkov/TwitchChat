@@ -10,7 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using CommonHelper;
+using Configuration;
 using Domain.Repositories;
 using DotaClient;
 using TwitchChat.Controls;
@@ -21,7 +21,7 @@ namespace TwitchChat
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private static readonly bool WhisperOn = bool.Parse(Configuration.GetSetting("WhisperOn"));
+        private static readonly bool WhisperOn = ConfigHolder.Configs.Global.Params.WhisperOn;
 
         //  Main IRC client
         private readonly TwitchIrcClient _irc;

@@ -1,11 +1,11 @@
-﻿using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+﻿using Configuration;
+using Configuration.Entities;
 
 namespace TwitchChat.Code.Commands
 {
     public static class SheikerCommand
     {
-        private static readonly Sheiker Texts = TextsHolder.Texts.Sheiker;
+        private static readonly Sheiker Texts = ConfigHolder.Configs.Sheiker;
 
         public static SendMessage GetSheiker()
         {

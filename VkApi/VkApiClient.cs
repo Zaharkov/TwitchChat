@@ -1,6 +1,6 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CommonHelper;
+using Configuration;
 using RestClientHelper;
 using RestSharp;
 using VkApi.Entities;
@@ -9,9 +9,9 @@ namespace VkApi
 {
     public static class VkApiClient
     {
-        private static readonly string VkClientId = Configuration.GetSetting("VkClientId");
-        private static readonly string VkClientSecret = Configuration.GetSetting("VkClientSecret");
-        private static readonly string Url = Configuration.GetSetting("Url");
+        private static readonly string VkClientId = ConfigHolder.Configs.Music.Params.VkClientId;
+        private static readonly string VkClientSecret = ConfigHolder.Configs.Music.Params.VkClientSecret;
+        private static readonly string Url = ConfigHolder.Configs.Global.Params.Url;
 
         private static readonly IRestClient ApiClient;
         private static readonly IRestClient AuthClient;

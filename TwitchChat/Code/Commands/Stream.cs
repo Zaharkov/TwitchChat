@@ -1,14 +1,14 @@
 ﻿using System;
 using TwitchApi;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 
 namespace TwitchChat.Code.Commands
 {
     public static class StreamCommand
     {
-        private static readonly Stream Texts = TextsHolder.Texts.Stream;
+        private static readonly Stream Texts = ConfigHolder.Configs.Stream;
 
         public static SendMessage GetUpTime(ChatMemberViewModel userModel)
         {

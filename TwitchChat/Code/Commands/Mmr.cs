@@ -1,16 +1,14 @@
-﻿using CommonHelper;
-using Domain.Models;
+﻿using Domain.Models;
 using Domain.Repositories;
 using DotaClient;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 
 namespace TwitchChat.Code.Commands
 {
     public static class MmrCommand
     {
-        private static readonly Mmr Texts = TextsHolder.Texts.Mmr;
-        private static readonly int Delay = int.Parse(Configuration.GetSetting("SteamMmrDelay"));
+        private static readonly Steam Steam = ConfigHolder.Configs.Steam;
 
         public static SendMessage GetMmr()
         {
@@ -57,14 +55,14 @@ namespace TwitchChat.Code.Commands
             solo = solo.HasValue && solo.Value > 0 ? solo : null;
             party = party.HasValue && party.Value > 0 ? party : null;
 
-            AccessTokenRepository.Instance.AddToken(AccessTokenType.SoloMmr, solo?.ToString() ?? "0", Delay);
-            AccessTokenRepository.Instance.AddToken(AccessTokenType.PartyMmr, party?.ToString() ?? "0", Delay);
+            AccessTokenRepository.Instance.AddToken(AccessTokenType.SoloMmr, solo?.ToString() ?? "0", Steam.Params.MmrDelay);
+            AccessTokenRepository.Instance.AddToken(AccessTokenType.PartyMmr, party?.ToString() ?? "0", Steam.Params.MmrDelay);
         }
 
         private static string BuildString(int? soloInt, int? partyInt)
         {
-            var solo = soloInt.HasValue && soloInt.Value > 0 ? string.Format(Texts.Solo, soloInt.Value) : Texts.NoSolo;
-            var party = partyInt.HasValue && partyInt.Value > 0 ? string.Format(Texts.Solo, partyInt.Value) : Texts.NoParty;
+            var solo = soloInt.HasValue && soloInt.Value > 0 ? string.Format(Steam.Texts.Solo, soloInt.Value) : Steam.Texts.NoSolo;
+            var party = partyInt.HasValue && partyInt.Value > 0 ? string.Format(Steam.Texts.Solo, partyInt.Value) : Steam.Texts.NoParty;
 
             return $"{solo}. {party}";
         }

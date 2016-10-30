@@ -1,4 +1,5 @@
 ﻿using CommonHelper;
+using Configuration;
 using RestClientHelper;
 using RestSharp;
 using TwitchApi.Entities;
@@ -9,10 +10,10 @@ namespace TwitchApi
     {
         private static readonly IRestClient ClientApi;
         private static readonly IRestClient ClientTmi;
-        private static readonly string TwitchApiBaseUrl = Configuration.GetSetting("TwitchApiBaseUrl");
-        private static readonly string TwitchTmiBaseUrl = Configuration.GetSetting("TwitchTmiBaseUrl");
-        private static readonly string TwitchClientId = Configuration.GetSetting("ClientId");
-        private static readonly string TwitchUrl = Configuration.GetSetting("Url");
+        private static readonly string TwitchApiBaseUrl = ConfigHolder.Configs.Global.Params.TwitchApiBaseUrl;
+        private static readonly string TwitchTmiBaseUrl = ConfigHolder.Configs.Global.Params.TwitchTmiBaseUrl;
+        private static readonly string TwitchClientId = ConfigHolder.Configs.Global.Params.ClientId;
+        private static readonly string TwitchUrl = ConfigHolder.Configs.Global.Params.Url;
 
         private static string _accessToken;
 

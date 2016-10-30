@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonHelper;
+using Configuration;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -9,7 +9,7 @@ namespace TwitchChat.Code.Commands
 {
     public static class CommandAccess
     {
-        private static readonly List<Command> DisabledCommands = Configuration.GetSetting("DisabledCommands").Split(',').Select(t => (Command)Enum.Parse(typeof(Command), t, true)).ToList();
+        private static readonly List<Command> DisabledCommands = ConfigHolder.Configs.Global.DisabledCommands.Select(t => (Command)Enum.Parse(typeof(Command), t, true)).ToList();
 
         private static readonly Dictionary<Command, UserType> Accesses = new Dictionary<Command, UserType>
         {

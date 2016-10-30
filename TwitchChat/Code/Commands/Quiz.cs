@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using CommonHelper;
 using Domain.Repositories;
 using TwitchChat.Code.Quiz;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
+using Configuration;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -12,8 +11,7 @@ namespace TwitchChat.Code.Commands
 {
     public static class QiuzCommand
     {
-        private static readonly int Delay = int.Parse(Configuration.GetSetting("QuizRestartDelay"));
-        private static readonly Texts.Entities.Quiz Texts = TextsHolder.Texts.Quiz;
+        private static readonly Configuration.Entities.Quiz Quiz = ConfigHolder.Configs.Quiz;
 
         public static SendMessage Start(ChatMemberViewModel userModel)
         {
@@ -31,16 +29,16 @@ namespace TwitchChat.Code.Commands
         {
             if (QuizHolder.IsQuizActive && QuizHolder.Question.HasValue)
             {
-                var message = string.Format(Texts.Question, QuizHolder.Question.Value.Key, QuizHolder.GetAnswer(QuizHolder.Question.Value.Value), Command.О);
+                var message = string.Format(Quiz.Texts.Question, QuizHolder.Question.Value.Key, QuizHolder.GetAnswer(QuizHolder.Question.Value.Value), Command.О);
                 return SendMessage.GetMessage(message);
             }
-            return SendMessage.GetMessage(Texts.Off);
+            return SendMessage.GetMessage(Quiz.Texts.Off);
         }
 
         public static SendMessage Score(ChatMemberViewModel userModel)
         {
             var score = ChatterInfoRepository.Instance.GetQuizScore(userModel.Name, userModel.Channel.ChannelName);
-            var message = string.Format(Texts.Score, string.Format(Texts.Answers, score.Key, GetName(score.Key)), score.Value);
+            var message = string.Format(Quiz.Texts.Score, string.Format(Quiz.Texts.Answers, score.Key, GetName(score.Key)), score.Value);
             return SendMessage.GetMessage(message);
         }
 
@@ -59,11 +57,11 @@ namespace TwitchChat.Code.Commands
 
                 Task.Run(() =>
                 {
-                    Thread.Sleep(Delay * 1000);
+                    Thread.Sleep(Quiz.Params.RestartDelay * 1000);
                     QuizHolder.StartNewQuiz(userModel.Channel);
                 });
 
-                return SendMessage.GetMessage(string.Format(Texts.RightAnswer, Delay));
+                return SendMessage.GetMessage(string.Format(Quiz.Texts.RightAnswer, Quiz.Params.RestartDelay));
             }
 
             return SendMessage.None;

@@ -1,8 +1,26 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchChat.Texts.Entities
+namespace Configuration.Entities
 {
     public class Duel
+    {
+        [JsonProperty("texts", Required = Required.Always)]
+        public DuelTexts Texts { get; set; }
+
+        [JsonProperty("params", Required = Required.Always)]
+        public DuelParams Params { get; set; }
+    }
+
+    public class DuelParams
+    {
+        [JsonProperty("wait", Required = Required.Always)]
+        public int Wait { get; set; }
+
+        [JsonProperty("delay", Required = Required.Always)]
+        public int Delay { get; set; }
+    }
+
+    public class DuelTexts
     {
         [JsonProperty("alreadyInDuel", Required = Required.Always)]
         public string AlreadyInDuel { get; set; }

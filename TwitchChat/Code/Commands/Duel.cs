@@ -2,14 +2,13 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
-using CommonHelper;
 using Domain.Repositories;
 using TwitchApi.Entities;
 using TwitchChat.Code.DelayDecorator;
 using TwitchChat.Code.Timers;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -17,10 +16,8 @@ namespace TwitchChat.Code.Commands
 {
     public static class DuelCommand
     {
-        private static readonly Duel Texts = TextsHolder.Texts.Duel;
-        private static readonly int RouletteTimeout = int.Parse(Configuration.GetSetting("RouletteTimeout"));
-        private static readonly int DuelWait = int.Parse(Configuration.GetSetting("DuelWait"));
-        private static readonly int DuelDelay = int.Parse(Configuration.GetSetting("DuelDelay"));
+        private static readonly Duel DuelConfig = ConfigHolder.Configs.Duel;
+        private static readonly int RouletteTimeout = ConfigHolder.Configs.Roulette.Params.Timeout;
         private static readonly ConcurrentDictionary<string, CancellationTokenSource> RemoveDuelNameTokens = new ConcurrentDictionary<string, CancellationTokenSource>();
 
         public static SendMessage Duel(MessageEventArgs e, ChatMemberViewModel userModel)
@@ -29,12 +26,12 @@ namespace TwitchChat.Code.Commands
             var sourceduelName = RouletteInfoRepository.Instance.Get(sourceRouletteId).DuelName;
 
             if (!string.IsNullOrEmpty(sourceduelName))
-                return SendMessage.GetWhisper(string.Format(Texts.AlreadyInDuel, sourceduelName));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.AlreadyInDuel, sourceduelName));
 
             var split = e.Message.Split(' ');
 
             if(split.Length < 2)
-                return SendMessage.GetWhisper(string.Format(Texts.IncorrectSyntax, Command.Дуэль));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.IncorrectSyntax, Command.Дуэль));
 
             var nameForDuel = split[1];
 
@@ -44,10 +41,10 @@ namespace TwitchChat.Code.Commands
             var allChatters = userModel.Channel.GetAllChatters();
 
             if (!allChatters.Any(t => t.Name.Equals(nameForDuel, StringComparison.InvariantCultureIgnoreCase)))
-                return SendMessage.GetWhisper(string.Format(Texts.NoInChat, nameForDuel));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.NoInChat, nameForDuel));
 
             if(e.Username.Equals(nameForDuel, StringComparison.InvariantCultureIgnoreCase))
-                return SendMessage.GetMessage(string.Format(Texts.Roulette, Command.Рулетка));
+                return SendMessage.GetMessage(string.Format(DuelConfig.Texts.Roulette, Command.Рулетка));
 
             var targetRouletteId = ChatterInfoRepository.Instance.GetRouletteId(nameForDuel, e.Channel);
             var targetduelName = RouletteInfoRepository.Instance.Get(targetRouletteId).DuelName;
@@ -55,9 +52,9 @@ namespace TwitchChat.Code.Commands
             if (!string.IsNullOrEmpty(targetduelName))
             {
                 if(e.Username.Equals(targetduelName, StringComparison.InvariantCultureIgnoreCase))
-                    return SendMessage.GetWhisper(string.Format(Texts.NeedConfirm, nameForDuel, Command.Принять));
+                    return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.NeedConfirm, nameForDuel, Command.Принять));
 
-                return SendMessage.GetWhisper(string.Format(Texts.TargetAlreadyInDuel, nameForDuel, targetduelName));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.TargetAlreadyInDuel, nameForDuel, targetduelName));
             }
 
             RouletteInfoRepository.Instance.SetDuelName(sourceRouletteId, nameForDuel);
@@ -66,13 +63,13 @@ namespace TwitchChat.Code.Commands
 
             Action sleep = () =>
             {
-                Thread.Sleep(DuelWait * 1000);
+                Thread.Sleep(DuelConfig.Params.Wait * 1000);
             };
 
             Action continueWith = () =>
             {
                 RouletteInfoRepository.Instance.RemoveDuelName(sourceRouletteId);
-                var message = SendMessage.GetMessage(string.Format(Texts.NoConfirm, nameForDuel));
+                var message = SendMessage.GetMessage(string.Format(DuelConfig.Texts.NoConfirm, nameForDuel));
                 userModel.Channel.SendMessage(e, message);
 
             };
@@ -80,7 +77,7 @@ namespace TwitchChat.Code.Commands
             var wait = TimerFactory.RunOnce(userModel.Channel, sleep);
             wait.ContinueWith(task => continueWith(), tokenSource.Token);
 
-            return SendMessage.GetMessage(string.Format(Texts.Start, nameForDuel, DuelWait, Command.Принять, e.Username, Command.Рулетка));
+            return SendMessage.GetMessage(string.Format(DuelConfig.Texts.Start, nameForDuel, DuelConfig.Params.Wait, Command.Принять, e.Username, Command.Рулетка));
         }
 
         public static SendMessage DuelStart(MessageEventArgs e, ChatMemberViewModel userModel)
@@ -89,12 +86,12 @@ namespace TwitchChat.Code.Commands
             var sourceduelName = RouletteInfoRepository.Instance.Get(sourceRouletteId).DuelName;
 
             if (!string.IsNullOrEmpty(sourceduelName))
-                return SendMessage.GetWhisper(string.Format(Texts.AlreadyInDuel, sourceduelName));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.AlreadyInDuel, sourceduelName));
 
             var split = e.Message.Split(' ');
 
             if (split.Length < 2)
-                return SendMessage.GetWhisper(string.Format(Texts.IncorrectSyntaxStart, Command.Принять));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.IncorrectSyntaxStart, Command.Принять));
 
             var nameForDuel = split[1];
 
@@ -104,16 +101,16 @@ namespace TwitchChat.Code.Commands
             var allChatters = userModel.Channel.GetAllChatters();
 
             if (!allChatters.Any(t => t.Name.Equals(nameForDuel, StringComparison.InvariantCultureIgnoreCase)))
-                return SendMessage.GetWhisper(string.Format(Texts.NoInChat, nameForDuel));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.NoInChat, nameForDuel));
 
             if (e.Username.Equals(nameForDuel, StringComparison.InvariantCultureIgnoreCase))
-                return SendMessage.GetMessage(string.Format(Texts.Roulette, Command.Рулетка));
+                return SendMessage.GetMessage(string.Format(DuelConfig.Texts.Roulette, Command.Рулетка));
 
             var targetRouletteId = ChatterInfoRepository.Instance.GetRouletteId(nameForDuel, e.Channel);
             var targetduelName = RouletteInfoRepository.Instance.Get(targetRouletteId).DuelName;
 
             if (!string.IsNullOrEmpty(targetduelName) && !e.Username.Equals(targetduelName, StringComparison.InvariantCultureIgnoreCase))
-                return SendMessage.GetWhisper(string.Format(Texts.TargetAlreadyInDuel, nameForDuel, targetduelName));
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.TargetAlreadyInDuel, nameForDuel, targetduelName));
 
             RouletteInfoRepository.Instance.SetDuelName(sourceRouletteId, nameForDuel);
             RouletteInfoRepository.Instance.Reset(sourceRouletteId);
@@ -135,13 +132,13 @@ namespace TwitchChat.Code.Commands
 
                     if (moderators.Any(t => t.Name.Equals(user, StringComparison.InvariantCultureIgnoreCase)))
                     {
-                        var mes = SendMessage.GetMessage(string.Format(Texts.AdminVsModer, e.Channel, user));
+                        var mes = SendMessage.GetMessage(string.Format(DuelConfig.Texts.AdminVsModer, e.Channel, user));
                         userModel.Channel.SendMessage(null, mes);
                         return;
                     }
 
                     var timeout = SendMessage.GetTimeout(user, RouletteTimeout);
-                    var message = SendMessage.GetMessage(string.Format(Texts.AdminVsUser, e.Channel, user));
+                    var message = SendMessage.GetMessage(string.Format(DuelConfig.Texts.AdminVsUser, e.Channel, user));
                     timeout.AddMessage(message);
                     userModel.Channel.SendMessage(null, timeout);
                     return;
@@ -155,13 +152,13 @@ namespace TwitchChat.Code.Commands
 
                     if (moderators.Any(t => t.Name.Equals(user, StringComparison.InvariantCultureIgnoreCase)))
                     {
-                        var mes = SendMessage.GetMessage(string.Format(Texts.ModerVsModer, e.Username, nameForDuel));
+                        var mes = SendMessage.GetMessage(string.Format(DuelConfig.Texts.ModerVsModer, e.Username, nameForDuel));
                         userModel.Channel.SendMessage(null, mes);
                         return;
                     }
 
                     var timeout = SendMessage.GetTimeout(user, RouletteTimeout);
-                    var message = SendMessage.GetMessage(string.Format(Texts.ModerVsUser, moder, user));
+                    var message = SendMessage.GetMessage(string.Format(DuelConfig.Texts.ModerVsUser, moder, user));
                     timeout.AddMessage(message);
                     userModel.Channel.SendMessage(null, timeout);
                     return;
@@ -177,7 +174,7 @@ namespace TwitchChat.Code.Commands
                     {
                         context.AddDuelScore(sourceRouletteId);
 
-                        var win = SendMessage.GetMessage(string.Format(Texts.Win, e.Username, nameForDuel));
+                        var win = SendMessage.GetMessage(string.Format(DuelConfig.Texts.Win, e.Username, nameForDuel));
                         first.NextMessage.AddMessage(win);
                         userModel.Channel.SendMessage(null, first);
                         return;
@@ -193,7 +190,7 @@ namespace TwitchChat.Code.Commands
                     {
                         context.AddDuelScore(targetRouletteId);
 
-                        var win = SendMessage.GetMessage(string.Format(Texts.Win, nameForDuel, e.Username));
+                        var win = SendMessage.GetMessage(string.Format(DuelConfig.Texts.Win, nameForDuel, e.Username));
                         second.NextMessage.AddMessage(win);
                         userModel.Channel.SendMessage(null, second);
                         return;
@@ -214,14 +211,14 @@ namespace TwitchChat.Code.Commands
             var wait = TimerFactory.RunOnce(userModel.Channel, action);
             wait.ContinueWith(task => continueWith());
 
-            return SendMessage.GetMessage(string.Format(Texts.Confirm, nameForDuel, e.Username));
+            return SendMessage.GetMessage(string.Format(DuelConfig.Texts.Confirm, nameForDuel, e.Username));
         }
 
         private static void WaitAndDefaultTimers()
         {
             GlobalDecorator.Get(Command.Принять).RestartTimer();
             GlobalDecorator.Get(Command.Дуэль).RestartTimer();
-            Thread.Sleep(DuelDelay * 1000);
+            Thread.Sleep(DuelConfig.Params.Delay * 1000);
         }
 
         private static SendMessage Roulette(RouletteInfoRepository context, long rouletteId, string source, string target)
@@ -243,16 +240,16 @@ namespace TwitchChat.Code.Commands
                 {
                     context.ResetCurrentTry(rouletteId);
                     context.AddPercent(rouletteId, 0.05);
-                    return SendMessage.GetMessage(string.Format(Texts.Misfire, source, target));
+                    return SendMessage.GetMessage(string.Format(DuelConfig.Texts.Misfire, source, target));
                 }
 
                 context.AddDeath(rouletteId);
-                return SendMessage.GetTimeout(target, RouletteTimeout).AddMessage(SendMessage.GetMessage(string.Format(Texts.Death, source, target, currentTry)));
+                return SendMessage.GetTimeout(target, RouletteTimeout).AddMessage(SendMessage.GetMessage(string.Format(DuelConfig.Texts.Death, source, target, currentTry)));
             }
 
             context.AddPercent(rouletteId, percent);
 
-            return SendMessage.GetMessage(string.Format(Texts.Luck, currentTry, target, source));
+            return SendMessage.GetMessage(string.Format(DuelConfig.Texts.Luck, currentTry, target, source));
         }
     }
 }

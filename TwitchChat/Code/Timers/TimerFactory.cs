@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using CommonHelper;
+using Configuration;
 using Domain.Repositories;
 using TwitchApi;
 using TwitchChat.Code.Commands;
@@ -15,7 +16,7 @@ namespace TwitchChat.Code.Timers
 {
     public static class TimerFactory
     {
-        private static readonly Dictionary<Timer, int> Config = DelayConfig<Timer>.GetDelayConfig("TimersConfig");
+        private static readonly Dictionary<Timer, int> Config = DelayConfig<Timer>.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Timers);
         private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
         private static readonly object LockObject = new object();
 
@@ -91,7 +92,7 @@ namespace TwitchChat.Code.Timers
                         action = () =>
                         {
                             var text = HelpCommand.GetHelpTimerText();
-                            channelModel.Client.Message(channelModel.ChannelName, text);
+                            channelModel.SendMessage(null, SendMessage.GetMessage(text));
                         };
                         break;
                     }

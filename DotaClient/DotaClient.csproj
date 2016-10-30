@@ -65,6 +65,10 @@
       <Project>{50e9e3b8-177f-470c-a0d7-e564c79d8143}</Project>
       <Name>CommonHelper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Configuration\Configuration.csproj">
+      <Project>{7bd66010-5039-4d8f-b3f3-c2547605e334}</Project>
+      <Name>Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{b1c47748-249c-4c5f-a6b4-0537bbee8ec4}</Project>
       <Name>Domain</Name>

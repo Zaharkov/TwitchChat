@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchChat.Texts.Entities
+namespace Configuration.Entities
 {
-    public class Text
+    public class Config
     {
         [JsonProperty("help", Required = Required.Always)]
         public Help Help { get; set; }
@@ -34,9 +34,6 @@ namespace TwitchChat.Texts.Entities
         [JsonProperty("music", Required = Required.Always)]
         public Music Music { get; set; }
 
-        [JsonProperty("mmr", Required = Required.Always)]
-        public Mmr Mmr { get; set; }
-
         [JsonProperty("eba", Required = Required.Always)]
         public Eba Eba { get; set; }
 
@@ -47,14 +44,3 @@ namespace TwitchChat.Texts.Entities
         public Global Global { get; set; }
     }
 }
-
-
-
-
-
-
-
-
-
-
-

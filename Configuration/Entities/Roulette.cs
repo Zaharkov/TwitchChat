@@ -1,8 +1,26 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchChat.Texts.Entities
+namespace Configuration.Entities
 {
     public class Roulette
+    {
+        [JsonProperty("params", Required = Required.Always)]
+        public RouletteParams Params { get; set; }
+
+        [JsonProperty("texts", Required = Required.Always)]
+        public RouletteTexts Texts { get; set; }
+    }
+
+    public class RouletteParams
+    {
+        [JsonProperty("timeout", Required = Required.Always)]
+        public int Timeout { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public int Top { get; set; }
+    }
+
+    public class RouletteTexts
     {
         [JsonProperty("admin", Required = Required.Always)]
         public string Admin { get; set; }

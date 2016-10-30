@@ -1,12 +1,12 @@
-﻿using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+﻿using Configuration;
+using Configuration.Entities;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class OnSubscriberCommand
     {
-        private static readonly Subscribe Texts = TextsHolder.Texts.Subscribe;
+        private static readonly Subscribe Texts = ConfigHolder.Configs.Subscribe;
 
         public static SendMessage OnSubscriber(SubscriberEventArgs e)
         {

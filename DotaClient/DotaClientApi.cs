@@ -9,7 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AE.Net.Mail;
-using CommonHelper;
+using Configuration;
+using Configuration.Entities;
 using Domain.Repositories;
 using DotaClient.Friend;
 using SteamKit2;
@@ -21,15 +22,16 @@ namespace DotaClient
 {
     public static class DotaClientApi
     {
-        private static readonly uint SteamId = uint.Parse(Configuration.GetSetting("SteamID"));
-        private static readonly string SteamUser = Configuration.GetSetting("SteamUser");
-        private static readonly string SteamPass = Configuration.GetSetting("SteamPass");
+        private static readonly SteamParams Params = ConfigHolder.Configs.Steam.Params;
+        private static readonly uint SteamId = Params.Id;
+        private static readonly string SteamUser = Params.User;
+        private static readonly string SteamPass = Params.Pass;
 
-        private static readonly string ImapHost = Configuration.GetSetting("ImapHost");
-        private static readonly int ImapPort = int.Parse(Configuration.GetSetting("ImapPort"));
-        private static readonly string ImapLogin = Configuration.GetSetting("ImapLogin");
-        private static readonly string ImapPass = Configuration.GetSetting("ImapPass");
-        private static readonly bool ImapUseSsl = bool.Parse(Configuration.GetSetting("ImapUseSsl"));
+        private static readonly string ImapHost = Params.ImapHost;
+        private static readonly int ImapPort = Params.ImapPort;
+        private static readonly string ImapLogin = Params.ImapLogin;
+        private static readonly string ImapPass = Params.ImapPass;
+        private static readonly bool ImapUseSsl = Params.ImapUseSsl;
 
         private static ClientState _state = ClientState.None;
         private static readonly Stopwatch ConnectProceed = new Stopwatch();

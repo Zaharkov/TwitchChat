@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using CommonHelper;
+using Configuration;
 using TwitchChat.Code.Commands;
 
 namespace TwitchChat.Code.DelayDecorator
@@ -12,8 +12,8 @@ namespace TwitchChat.Code.DelayDecorator
         private bool _firstTime = true;
         private readonly Command _command;
         private readonly Stopwatch _timer = new Stopwatch();
-        private static readonly int Multi = int.Parse(Configuration.GetSetting("HybridDelayMulti"));
-        protected static readonly Dictionary<Command, int> Configs = DelayConfig<Command>.GetDelayConfig("CommandsConfig");
+        private static readonly int Multi = ConfigHolder.Configs.Global.HybridDelayMulti;
+        protected static readonly Dictionary<Command, int> Configs = DelayConfig<Command>.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Commands);
 
         protected BaseDecorator(Command command, bool useMultilpier = false)
         {

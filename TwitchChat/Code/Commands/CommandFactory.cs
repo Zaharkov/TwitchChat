@@ -2,8 +2,8 @@
 using System.Linq;
 using TwitchChat.Code.DelayDecorator;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -11,7 +11,7 @@ namespace TwitchChat.Code.Commands
 {
     public class CommandFactory
     {
-        private static readonly Global Texts = TextsHolder.Texts.Global;
+        private static readonly GlobalTexts Texts = ConfigHolder.Configs.Global.Texts;
 
         public static SendMessage ExecuteCommand(MessageEventArgs e, ChatMemberViewModel userModel)
         {

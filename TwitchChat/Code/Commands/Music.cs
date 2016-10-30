@@ -1,25 +1,23 @@
 ﻿using System.Linq;
-using CommonHelper;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 using VkApi;
 
 namespace TwitchChat.Code.Commands
 {
     public static class MusicCommand
     {
-        private static readonly string UserName = Configuration.GetSetting("VkAudioName");
-        private static readonly Music Texts = TextsHolder.Texts.Music;
+        private static readonly Music Music = ConfigHolder.Configs.Music;
 
         public static SendMessage GetMusic()
         {
             var list = VkApiClient.GetBroadcastList();
 
-            var user = list.FirstOrDefault(t => t.Name.Equals(UserName) || $"{t.FirstName} {t.SecondName}".Equals(UserName));
+            var user = list.FirstOrDefault(t => t.Name.Equals(Music.Params.VkAudioName) || $"{t.FirstName} {t.SecondName}".Equals(Music.Params.VkAudioName));
 
             var message = user == null
-                ? string.Format(Texts.NoMusic, UserName)
-                : string.Format(Texts.Played, UserName, user.StatusAudio.Artist, user.StatusAudio.Title);
+                ? string.Format(Music.Texts.NoMusic, Music.Params.VkAudioName)
+                : string.Format(Music.Texts.Played, Music.Params.VkAudioName, user.StatusAudio.Artist, user.StatusAudio.Title);
 
             return SendMessage.GetMessage(message);
         }

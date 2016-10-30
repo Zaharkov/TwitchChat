@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CommonHelper;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
+using Configuration;
 
 namespace TwitchChat.Code.Quiz
 {
     public static class QuizHolder
     {
         private static readonly Dictionary<ChannelViewModel, CancellationTokenSource> TokenSources = new Dictionary<ChannelViewModel, CancellationTokenSource>();
-        private static readonly int Delay = int.Parse(Configuration.GetSetting("QuizDelay"));
-        private static readonly Texts.Entities.Quiz Texts = TextsHolder.Texts.Quiz;
+        private static readonly Configuration.Entities.Quiz Quiz = ConfigHolder.Configs.Quiz;
 
         public static bool IsQuizActive { get; private set; }
         public static KeyValuePair<string, string>? Question { get; private set; }
@@ -24,7 +22,7 @@ namespace TwitchChat.Code.Quiz
             if (!IsQuizActive || !Question.HasValue)
                 return null;
 
-            return string.Format(Texts.Question, Question.Value.Key, GetAnswer(Question.Value.Value), Command.О);
+            return string.Format(Quiz.Texts.Question, Question.Value.Key, GetAnswer(Question.Value.Value), Command.О);
         }
 
         public static string GetAnswer(string answer)
@@ -60,10 +58,10 @@ namespace TwitchChat.Code.Quiz
                 var text = GetQuestionText();
 
                 if(!string.IsNullOrEmpty(text))
-                    channelView.Client.Message(channelView.ChannelName, text);
+                    channelView.SendMessage(null, SendMessage.GetMessage(text));
             };
 
-            var cancelToken = TimerFactory.Start(channelView, action, Delay*1000);
+            var cancelToken = TimerFactory.Start(channelView, action, Quiz.Params.Delay * 1000);
             TokenSources.Add(channelView, cancelToken);
         }
 

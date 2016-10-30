@@ -2,8 +2,8 @@
 using Domain.Repositories;
 using DotaClient;
 using DotaClient.Friend;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -11,7 +11,7 @@ namespace TwitchChat.Code.Commands
 {
     public static class SteamCommand
     {
-        private static readonly Steam Texts = TextsHolder.Texts.Steam;
+        private static readonly SteamTexts Texts = ConfigHolder.Configs.Steam.Texts;
 
         public static SendMessage AddSteam(MessageEventArgs e)
         {

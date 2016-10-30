@@ -1,12 +1,12 @@
 ﻿using System;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
+using Configuration;
 
 namespace TwitchChat.Code.Commands
 {
     public static class Eba
     {
-        private static readonly Texts.Entities.Eba Texts = TextsHolder.Texts.Eba;
+        private static readonly Configuration.Entities.Eba Texts = ConfigHolder.Configs.Eba;
         private static readonly Random Rnd = new Random();
 
         public static SendMessage EbaComeOn(ChatMemberViewModel userModel)

@@ -1,13 +1,13 @@
 ﻿using System.Linq;
 using System.Text;
-using TwitchChat.Texts;
+using Configuration;
 using Twitchiedll.IRC.Enums;
 
 namespace TwitchChat.Code.Commands
 {
     public static class HelpCommand
     {
-        private static readonly Texts.Entities.Help Texts = TextsHolder.Texts.Help;
+        private static readonly Configuration.Entities.Help Texts = ConfigHolder.Configs.Help;
 
         public static SendMessage GetHelp()
         {

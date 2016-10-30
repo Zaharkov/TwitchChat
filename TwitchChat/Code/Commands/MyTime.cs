@@ -1,14 +1,14 @@
 ﻿using Domain.Repositories;
 using TwitchChat.Controls;
-using TwitchChat.Texts;
-using TwitchChat.Texts.Entities;
+using Configuration;
+using Configuration.Entities;
 using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
     public static class MyTimeCommand
     {
-        private static readonly MyTime Texts = TextsHolder.Texts.MyTime;
+        private static readonly MyTime Texts = ConfigHolder.Configs.MyTime;
 
         public static SendMessage GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {

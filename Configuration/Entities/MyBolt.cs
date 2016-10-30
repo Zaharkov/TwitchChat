@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TwitchChat.Texts.Entities
+namespace Configuration.Entities
 {
     public class MyBolt
     {

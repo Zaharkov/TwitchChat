@@ -1,5 +1,5 @@
 ﻿using System;
-using TwitchChat.Texts;
+using Configuration;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -7,7 +7,7 @@ namespace TwitchChat.Code.Commands
 {
     public static class MyBolt
     {
-        private static readonly Texts.Entities.MyBolt Texts = TextsHolder.Texts.MyBolt;
+        private static readonly Configuration.Entities.MyBolt Texts = ConfigHolder.Configs.MyBolt;
 
         public static SendMessage Bolt(MessageEventArgs userModel)
         {
