@@ -92,7 +92,7 @@ namespace TwitchChat.Code.Timers
                         action = () =>
                         {
                             var text = HelpCommand.GetHelpTimerText();
-                            channelModel.SendMessage(null, SendMessage.GetMessage(text));
+                            channelModel.Client.Message(channelModel.ChannelName, text);
                         };
                         break;
                     }

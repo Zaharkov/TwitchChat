@@ -64,7 +64,7 @@ namespace TwitchChat.Code.Commands
             var rouletteId = ChatterInfoRepository.Instance.GetRouletteId(e.Username, e.Channel);
             var roulette = RouletteInfoRepository.Instance.Get(rouletteId);
 
-            var message = string.Format(Roulette.Texts.Stats, roulette.TryCount, roulette.DeathCount, roulette.MaxStreak, roulette.MaxPercent.ToString("0.####%"), roulette.Streak, roulette.Percent.ToString("0.####%"), roulette.DeathCount);
+            var message = string.Format(Roulette.Texts.Stats, roulette.TryCount, roulette.DeathCount, roulette.MaxStreak, roulette.MaxPercent.ToString("0.####%"), roulette.Streak, roulette.Percent.ToString("0.####%"), roulette.DuelScore);
             return SendMessage.GetMessage(message);
         }
 
