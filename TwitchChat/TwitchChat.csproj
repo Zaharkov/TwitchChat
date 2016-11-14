@@ -75,6 +75,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Code\Commands\CommandType.cs" />
+    <Compile Include="Code\Commands\CustomCommandHandler.cs" />
     <Compile Include="Code\Commands\DelayType.cs" />
     <Compile Include="Code\Commands\Eba.cs" />
     <Compile Include="Code\Commands\Duel.cs" />
@@ -88,7 +90,7 @@
     <Compile Include="Code\Commands\SendType.cs" />
     <Compile Include="Code\Commands\CommandAccess.cs" />
     <Compile Include="Code\Commands\Command.cs" />
-    <Compile Include="Code\Commands\CommandFactory.cs" />
+    <Compile Include="Code\Commands\CommandExecution.cs" />
     <Compile Include="Code\Commands\Steam.cs" />
     <Compile Include="Code\Commands\Sheiker.cs" />
     <Compile Include="Code\Commands\MyTime.cs" />

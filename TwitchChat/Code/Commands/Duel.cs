@@ -59,7 +59,7 @@ namespace TwitchChat.Code.Commands
 
             RouletteInfoRepository.Instance.SetDuelName(sourceRouletteId, nameForDuel);
             var tokenSource = new CancellationTokenSource();
-            RemoveDuelNameTokens.AddOrUpdate(e.Username, tokenSource, (k, v) => tokenSource);
+            RemoveDuelNameTokens.AddOrUpdate(e.Username.ToUpper(), tokenSource, (k, v) => tokenSource);
 
             Action sleep = () =>
             {
@@ -116,8 +116,8 @@ namespace TwitchChat.Code.Commands
             RouletteInfoRepository.Instance.Reset(sourceRouletteId);
             RouletteInfoRepository.Instance.Reset(targetRouletteId);
 
-            if (RemoveDuelNameTokens.ContainsKey(nameForDuel))
-                RemoveDuelNameTokens[nameForDuel].Cancel();
+            if (RemoveDuelNameTokens.ContainsKey(nameForDuel.ToUpper()))
+                RemoveDuelNameTokens[nameForDuel.ToUpper()].Cancel();
 
             Action action = () =>
             {
@@ -216,8 +216,8 @@ namespace TwitchChat.Code.Commands
 
         private static void WaitAndDefaultTimers()
         {
-            GlobalDecorator.Get(Command.Принять).RestartTimer();
-            GlobalDecorator.Get(Command.Дуэль).RestartTimer();
+            GlobalDecorator.Get(Command.Принять.ToString()).RestartTimer();
+            GlobalDecorator.Get(Command.Дуэль.ToString()).RestartTimer();
             Thread.Sleep(DuelConfig.Params.Delay * 1000);
         }
 
@@ -226,7 +226,7 @@ namespace TwitchChat.Code.Commands
             var currentTry = context.Get(rouletteId).CurrentTry;
 
             var rnd = new Random();
-            var firstNumber = rnd.Next(1, 6 - currentTry);
+            var firstNumber = rnd.Next(1, 7 - currentTry);
             var percent = 1 - 1 / (6.0 - currentTry);
             currentTry++;
 
@@ -234,7 +234,7 @@ namespace TwitchChat.Code.Commands
 
             if (firstNumber == 1)
             {
-                var secondNumber = rnd.Next(1, 20);
+                var secondNumber = rnd.Next(1, 21);
 
                 if (secondNumber == 1)
                 {

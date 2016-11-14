@@ -15,7 +15,7 @@ namespace TwitchChat.Code.Commands
                 return SendMessage.GetMessage(Texts.Admin);
 
             var rnd = new Random();
-            return SendMessage.GetMessage(string.Format(Texts.User, rnd.Next(Texts.Min, Texts.Max)));
+            return SendMessage.GetMessage(string.Format(Texts.User, rnd.Next(Texts.Min, Texts.Max+1)));
         }
     }
 }

@@ -32,8 +32,8 @@ namespace Tests
         [Test]
         public void GlobalTest()
         {
-            var test1 = GlobalDecorator.Get(Command.Музыка);
-            var test2 = GlobalDecorator.Get(Command.Музыка);
+            var test1 = GlobalDecorator.Get(Command.Музыка.ToString());
+            var test2 = GlobalDecorator.Get(Command.Музыка.ToString());
 
             Execute(test1, true);
 
@@ -61,8 +61,8 @@ namespace Tests
         [Test]
         public void UserTest()
         {
-            var test1 = UserDecorator.Get("test3", Command.ДобавитьСтим);
-            var test2 = UserDecorator.Get("test4", Command.ДобавитьСтим);
+            var test1 = UserDecorator.Get("test3", Command.ДобавитьСтим.ToString());
+            var test2 = UserDecorator.Get("test4", Command.ДобавитьСтим.ToString());
 
             Execute(test1, true);
 
@@ -92,9 +92,9 @@ namespace Tests
         [Test]
         public void HybridTest()
         {
-            var test1 = HybridDecorator.Get("test5", Command.МоеВремя);
-            var test2 = HybridDecorator.Get("test6", Command.МоеВремя);
-            var test3 = HybridDecorator.Get("test7", Command.МоеВремя);
+            var test1 = HybridDecorator.Get("test5", Command.МоеВремя.ToString());
+            var test2 = HybridDecorator.Get("test6", Command.МоеВремя.ToString());
+            var test3 = HybridDecorator.Get("test7", Command.МоеВремя.ToString());
 
             Execute(test1, true);
 

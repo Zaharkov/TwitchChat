@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Configuration;
 using TwitchChat.Code.Commands;
+using Twitchiedll.IRC.Enums;
 
 namespace TwitchChat.Code.DelayDecorator
 {
@@ -10,12 +11,18 @@ namespace TwitchChat.Code.DelayDecorator
     {
         private readonly bool _useMultiplier;
         private bool _firstTime = true;
-        private readonly Command _command;
+        private readonly string _command;
         private readonly Stopwatch _timer = new Stopwatch();
         private static readonly int Multi = ConfigHolder.Configs.Global.HybridDelayMulti;
-        protected static readonly Dictionary<Command, int> Configs = DelayConfig<Command>.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Commands);
+        protected static readonly Dictionary<string, int> Configs = DelayConfig.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Commands);
 
-        protected BaseDecorator(Command command, bool useMultilpier = false)
+        static BaseDecorator()
+        {
+            foreach (var customCommand in CustomCommands<CommandType, UserType, DelayType>.Commands)
+                Configs.Add(customCommand.Name, customCommand.CooldownTime);
+        }
+
+        protected BaseDecorator(string command, bool useMultilpier = false)
         {
             _command = command;
             _useMultiplier = useMultilpier;
@@ -23,7 +30,7 @@ namespace TwitchChat.Code.DelayDecorator
 
         public bool CanExecute(out int needWait)
         {
-            var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global];
+            var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global.ToString()];
 
             if (_useMultiplier)
                 delay = delay * Multi;
@@ -48,7 +55,7 @@ namespace TwitchChat.Code.DelayDecorator
 
         public SendMessage Execute(Func<SendMessage> func, bool needExec = true)
         {
-            var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global];
+            var delay = Configs.ContainsKey(_command) ? Configs[_command] : Configs[Command.Global.ToString()];
 
             if (_useMultiplier)
                 delay = delay * Multi;

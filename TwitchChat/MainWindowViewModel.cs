@@ -7,6 +7,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -204,7 +205,26 @@ namespace TwitchChat
                 if(_irc.State == IrcState.Closed)
                     _irc.Reconnect();
 
-                _irc.Login(user.Name, "oauth:" + TwitchApiClient.GetToken());
+                for (var i = 0; i < 5; i++)
+                {
+                    var succefull = false;
+                    try
+                    {
+                        _irc.Login(user.Name, "oauth:" + TwitchApiClient.GetToken());
+                        succefull = true;
+                    }
+                    catch(Exception ex)
+                    {
+                       LogRepository.Instance.LogException("Login failed", ex); 
+                    }
+
+                    if (succefull)
+                        break;
+
+                    Thread.Sleep(2000);
+                }
+
+                
             }
             catch (ErrorResponseDataException ex)
             {

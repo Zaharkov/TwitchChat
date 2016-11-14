@@ -9,7 +9,7 @@ namespace TwitchChat.Code.DelayDecorator
         private IDelayDecorator User { get; }
         private IDelayDecorator Global { get; }
 
-        private static readonly ConcurrentDictionary<Command, ConcurrentDictionary<string, HybridDecorator>> HybridInstances = new ConcurrentDictionary<Command, ConcurrentDictionary<string, HybridDecorator>>();
+        private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, HybridDecorator>> HybridInstances = new ConcurrentDictionary<string, ConcurrentDictionary<string, HybridDecorator>>();
 
         private HybridDecorator(IDelayDecorator user, IDelayDecorator global)
         {
@@ -17,7 +17,7 @@ namespace TwitchChat.Code.DelayDecorator
             User = user;
         }
 
-        public static IDelayDecorator Get(string username, Command command)
+        public static IDelayDecorator Get(string username, string command)
         {
             var userDecorator = UserDecorator.Get(username, command, true);
             var globalDecorator = GlobalDecorator.Get(command);

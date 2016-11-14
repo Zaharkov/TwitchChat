@@ -206,7 +206,7 @@ namespace TwitchChat.Controls
 
                 if (IsChatCommand(e))
                 {
-                    var result = CommandFactory.ExecuteCommand(e, FindOrJoinUser(e.Username, e.UserType));
+                    var result = CommandExecution.ExecuteCommand(e, FindOrJoinUser(e.Username, e.UserType));
                     SendMessage(e, result);
                 }
             }

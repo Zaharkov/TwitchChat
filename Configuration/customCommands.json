@@ -1,0 +1,37 @@
+﻿[
+  {
+    "name": "Засос",
+    "type": "write",
+    "access": "default",
+    "cooldownType": "global",
+    "cooldownTime": 30,
+    "text": "смачно засосяндрил {0} в промежность KappaPride",
+    "params": [
+      { //0
+        "type": "randomUser"
+      }
+    ]
+  }
+  //{
+  //  "name": "timerTest",
+  //  "type": "timer",
+  //  "access": "default",
+  //  "cooldownType": "user",
+  //  "cooldownTime": 20,
+  //  "text": "timer test {0} message {1} user {2}",
+  //  "params": [
+  //    {//0
+  //      "type": "randomNumber",
+  //      "min": 1,
+  //      "max": 10
+  //    },
+  //    {//1
+  //      "type": "randomUser" 
+  //    },
+  //    {//1
+  //      "type": "username" 
+  //    }
+  //  ] 
+  //}
+]
+

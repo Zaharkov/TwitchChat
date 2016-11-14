@@ -7,7 +7,6 @@ namespace TwitchChat.Code.Quiz
 {
     public static class QuizCollection
     {
-        private static readonly Random Rnd = new Random();
         private static readonly Dictionary<string, string> Questions = new Dictionary<string, string>();
 
         static QuizCollection()
@@ -30,7 +29,8 @@ namespace TwitchChat.Code.Quiz
 
         public static KeyValuePair<string, string> GetNew()
         {
-            var value = Questions.ElementAt(Rnd.Next(0, Questions.Count));
+            var random = new Random();
+            var value = Questions.ElementAt(random.Next(0, Questions.Count));
             Questions.Remove(value.Key);
 
             return value;

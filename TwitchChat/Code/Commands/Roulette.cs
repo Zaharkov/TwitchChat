@@ -25,7 +25,7 @@ namespace TwitchChat.Code.Commands
             var currentTry = RouletteInfoRepository.Instance.Get(rouletteId).CurrentTry;
 
             var rnd = new Random();
-            var firstNumber = rnd.Next(1, 6 - currentTry);
+            var firstNumber = rnd.Next(1, 7 - currentTry);
             var percent = 1 - 1 / (6.0 - currentTry);
             currentTry++;
 
@@ -33,7 +33,7 @@ namespace TwitchChat.Code.Commands
 
             if (firstNumber == 1)
             {
-                var secondNumber = rnd.Next(1, 20);
+                var secondNumber = rnd.Next(1, 21);
 
                 if (secondNumber == 1)
                 {

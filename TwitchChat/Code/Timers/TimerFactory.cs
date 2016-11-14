@@ -10,15 +10,22 @@ using Domain.Repositories;
 using TwitchApi;
 using TwitchChat.Code.Commands;
 using TwitchChat.Controls;
+using Twitchiedll.IRC.Enums;
 using ChatterInfo = Domain.Models.ChatterInfo;
 
 namespace TwitchChat.Code.Timers
 {
     public static class TimerFactory
     {
-        private static readonly Dictionary<Timer, int> Config = DelayConfig<Timer>.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Timers);
+        private static readonly Dictionary<string, int> Configs = DelayConfig.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Timers);
         private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
         private static readonly object LockObject = new object();
+
+        static TimerFactory()
+        {
+            foreach (var customCommand in CustomCommands<CommandType, UserType, DelayType>.Commands)
+                Configs.Add(customCommand.Name, customCommand.CooldownTime);
+        }
 
         private static void AddToken(ChannelViewModel channelModel, CancellationTokenSource tokenSource)
         {
@@ -77,9 +84,23 @@ namespace TwitchChat.Code.Timers
 
         public static void InitTimers(ChannelViewModel channelModel)
         {
+            var timerCustomCommands = CustomCommands<CommandType, UserType, DelayType>.Commands.Where(t => t.Type == CommandType.Timer);
+
+            foreach (var timerCustomCommand in timerCustomCommands)
+            {
+                var message = CustomCommandHandler.CreateCommand(timerCustomCommand, null, channelModel);
+
+                Action action = () =>
+                {
+                    channelModel.Client.Message(channelModel.ChannelName, message.Message);
+                };
+
+                Start(channelModel, action, timerCustomCommand.CooldownTime * 1000);
+            }
+
             foreach (Timer timer in Enum.GetValues(typeof(Timer)))
             {
-                var delay = Config.ContainsKey(timer) ? Config[timer] : Config[Timer.Global];
+                var delay = Configs.ContainsKey(timer.ToString()) ? Configs[timer.ToString()] : Configs[Timer.Global.ToString()];
 
                 Action action;
 
