@@ -2,10 +2,23 @@
   {
     "name": "Засос",
     "type": "write",
-    "access": "default",
+    "access": [ "default" ],
     "cooldownType": "global",
     "cooldownTime": 30,
-    "text": "смачно засосяндрил {0} в промежность KappaPride",
+    "texts": [
+      {
+        "text": "смачно засосяндрил {0} в промежность KappaPride",
+        "access": [ "default" ]
+      },
+      {
+        "text": "смачно засосяндрил {0} в промежность KappaPride KappaPride",
+        "access": [ "subscriber" ]
+      },
+      {
+        "text": "смачно засосяндрил {0} в промежность KappaPride KappaPride KappaPride",
+        "access": [ "moderator", "subscriber" ]
+      }
+    ], 
     "params": [
       { //0
         "type": "randomUser"

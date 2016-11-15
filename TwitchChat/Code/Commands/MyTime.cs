@@ -12,11 +12,7 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage GetMyTime(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            var chatTime = userModel.GetTime();
-            var dbTime = ChatterInfoRepository.Instance.GetChatterTime(userModel.Name, e.Channel);
-
-            var totalTime = chatTime + dbTime;
-
+            var totalTime = ChatterInfoRepository.Instance.GetChatterTime(userModel.Name, e.Channel);
             var message = string.Format(Texts.Time, string.Format(Texts.Seconds, totalTime, GetSecondsName(totalTime)));
             return SendMessage.GetMessage(message);
         }

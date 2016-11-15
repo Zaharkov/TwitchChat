@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Domain.Models;
 
 namespace Domain.Repositories
@@ -13,27 +14,39 @@ namespace Domain.Repositories
 
         public static ChatterInfoRepository Instance => new ChatterInfoRepository();
 
-        public void UpdateChatterInfo(string chatName, List<ChatterInfo> chattersInfo)
+        public void UpdateChatterInfo(string chatName, List<ChatterInfo> chattersInfo, int seconds)
         {
             if (!chattersInfo.Any())
                 return;
 
             var namesList = chattersInfo.Select(t => t.Name);
-            var exists = Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName));
+            var exists = Table.Where(t => namesList.Contains(t.Name) && t.ChatName.Equals(chatName)).ToList();
 
-            foreach (var chatterInfo in exists)
+            var updateBuilder = new StringBuilder();
+            updateBuilder.AppendLine( "UPDATE [ChatterInfoes]");
+            updateBuilder.AppendLine($"SET [Seconds] = [Seconds] + {seconds}");
+            updateBuilder.AppendLine($"WHERE [ChatName] = N'{chatName}' AND [Name] IN (");
+
+            if (exists.Any())
             {
-                var chatter = chattersInfo.Single(t => 
-                    t.Name.Equals(chatterInfo.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    t.ChatName.Equals(chatterInfo.ChatName, StringComparison.InvariantCultureIgnoreCase)
-                );
+                var lastUpdate = exists.Last();
 
-                chatterInfo.Seconds += chatter.Seconds;
-                chattersInfo.Remove(chatter);
+                foreach (var chatterInfo in exists)
+                {
+                    var chatter = chattersInfo.Single(t =>
+                        t.Name.Equals(chatterInfo.Name, StringComparison.InvariantCultureIgnoreCase) &&
+                        t.ChatName.Equals(chatterInfo.ChatName, StringComparison.InvariantCultureIgnoreCase)
+                        );
+
+                    chattersInfo.Remove(chatter);
+                    updateBuilder.Append($"N'{chatterInfo.Name}'{(lastUpdate == chatterInfo ? ")" : ", ")}");
+                }
+
+                Sql(updateBuilder.ToString());
             }
 
-            UpdateRange(exists);
-            AddRange(chattersInfo);
+            if (chattersInfo.Any())
+                AddRange(chattersInfo);
         }
 
         public void AddSecods(string name, string chatName, long seconds)
@@ -80,7 +93,7 @@ namespace Domain.Repositories
 
         public void AddChatterSteamId(string name, long steamId)
         {
-            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             foreach (var chatterInfo in chatters)
                 chatterInfo.SteamId = steamId;
@@ -90,7 +103,7 @@ namespace Domain.Repositories
 
         public void DeleteChatterSteamId(string name)
         {
-            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             foreach (var chatterInfo in chatters)
                 chatterInfo.SteamId = null;

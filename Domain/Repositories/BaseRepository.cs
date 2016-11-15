@@ -22,13 +22,14 @@ namespace Domain.Repositories
             }
         }
 
-        protected IQueryable<T> Table => Entities;
+        private AppContext Context { get; }
 
-        protected AppContext Context { get; }
+        protected IQueryable<T> Table => Entities;
 
         protected BaseRepository()
         {
             Context = new AppContext();
+            Context.Configuration.AutoDetectChangesEnabled = false;
         }
 
         protected T GetById(object id)
@@ -36,14 +37,12 @@ namespace Domain.Repositories
             return Entities.Find(id);
         }
 
-        protected void UpdateRange(IEnumerable<T> entities)
+        protected void UpdateRange(List<T> entities)
         {
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));
 
-            foreach (var entity in entities)
-                Entities.AddOrUpdate(entity);
-
+            Entities.AddOrUpdate(entities.ToArray());
             Context.SaveChanges();
         }
 
@@ -52,9 +51,7 @@ namespace Domain.Repositories
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));
 
-            foreach (var entity in entities)
-                Entities.Add(entity);
-
+            Entities.AddRange(entities);
             Context.SaveChanges();
         }
 
@@ -86,6 +83,11 @@ namespace Domain.Repositories
 
             Entities.RemoveRange(entities);
             Context.SaveChanges();
+        }
+
+        protected void Sql(string sql)
+        {
+            Context.Database.ExecuteSqlCommand(sql);
         }
     }
 }

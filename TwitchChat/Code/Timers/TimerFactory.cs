@@ -20,6 +20,7 @@ namespace TwitchChat.Code.Timers
         private static readonly Dictionary<string, int> Configs = DelayConfig.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Timers);
         private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
         private static readonly object LockObject = new object();
+        private static bool _updateWasOneTime;
 
         static TimerFactory()
         {
@@ -123,35 +124,10 @@ namespace TwitchChat.Code.Timers
                         {
                             var chatterInfo = TwitchApiClient.GetUsersList(channelModel.ChannelName);
                             var newUsers = chatterInfo.Chatters.GetAll();
-                            var listForUpdate = new List<ChatterInfo>();
+                            var listForUpdate = newUsers.Select(t => new ChatterInfo { ChatName = channelModel.ChannelName, Name = t.Key, Seconds = delay }).ToList();
 
                             var allChatters = channelModel.GetAllChatters();
-                            var forDelete = new List<ChatMemberViewModel>();
-                            foreach (var user in allChatters)
-                            {
-                                if (!newUsers.Any(t => t.Key.Equals(user.Name)))
-                                {
-                                    forDelete.Add(user);
-
-                                    var exists = listForUpdate.FirstOrDefault(t => 
-                                        t.Name.Equals(user.Name, StringComparison.InvariantCultureIgnoreCase) && 
-                                        t.ChatName.Equals(channelModel.ChannelName, StringComparison.InvariantCultureIgnoreCase)
-                                    );
-
-                                    if (exists != null)
-                                    {
-                                        exists.Seconds += user.GetTimeAndRestart();
-                                        continue;
-                                    }
-
-                                    listForUpdate.Add(new ChatterInfo
-                                    {
-                                        Name = user.Name,
-                                        ChatName = channelModel.ChannelName,
-                                        Seconds = user.GetTimeAndRestart()
-                                    });
-                                }
-                            }
+                            var forDelete = allChatters.Where(user => !newUsers.Any(t => t.Key.Equals(user.Name))).ToList();
 
                             Application.Current.Dispatcher.Invoke(() =>
                             {
@@ -167,7 +143,10 @@ namespace TwitchChat.Code.Timers
                                 }
                             });
 
-                            ChatterInfoRepository.Instance.UpdateChatterInfo(channelModel.ChannelName, listForUpdate);
+                            if(_updateWasOneTime)
+                                ChatterInfoRepository.Instance.UpdateChatterInfo(channelModel.ChannelName, listForUpdate, delay);
+
+                            _updateWasOneTime = true;
                         };
                         break;
                     }

@@ -35,6 +35,7 @@ namespace TwitchChat.Code.Commands
             { Command.Эба.ToString(), UserType.Default },
             { Command.Аптайм.ToString(), UserType.Default },
             { Command.Задержка.ToString(), UserType.Default },
+            { Command.Игра.ToString(), UserType.Default },
             { Command.Рулетка.ToString(), UserType.Default },
             { Command.МояРулетка.ToString(), UserType.Default },
             { Command.ТопРулетки.ToString(), UserType.Default },
@@ -122,6 +123,8 @@ namespace TwitchChat.Code.Commands
                     return () => StreamCommand.GetUpTime(userModel);
                 case Command.Задержка:
                     return () => StreamCommand.GetDelay(userModel);
+                case Command.Игра:
+                    return () => StreamCommand.GetGame(userModel);
                 case Command.Рулетка:
                     return () => RouletteCommand.RouletteTry(e);
                 case Command.МояРулетка:

@@ -7,6 +7,9 @@ namespace Configuration.Entities
         [JsonProperty("end", Required = Required.Always)]
         public string End { get; set; }
 
+        [JsonProperty("game", Required = Required.Always)]
+        public string Game { get; set; }
+        
         [JsonProperty("active", Required = Required.Always)]
         public string Active { get; set; }
 

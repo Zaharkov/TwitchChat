@@ -75,6 +75,7 @@ namespace TwitchChat.Controls
             _irc.OnPart += OnPart;
             //_irc.OnNotice;
             _irc.OnSubscribe += OnSubscribe;
+            _irc.OnUserNotice += OnReSubscribe;
             //_irc.OnClearChat;
 
             _channelName = channelName;
@@ -187,8 +188,6 @@ namespace TwitchChat.Controls
                 {
                     //  Remove once user is gound and removed
                     Application.Current.Dispatcher.Invoke(() => { group.Remove(user); });
-
-                    ChatterInfoRepository.Instance.AddSecods(user.Name, ChannelName, user.GetTimeAndRestart());
                 }
             }
         }
@@ -248,7 +247,17 @@ namespace TwitchChat.Controls
         {
             if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
             {
-                SendMessage(null, OnSubscriberCommand.OnSubscriber(e));
+                var sub = new SubscribeParams(e.Username, e.Months);
+                SendMessage(null, OnSubscriberCommand.OnSubscriber(sub));
+            }
+        }
+
+        public void OnReSubscribe(UserNoticeEventArgs e)
+        {
+            if (e.Channel.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                var sub = new SubscribeParams(e.ResubUserName, e.ResubMonths);
+                SendMessage(null, OnSubscriberCommand.OnSubscriber(sub));
             }
         }
 
@@ -335,8 +344,6 @@ namespace TwitchChat.Controls
                 cancellationToken.Dispose();
             }
 
-            UpdateChattersInfo();
-
             if (_irc.State == IrcState.Registered)
                 _irc.Part(_channelName);
 
@@ -349,6 +356,7 @@ namespace TwitchChat.Controls
             _irc.OnPart -= OnPart;
             //_irc.OnNotice;
             _irc.OnSubscribe -= OnSubscribe;
+            _irc.OnUserNotice -= OnReSubscribe;
             //_irc.OnClearChat;
 
             //  Raise the event.  MainWindowViewModel uses this to remove from list of channels
@@ -379,28 +387,6 @@ namespace TwitchChat.Controls
                 Application.Current.Dispatcher.Invoke(() => { ChatGroups.Add(group); });
             }
             return group;
-        }
-
-        public void UpdateChattersInfo()
-        {
-            var listForUpdate = new List<Domain.Models.ChatterInfo>();
-            foreach (var user in GetAllChatters())
-            {
-                var exists = listForUpdate.FirstOrDefault(t => t.Name.Equals(user.Name, StringComparison.InvariantCultureIgnoreCase) && t.ChatName.Equals(ChannelName, StringComparison.InvariantCultureIgnoreCase));
-
-                if (exists != null)
-                {
-                    exists.Seconds += user.GetTimeAndRestart();
-                    continue;
-                }
-
-                listForUpdate.Add(new Domain.Models.ChatterInfo
-                {
-                    Name = user.Name, ChatName = ChannelName, Seconds = user.GetTimeAndRestart()
-                });
-            }
-
-            ChatterInfoRepository.Instance.UpdateChatterInfo(ChannelName, listForUpdate);
         }
 
         #endregion

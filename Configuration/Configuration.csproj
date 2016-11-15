@@ -58,21 +58,22 @@
     <Compile Include="Entities\Steam.cs" />
     <Compile Include="Entities\Stream.cs" />
     <Compile Include="Entities\Subscribe.cs" />
+    <Compile Include="Entities\Texts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="customCommands.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="configs.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties customCommands_1json__JSONSchema="http://json.schemastore.org/component" configs_1json__JSONSchema="http://json.schemastore.org/component" />
+      <UserProperties configs_1json__JSONSchema="http://json.schemastore.org/component" customCommands_1json__JSONSchema="http://json.schemastore.org/component" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

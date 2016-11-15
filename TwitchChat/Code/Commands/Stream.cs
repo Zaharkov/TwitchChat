@@ -39,6 +39,18 @@ namespace TwitchChat.Code.Commands
             return SendMessage.GetMessage(string.Format(Texts.Delay, string.Format(Texts.Seconds, delay, GetSecondsName(delay))));
         }
 
+        public static SendMessage GetGame(ChatMemberViewModel userModel)
+        {
+            var stream = TwitchApiClient.GetStreamInfo(userModel.Channel.ChannelName);
+
+            if (stream.Stream == null)
+                return SendMessage.GetMessage(Texts.End);
+
+            var game = stream.Stream.Game;
+
+            return SendMessage.GetMessage(string.Format(Texts.Game, game));
+        }
+
         private static string GetHoursName(long hours)
         {
             if (hours % 10 == 1)

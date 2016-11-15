@@ -118,7 +118,7 @@ namespace Domain.Repositories
 
         public void ResetAllDuelNames()
         {
-            var exists = Table.Where(t => t.DuelName != null);
+            var exists = Table.Where(t => t.DuelName != null).ToList();
 
             foreach (var rouletteInfo in exists)
                 rouletteInfo.DuelName = null;

@@ -1,6 +1,5 @@
 ﻿using Configuration;
 using Configuration.Entities;
-using Twitchiedll.IRC.Events;
 
 namespace TwitchChat.Code.Commands
 {
@@ -8,13 +7,13 @@ namespace TwitchChat.Code.Commands
     {
         private static readonly Subscribe Texts = ConfigHolder.Configs.Subscribe;
 
-        public static SendMessage OnSubscriber(SubscriberEventArgs e)
+        public static SendMessage OnSubscriber(SubscribeParams e)
         {
             SendMessage message = null;
 
             foreach (var monthText in Texts.List)
             {
-                if (monthText.Start >= e.Months && monthText.End <= e.Months)
+                if (monthText.Start >= e.Months && e.Months <= monthText.End)
                 {
                     var mes = SendMessage.GetMessage(string.Format(monthText.Text, e.Username));
 
@@ -23,6 +22,18 @@ namespace TwitchChat.Code.Commands
             }
 
             return message;
+        }
+    }
+
+    public class SubscribeParams
+    {
+        public string Username { get; }
+        public int Months { get; }
+
+        public SubscribeParams(string username, int months)
+        {
+            Username = username;
+            Months = months;
         }
     }
 }
