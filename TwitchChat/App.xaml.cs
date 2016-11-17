@@ -15,13 +15,29 @@ namespace TwitchChat
     /// </summary>
     public partial class App
     {
-        //  Create a client id for twitch application that redirects to 
-        public const int Maxmessages = 150;
-
         private MainWindowViewModel _vm;
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            Current.DispatcherUnhandledException += (serder, ee) =>
+            {
+                if (File.Exists("LastError.txt"))
+                    File.Delete("LastError.txt");
+
+                File.AppendAllText("LastError.txt", ee.Exception.ToString());
+
+                var error = ee.Exception.GetBaseException().Message;
+
+                Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show($"Error happend on start. Check LastError.txt file for more info. Error message: {error}");
+                });
+
+                LogRepository.Instance.LogException("Fatal error in application", ee.Exception);
+
+                _vm?.Logout();
+            };
+
             Task.Run(() =>
             {
                 Backup.MakeBackUp();
@@ -36,18 +52,6 @@ namespace TwitchChat
             {
                 _vm.Logout();
                 Current.Shutdown();
-            };
-
-            Current.DispatcherUnhandledException += (serder, ee) =>
-            {
-                LogRepository.Instance.LogException("Fatal error in application", ee.Exception);
-
-                if(File.Exists("LastError.txt"))
-                    File.Delete("LastError.txt");
-
-                File.AppendAllText("LastError.txt", ee.Exception.ToString());
-
-                _vm.Logout();
             };
 
             mainWindow.Show();

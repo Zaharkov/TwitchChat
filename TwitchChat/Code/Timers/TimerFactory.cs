@@ -122,26 +122,34 @@ namespace TwitchChat.Code.Timers
                     {
                         action = () =>
                         {
-                            var chatterInfo = TwitchApiClient.GetUsersList(channelModel.ChannelName);
-                            var newUsers = chatterInfo.Chatters.GetAll();
-                            var listForUpdate = newUsers.Select(t => new ChatterInfo { ChatName = channelModel.ChannelName, Name = t.Key, Seconds = delay }).ToList();
-
+                            List<ChatterInfo> listForUpdate;
                             var allChatters = channelModel.GetAllChatters();
-                            var forDelete = allChatters.Where(user => !newUsers.Any(t => t.Key.Equals(user.Name))).ToList();
-
-                            Application.Current.Dispatcher.Invoke(() =>
+                            try
                             {
-                                foreach (var memberViewModel in forDelete)
-                                    allChatters.Remove(memberViewModel);
+                                var chatterInfo = TwitchApiClient.GetUsersList(channelModel.ChannelName);
+                                var newUsers = chatterInfo.Chatters.GetAll();
+                                listForUpdate = newUsers.Select(t => new ChatterInfo { ChatName = channelModel.ChannelName, Name = t.Key, Seconds = delay }).ToList();
 
-                                foreach (var user in newUsers)
+                                var forDelete = allChatters.Where(user => !newUsers.Any(t => t.Key.Equals(user.Name))).ToList();
+
+                                Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    var group = channelModel.GetGroup(user.Value);
+                                    foreach (var memberViewModel in forDelete)
+                                        allChatters.Remove(memberViewModel);
 
-                                    if (!allChatters.Any(t => t.Name.Equals(user.Key)))
-                                        group.Add(new ChatMemberViewModel(user.Key, channelModel, group));
-                                }
-                            });
+                                    foreach (var user in newUsers)
+                                    {
+                                        var group = channelModel.GetGroup(user.Value);
+
+                                        if (!allChatters.Any(t => t.Name.Equals(user.Key)))
+                                            group.Add(new ChatMemberViewModel(user.Key, channelModel, group));
+                                    }
+                                });
+                            }
+                            catch
+                            {
+                                listForUpdate = allChatters.Select(t => new ChatterInfo { ChatName = channelModel.ChannelName, Name = t.Name, Seconds = delay}).ToList();
+                            }
 
                             if(_updateWasOneTime)
                                 ChatterInfoRepository.Instance.UpdateChatterInfo(channelModel.ChannelName, listForUpdate, delay);

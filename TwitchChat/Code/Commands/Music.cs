@@ -11,6 +11,9 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage GetMusic()
         {
+            if (Music.Params.Disable)
+                return SendMessage.None;
+
             var list = VkApiClient.GetBroadcastList();
 
             var user = list.FirstOrDefault(t => t.Name.Equals(Music.Params.VkAudioName) || $"{t.FirstName} {t.SecondName}".Equals(Music.Params.VkAudioName));

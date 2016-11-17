@@ -29,7 +29,6 @@ namespace Domain.Repositories
         protected BaseRepository()
         {
             Context = new AppContext();
-            Context.Configuration.AutoDetectChangesEnabled = false;
         }
 
         protected T GetById(object id)

@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Configuration;
 using Domain.Repositories;
 using TwitchChat.Code.Commands;
 using TwitchChat.Code.Timers;
@@ -19,6 +20,7 @@ namespace TwitchChat.Controls
 {
     public class ChannelViewModel : ViewModelBase
     {
+        private readonly int _maxMessages = ConfigHolder.Configs.Global.Params.MaxMessages;
         private readonly TwitchIrcClient _irc;
 
         //  The badges that are taken from https://api.twitch.tv/kraken/chat/{0}/badges
@@ -199,7 +201,7 @@ namespace TwitchChat.Controls
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Messages.Add(new ChatMessageViewModel(e, _badges));
-                    if (Messages.Count > App.Maxmessages)
+                    if (Messages.Count > _maxMessages)
                         Messages.RemoveAt(0);
                 });
 
@@ -279,7 +281,8 @@ namespace TwitchChat.Controls
                             break;
                         case SendType.Message:
 
-                            var botMessage = $"БОТ: {(e != null ? TwitchConstName.UserStartName + e.Username : "")} {message.Message}";
+                            var username = e != null && message.NeedPrefix ? TwitchConstName.UserStartName + e.Username : "";
+                            var botMessage = string.Format(ConfigHolder.Configs.Global.Texts.MessagePrefix, username, message.Message);
 
                             if (e != null && e.IsAction)
                                 _irc.Action(ChannelName, botMessage);
@@ -290,7 +293,7 @@ namespace TwitchChat.Controls
                             {
                                 Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, botMessage,
                                     userInfo.ColorHex, e?.IsAction ?? false, _badges));
-                                if (Messages.Count > App.Maxmessages)
+                                if (Messages.Count > _maxMessages)
                                     Messages.RemoveAt(0);
                             });
                             break;
@@ -329,7 +332,7 @@ namespace TwitchChat.Controls
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Messages.Add(new ChatMessageViewModel(userInfo.UserType, _irc.User, Message, userInfo.ColorHex, isAction, _badges));
-                if (Messages.Count > App.Maxmessages)
+                if (Messages.Count > _maxMessages)
                     Messages.RemoveAt(0);
 
                 Message = string.Empty;

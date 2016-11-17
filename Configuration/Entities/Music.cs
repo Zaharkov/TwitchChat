@@ -13,6 +13,9 @@ namespace Configuration.Entities
 
     public class MusicParams
     {
+        [JsonProperty("disable", Required = Required.Always)]
+        public bool Disable { get; set; }
+
         [JsonProperty("vkClientId", Required = Required.Always)]
         public string VkClientId { get; set; }
 

@@ -8,6 +8,8 @@
 
         public int Timeout { get; }
 
+        public bool NeedPrefix { get; private set; }
+
         public SendMessage NextMessage { get; private set; }
 
         private SendMessage(SendType type, string message, int timeout)
@@ -15,11 +17,18 @@
             Type = type;
             Message = message;
             Timeout = timeout;
+            NeedPrefix = true;
         }
 
         public SendMessage AddMessage(SendMessage message)
         {
             NextMessage = message;
+            return this;
+        }
+
+        public SendMessage Prefix(bool need)
+        {
+            NeedPrefix = need;
             return this;
         }
 

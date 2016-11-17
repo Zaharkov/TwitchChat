@@ -7,12 +7,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Configuration;
 using Twitchiedll.IRC.Enums;
 
 namespace TwitchChat.Dialog
 {
     public class WhisperWindowViewModel : ViewModelBase
     {
+        private readonly int _maxMessages = ConfigHolder.Configs.Global.Params.MaxMessages;
         private readonly TwitchIrcClient _irc;
 
         //  User viewmodel is for
@@ -73,7 +75,7 @@ namespace TwitchChat.Dialog
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Messages.Add(new MessageViewModel(e));
-                    if (Messages.Count > App.Maxmessages)
+                    if (Messages.Count > _maxMessages)
                         Messages.RemoveAt(0);
                 });
             }
@@ -93,7 +95,7 @@ namespace TwitchChat.Dialog
             }
 
             Messages.Add(new MessageViewModel(_irc.User, Message, color, isAction));
-            if (Messages.Count > App.Maxmessages)
+            if (Messages.Count > _maxMessages)
                 Messages.RemoveAt(0);
 
             _irc.Whisper(_userName, Message);

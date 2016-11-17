@@ -17,7 +17,7 @@ namespace Domain.Repositories
         {
             var log = new Log
             {
-                Exception = e.ToString(),
+                Exception = e.GetBaseException().ToString(),
                 Message = message,
                 Time = DateTime.UtcNow
             };

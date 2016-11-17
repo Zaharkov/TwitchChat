@@ -12,9 +12,13 @@ namespace TwitchChat.Code.Commands
     public static class SteamCommand
     {
         private static readonly SteamTexts Texts = ConfigHolder.Configs.Steam.Texts;
+        private static readonly SteamParams Params = ConfigHolder.Configs.Steam.Params;
 
         public static SendMessage AddSteam(MessageEventArgs e)
         {
+            if(Params.Disable)
+                return SendMessage.None;
+
             var message =  e.UserType.HasFlag(UserType.Broadcaster) 
                 ? AddSteamBroadcaster(e.Message) 
                 : AddSteamSimple(e.Username, e.Message);
@@ -131,6 +135,9 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage RemoveSteam(MessageEventArgs e)
         {
+            if (Params.Disable)
+                return SendMessage.None;
+
             var message =  e.UserType.HasFlag(UserType.Broadcaster) 
                 ? RemoveSteamBroadcaster(e.Message) 
                 : RemoveSteamSimple(e.Username, e.Message);

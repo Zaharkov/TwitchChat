@@ -13,7 +13,7 @@ namespace TwitchChat.Code.Commands
 
             foreach (var monthText in Texts.List)
             {
-                if (monthText.Start >= e.Months && e.Months <= monthText.End)
+                if (monthText.Start <= e.Months && e.Months <= monthText.End)
                 {
                     var mes = SendMessage.GetMessage(string.Format(monthText.Text, e.Username));
 

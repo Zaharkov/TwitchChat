@@ -195,8 +195,12 @@ namespace TwitchChat
         private void Login()
         {
             LoginWindow.Login(LoginType.Twitch);
-            LoginWindow.Login(LoginType.Vk);
-            Task.Run(() => DotaClientApi.Init());
+
+            if(!ConfigHolder.Configs.Music.Params.Disable)
+                LoginWindow.Login(LoginType.Vk);
+
+            if (!ConfigHolder.Configs.Steam.Params.Disable)
+                Task.Run(() => DotaClientApi.Init());
 
             try
             {
@@ -245,7 +249,8 @@ namespace TwitchChat
             foreach (var whisper in whispers)
                 whisper.Remove(whisper, EventArgs.Empty);
 
-            DotaClientApi.Disconnect();
+            if(!ConfigHolder.Configs.Steam.Params.Disable)
+                DotaClientApi.Disconnect();
 
             _irc.Quit();
         }

@@ -13,6 +13,9 @@ namespace Configuration.Entities
 
     public class SteamParams
     {
+        [JsonProperty("disable", Required = Required.Always)]
+        public bool Disable { get; set; }
+
         [JsonProperty("id", Required = Required.Always)]
         public uint Id { get; set; }
 

@@ -52,7 +52,8 @@ namespace TwitchChat.Code.Commands
                 var randomMes = new Random();
                 var message = messages[randomMes.Next(0, messages.Count)];
 
-                return SendMessage.GetMessage(string.Format(message.Text, args.Cast<object>().ToArray()));
+                return SendMessage.GetMessage(string.Format(message.Text, args.Cast<object>().ToArray()))
+                    .Prefix(command.NeedPrefix);
             }
 
             return SendMessage.None;

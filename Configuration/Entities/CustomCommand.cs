@@ -31,6 +31,9 @@ namespace Configuration.Entities
 
         [JsonProperty("params")]
         public List<CommandParams> CommandParams { get; set; }
+
+        [JsonProperty("needPrefix")]
+        public bool NeedPrefix { get; set; }
     }
 
     public class FlagsEnumConverter : JsonConverter

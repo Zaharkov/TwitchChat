@@ -34,6 +34,9 @@ namespace Configuration.Entities
 
         [JsonProperty("seconds", Required = Required.Always)]
         public string Seconds { get; set; }
+
+        [JsonProperty("messagePrefix", Required = Required.Always)]
+        public string MessagePrefix { get; set; }     
     }
 
     public class GlobalParams
@@ -52,6 +55,9 @@ namespace Configuration.Entities
 
         [JsonProperty("whisperOn", Required = Required.Always)]
         public bool WhisperOn { get; set; }
+
+        [JsonProperty("maxMessages", Required = Required.Always)]
+        public int MaxMessages { get; set; }
     }
 
     public class GlobalCooldowns

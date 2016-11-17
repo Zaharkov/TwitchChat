@@ -5,6 +5,7 @@
     "access": [ "default" ],
     "cooldownType": "global",
     "cooldownTime": 30,
+    "needPrefix" : true, 
     "texts": [
       {
         "text": "смачно засосяндрил {0} в промежность KappaPride",
@@ -31,6 +32,7 @@
   //  "access": "default",
   //  "cooldownType": "user",
   //  "cooldownTime": 20,
+  //  "needPrefix" : true, 
   //  "text": "timer test {0} message {1} user {2}",
   //  "params": [
   //    {//0

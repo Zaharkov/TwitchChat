@@ -12,6 +12,9 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage GetMmr()
         {
+            if (Steam.Params.Disable)
+                return SendMessage.None;
+
             int? soloInt = null;
             int? partyInt = null;
 
@@ -41,6 +44,9 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage MmrUpdate()
         {
+            if (Steam.Params.Disable)
+                return SendMessage.None;
+
             int? solo;
             int? party;
             GetMmr(out solo, out party);
