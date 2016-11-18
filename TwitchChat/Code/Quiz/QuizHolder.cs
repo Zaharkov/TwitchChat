@@ -12,7 +12,7 @@ namespace TwitchChat.Code.Quiz
     public class QuizHolder
     {
         private readonly ChannelViewModel _channel;
-        private static readonly Dictionary<ChannelViewModel, CancellationTokenSource> TokenSources = new Dictionary<ChannelViewModel, CancellationTokenSource>();
+        private CancellationTokenSource _timerTokenSource;
         private static readonly Configuration.Entities.Quiz Quiz = ConfigHolder.Configs.Quiz;
 
         public bool IsQuizActive { get; private set; }
@@ -68,15 +68,15 @@ namespace TwitchChat.Code.Quiz
             };
 
             var cancelToken = TimerFactory.Start(_channel, action, Quiz.Params.Delay * 1000);
-            TokenSources.Add(_channel, cancelToken);
+            _timerTokenSource = cancelToken;
         }
 
         public void StopQuiz()
         {
-            if (TokenSources.ContainsKey(_channel))
+            if (_timerTokenSource != null && !_timerTokenSource.IsCancellationRequested)
             {
-                TimerFactory.Stop(_channel, TokenSources[_channel]);
-                TokenSources.Remove(_channel);
+                TimerFactory.Stop(_channel, _timerTokenSource);
+                _timerTokenSource = null;
             }
 
             IsQuizActive = false;

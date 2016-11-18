@@ -12,8 +12,8 @@ namespace TwitchChat.Code.Vote
     public class VoteHolder
     {
         private readonly ChannelViewModel _channel;
-        private CancellationTokenSource _tokenSource;
-        private static readonly Dictionary<ChannelViewModel, CancellationTokenSource> TokenSources = new Dictionary<ChannelViewModel, CancellationTokenSource>();
+        private CancellationTokenSource _stopTokenSource;
+        private CancellationTokenSource _timerTokenSource;
         private static readonly Configuration.Entities.Vote Vote = ConfigHolder.Configs.Vote;
 
         public bool IsVoteActive { get; private set; }
@@ -51,7 +51,7 @@ namespace TwitchChat.Code.Vote
                     _channel.SendMessage(null, SendMessage.GetMessage(text));
             };
 
-            _tokenSource = new CancellationTokenSource();
+            _stopTokenSource = new CancellationTokenSource();
 
             Action sleep = () =>
             {
@@ -59,10 +59,10 @@ namespace TwitchChat.Code.Vote
             };
 
             var wait = TimerFactory.RunOnce(_channel, sleep);
-            wait.ContinueWith(task => StopVote(), _tokenSource.Token);
+            wait.ContinueWith(task => StopVote(), _stopTokenSource.Token);
 
             var cancelToken = TimerFactory.Start(_channel, action, Vote.Delay * 1000);
-            TokenSources.Add(_channel, cancelToken);
+            _timerTokenSource = cancelToken;
         }
 
         public void StopVote()
@@ -74,10 +74,10 @@ namespace TwitchChat.Code.Vote
                 _channel.SendMessage(null, SendMessage.GetMessage(text));
             }
 
-            if (TokenSources.ContainsKey(_channel))
+            if (_timerTokenSource != null && !_timerTokenSource.IsCancellationRequested)
             {
-                TimerFactory.Stop(_channel, TokenSources[_channel]);
-                TokenSources.Remove(_channel);
+                TimerFactory.Stop(_channel, _timerTokenSource);
+                _timerTokenSource = null;
             }
 
             IsVoteActive = false;
@@ -85,11 +85,11 @@ namespace TwitchChat.Code.Vote
             Votes = null;
             Voted = null;
 
-            if (_tokenSource != null && !_tokenSource.IsCancellationRequested)
+            if (_stopTokenSource != null && !_stopTokenSource.IsCancellationRequested)
             {
-                _tokenSource.Cancel();
-                _tokenSource.Dispose();
-                _tokenSource = null;
+                _stopTokenSource.Cancel();
+                _stopTokenSource.Dispose();
+                _stopTokenSource = null;
             }
         }
     }
