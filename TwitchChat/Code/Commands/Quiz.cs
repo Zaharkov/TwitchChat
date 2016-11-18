@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Repositories;
-using TwitchChat.Code.Quiz;
 using TwitchChat.Controls;
 using Configuration;
 using Twitchiedll.IRC.Enums;
@@ -15,21 +14,23 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage Start(ChatMemberViewModel userModel)
         {
-            QuizHolder.StartNewQuiz(userModel.Channel);
+            userModel.Channel.QuizHolder.StartNewQuiz();
             return SendMessage.None;
         }
 
         public static SendMessage Stop(ChatMemberViewModel userModel)
         {
-            QuizHolder.StopQuiz(userModel.Channel);
+            userModel.Channel.QuizHolder.StopQuiz();
             return SendMessage.None;
         }
 
-        public static SendMessage Question()
+        public static SendMessage Question(ChatMemberViewModel userModel)
         {
-            if (QuizHolder.IsQuizActive && QuizHolder.Question.HasValue)
+            var quiz = userModel.Channel.QuizHolder;
+
+            if (quiz.IsQuizActive && quiz.Question.HasValue)
             {
-                var message = string.Format(Quiz.Texts.Question, QuizHolder.Question.Value.Key, QuizHolder.GetAnswer(QuizHolder.Question.Value.Value), Command.О);
+                var message = string.Format(Quiz.Texts.Question, quiz.Question.Value.Key, quiz.GetAnswer(quiz.Question.Value.Value), Command.О);
                 return SendMessage.GetMessage(message);
             }
             return SendMessage.GetMessage(Quiz.Texts.Off);
@@ -44,21 +45,23 @@ namespace TwitchChat.Code.Commands
 
         public static SendMessage Answer(MessageEventArgs e, ChatMemberViewModel userModel)
         {
-            if (!QuizHolder.IsQuizActive || !QuizHolder.Question.HasValue)
+            var quiz = userModel.Channel.QuizHolder;
+
+            if (!quiz.IsQuizActive || !quiz.Question.HasValue)
                 return SendMessage.None;
 
             var answerUser = e.Message.ToUpper().Replace($"{TwitchConstName.Command}{Command.О}".ToUpper(), "").Trim();
-            var answerQuiz = QuizHolder.Question.Value.Value.ToUpper();
+            var answerQuiz = quiz.Question.Value.Value.ToUpper();
 
             if (answerQuiz == answerUser)
             {
-                QuizHolder.StopQuiz(userModel.Channel);
+                quiz.StopQuiz();
                 ChatterInfoRepository.Instance.AddQuizScore(userModel.Name, e.Channel);
 
                 Task.Run(() =>
                 {
                     Thread.Sleep(Quiz.Params.RestartDelay * 1000);
-                    QuizHolder.StartNewQuiz(userModel.Channel);
+                    quiz.StartNewQuiz();
                 });
 
                 return SendMessage.GetMessage(string.Format(Quiz.Texts.RightAnswer, Quiz.Params.RestartDelay));

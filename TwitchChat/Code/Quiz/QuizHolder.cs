@@ -9,15 +9,21 @@ using Configuration;
 
 namespace TwitchChat.Code.Quiz
 {
-    public static class QuizHolder
+    public class QuizHolder
     {
+        private readonly ChannelViewModel _channel;
         private static readonly Dictionary<ChannelViewModel, CancellationTokenSource> TokenSources = new Dictionary<ChannelViewModel, CancellationTokenSource>();
         private static readonly Configuration.Entities.Quiz Quiz = ConfigHolder.Configs.Quiz;
 
-        public static bool IsQuizActive { get; private set; }
-        public static KeyValuePair<string, string>? Question { get; private set; }
+        public bool IsQuizActive { get; private set; }
+        public KeyValuePair<string, string>? Question { get; private set; }
 
-        public static string GetQuestionText()
+        public QuizHolder(ChannelViewModel channelView)
+        {
+            _channel = channelView;
+        }
+
+        public string GetQuestionText()
         {
             if (!IsQuizActive || !Question.HasValue)
                 return null;
@@ -25,7 +31,7 @@ namespace TwitchChat.Code.Quiz
             return string.Format(Quiz.Texts.Question, Question.Value.Key, GetAnswer(Question.Value.Value), Command.О);
         }
 
-        public static string GetAnswer(string answer)
+        public string GetAnswer(string answer)
         {
             var answerStars = string.Join(" ", answer.Split(' ').Select(GetWordWithStars));
             return answerStars;
@@ -46,9 +52,9 @@ namespace TwitchChat.Code.Quiz
             return wordWithStars;
         }
 
-        public static void StartNewQuiz(ChannelViewModel channelView)
+        public void StartNewQuiz()
         {
-            StopQuiz(channelView);
+            StopQuiz();
 
             IsQuizActive = true;
             Question = QuizCollection.GetNew();
@@ -58,19 +64,19 @@ namespace TwitchChat.Code.Quiz
                 var text = GetQuestionText();
 
                 if(!string.IsNullOrEmpty(text))
-                    channelView.SendMessage(null, SendMessage.GetMessage(text));
+                    _channel.SendMessage(null, SendMessage.GetMessage(text));
             };
 
-            var cancelToken = TimerFactory.Start(channelView, action, Quiz.Params.Delay * 1000);
-            TokenSources.Add(channelView, cancelToken);
+            var cancelToken = TimerFactory.Start(_channel, action, Quiz.Params.Delay * 1000);
+            TokenSources.Add(_channel, cancelToken);
         }
 
-        public static void StopQuiz(ChannelViewModel channelView)
+        public void StopQuiz()
         {
-            if (TokenSources.ContainsKey(channelView))
+            if (TokenSources.ContainsKey(_channel))
             {
-                TimerFactory.Stop(channelView, TokenSources[channelView]);
-                TokenSources.Remove(channelView);
+                TimerFactory.Stop(_channel, TokenSources[_channel]);
+                TokenSources.Remove(_channel);
             }
 
             IsQuizActive = false;

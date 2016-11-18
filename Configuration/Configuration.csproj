@@ -52,6 +52,7 @@
     <Compile Include="Entities\Music.cs" />
     <Compile Include="Entities\MyBolt.cs" />
     <Compile Include="Entities\MyTime.cs" />
+    <Compile Include="Entities\Vote.cs" />
     <Compile Include="Entities\Quiz.cs" />
     <Compile Include="Entities\Roulette.cs" />
     <Compile Include="Entities\Sheiker.cs" />

@@ -80,6 +80,7 @@
     <Compile Include="Code\Commands\DelayType.cs" />
     <Compile Include="Code\Commands\Eba.cs" />
     <Compile Include="Code\Commands\Duel.cs" />
+    <Compile Include="Code\Commands\Vote.cs" />
     <Compile Include="Code\Commands\Subscribe.cs" />
     <Compile Include="Code\Commands\Roulette.cs" />
     <Compile Include="Code\Commands\SendMessage.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Code\Quiz\QuizCollection.cs" />
     <Compile Include="Code\Timers\TimerFactory.cs" />
     <Compile Include="Code\Timers\Timer.cs" />
+    <Compile Include="Code\Vote\VoteHolder.cs" />
     <Compile Include="Controls\ChannelViewModel.cs" />
     <Compile Include="Controls\ChatGroupViewModel.cs" />
     <Compile Include="Controls\ChatMemberViewModel.cs" />

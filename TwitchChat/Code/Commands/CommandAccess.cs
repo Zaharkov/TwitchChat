@@ -32,6 +32,10 @@ namespace TwitchChat.Code.Commands
             { Command.МояВикторина.ToString(), UserType.Default },
             { Command.ВикторинаСтарт.ToString(), UserType.Broadcaster | UserType.Moderator },
             { Command.ВикторинаСтоп.ToString(), UserType.Broadcaster | UserType.Moderator },
+            { Command.ОпросВопрос.ToString(), UserType.Default },
+            { Command.Голос.ToString(), UserType.Default },
+            { Command.ОпросСтарт.ToString(), UserType.Broadcaster | UserType.Moderator },
+            { Command.ОпросСтоп.ToString(), UserType.Broadcaster | UserType.Moderator },
             { Command.Эба.ToString(), UserType.Default },
             { Command.Аптайм.ToString(), UserType.Default },
             { Command.Задержка.ToString(), UserType.Default },
@@ -52,6 +56,7 @@ namespace TwitchChat.Code.Commands
             { Command.Шейкер.ToString(), DelayType.Hybrid},
             { Command.Эба.ToString(), DelayType.Hybrid},
             { Command.О.ToString(), DelayType.Hybrid},
+            { Command.Голос.ToString(), DelayType.User},
             { Command.МояВикторина.ToString(), DelayType.User},
             { Command.Мойписюн.ToString(), DelayType.Hybrid},
             { Command.Рулетка.ToString(), DelayType.Hybrid},
@@ -111,12 +116,20 @@ namespace TwitchChat.Code.Commands
                     return () => QiuzCommand.Start(userModel);
                 case Command.ВикторинаСтоп:
                     return () => QiuzCommand.Stop(userModel);
+                case Command.ОпросСтарт:
+                    return () => VoteCommand.Start(e, userModel);
+                case Command.ОпросСтоп:
+                    return () => VoteCommand.Stop(userModel);
                 case Command.МояВикторина:
                     return () => QiuzCommand.Score(userModel);
                 case Command.О:
                     return () => QiuzCommand.Answer(e, userModel);
+                case Command.Голос:
+                    return () => VoteCommand.UserVote(e, userModel);
                 case Command.ВикторинаВопрос:
-                    return QiuzCommand.Question;
+                    return () => QiuzCommand.Question(userModel);
+                case Command.ОпросВопрос:
+                    return () => VoteCommand.Question(userModel);
                 case Command.Эба:
                     return () => Eba.EbaComeOn(userModel);
                 case Command.Аптайм:

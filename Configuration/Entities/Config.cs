@@ -10,6 +10,9 @@ namespace Configuration.Entities
         [JsonProperty("quiz", Required = Required.Always)]
         public Quiz Quiz { get; set; }
 
+        [JsonProperty("vote", Required = Required.Always)]
+        public Vote Vote { get; set; }
+
         [JsonProperty("subscribe", Required = Required.Always)]
         public Subscribe Subscribe { get; set; }
 

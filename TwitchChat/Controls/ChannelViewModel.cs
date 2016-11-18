@@ -12,7 +12,9 @@ using System.Windows.Input;
 using Configuration;
 using Domain.Repositories;
 using TwitchChat.Code.Commands;
+using TwitchChat.Code.Quiz;
 using TwitchChat.Code.Timers;
+using TwitchChat.Code.Vote;
 using Twitchiedll.IRC.Enums;
 using Twitchiedll.IRC.Events;
 
@@ -50,6 +52,9 @@ namespace TwitchChat.Controls
             }
         }
 
+        public QuizHolder QuizHolder;
+        public VoteHolder VoteHolder;
+
         public TwitchIrcClient Client => _irc;
 
         //  Groups of chatters
@@ -86,6 +91,9 @@ namespace TwitchChat.Controls
 
             SendCommand = new DelegateCommand(Send);
             PartCommand = new DelegateCommand(Part);
+
+            QuizHolder = new QuizHolder(this);
+            VoteHolder = new VoteHolder(this);
 
             _badges = TwitchApiClient.GetBadges(channelName);
 
