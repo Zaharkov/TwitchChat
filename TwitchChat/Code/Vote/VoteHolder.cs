@@ -31,7 +31,7 @@ namespace TwitchChat.Code.Vote
             if (!IsVoteActive)
                 return null;
 
-            return string.Format(Vote.Question, Question, string.Join(",", Votes), Command.Голос);
+            return string.Format(Vote.Question, Question, string.Join(",", Votes.Keys), Command.Голос);
         }
 
         public void StartNewVote(string question, List<string> votes, int seconds)
@@ -69,7 +69,7 @@ namespace TwitchChat.Code.Vote
         {
             if (IsVoteActive)
             {
-                var votes = string.Join(";", Votes);
+                var votes = string.Join(",", Votes.Select(t => $"{t.Key}:{t.Value}"));
                 var text = string.Format(Vote.Result, Question, votes);
                 _channel.SendMessage(null, SendMessage.GetMessage(text));
             }
