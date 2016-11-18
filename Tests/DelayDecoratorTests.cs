@@ -125,7 +125,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            Console.WriteLine(QuizHolder.GetQuestionText());
+            Console.WriteLine();
             
         }
     }
