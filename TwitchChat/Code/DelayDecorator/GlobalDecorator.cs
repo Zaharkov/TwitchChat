@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using TwitchChat.Code.Commands;
 
 namespace TwitchChat.Code.DelayDecorator
 {
     public class GlobalDecorator : BaseDecorator
     {
-        private static readonly Dictionary<string, IDelayDecorator> Instances = new Dictionary<string, IDelayDecorator>();
+        private static readonly Dictionary<CommandHandler, IDelayDecorator> Instances = new Dictionary<CommandHandler, IDelayDecorator>();
 
-        private GlobalDecorator(string command) : base(command)
+        private GlobalDecorator(CommandHandler command) : base(command)
         {
         }
 
-        public static IDelayDecorator Get(string command)
+        public static IDelayDecorator Get(CommandHandler command)
         {
             if (Instances.ContainsKey(command))
                 return Instances[command];

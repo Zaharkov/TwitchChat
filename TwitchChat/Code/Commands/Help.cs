@@ -16,7 +16,7 @@ namespace TwitchChat.Code.Commands
 
         public static string GetHelpTimerText()
         {
-            var groupedAccess = CommandAccess.GetGroupedAccess();
+            var groupedAccess = CommandHandler.GetGroupedAccess();
 
             var builder = new StringBuilder();
             builder.Append(Texts.StartMessage);

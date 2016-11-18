@@ -216,8 +216,8 @@ namespace TwitchChat.Code.Commands
 
         private static void WaitAndDefaultTimers()
         {
-            GlobalDecorator.Get(Command.Принять.ToString()).RestartTimer();
-            GlobalDecorator.Get(Command.Дуэль.ToString()).RestartTimer();
+            GlobalDecorator.Get(CommandHandler.Get(Command.Принять)).RestartTimer();
+            GlobalDecorator.Get(CommandHandler.Get(Command.Дуэль)).RestartTimer();
             Thread.Sleep(DuelConfig.Params.Delay * 1000);
         }
 

@@ -16,27 +16,29 @@ namespace TwitchChat.Code.Commands
         public static SendMessage ExecuteCommand(MessageEventArgs e, ChatMemberViewModel userModel)
         {
             var command = e.Message.TrimStart(TwitchConstName.Command).Split(' ').First();
-            
-            if(!CommandAccess.IsExistCommand(command))
+
+            CommandHandler commandHandler;
+
+            if(!CommandHandler.TryGet(command, out commandHandler))
                 return SendMessage.None;
 
-            if (!CommandAccess.IsHaveAccess(e, command))
+            if (!commandHandler.IsHaveAccess(e))
                 return SendMessage.None;
 
-            var commandFunc = CommandAccess.GetHandler(command, e, userModel);
-            var delayType = CommandAccess.GetCommandDelayType(command);
+            Func<SendMessage> commandFunc = () => commandHandler.Handler(e, userModel);
+            var delayType = commandHandler.DelayType;
 
             IDelayDecorator delayDecorator;
             switch (delayType)
             {
                 case DelayType.User:
-                    delayDecorator = UserDecorator.Get(e.Username, command);
+                    delayDecorator = UserDecorator.Get(e.Username, commandHandler);
                     break;
                 case DelayType.Global:
-                    delayDecorator = GlobalDecorator.Get(command);
+                    delayDecorator = GlobalDecorator.Get(commandHandler);
                     break;
                 case DelayType.Hybrid:
-                    delayDecorator = HybridDecorator.Get(e.Username, command);
+                    delayDecorator = HybridDecorator.Get(e.Username, commandHandler);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(delayType), delayType, null);
