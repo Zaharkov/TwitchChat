@@ -45,16 +45,13 @@
     <Compile Include="Entities\CommandParams.cs" />
     <Compile Include="Entities\CustomCommand.cs" />
     <Compile Include="Entities\Duel.cs" />
-    <Compile Include="Entities\Eba.cs" />
     <Compile Include="Entities\Global.cs" />
     <Compile Include="Entities\Help.cs" />
     <Compile Include="Entities\MonthText.cs" />
     <Compile Include="Entities\Music.cs" />
-    <Compile Include="Entities\MyBolt.cs" />
     <Compile Include="Entities\MyTime.cs" />
     <Compile Include="Entities\Quiz.cs" />
     <Compile Include="Entities\Roulette.cs" />
-    <Compile Include="Entities\Sheiker.cs" />
     <Compile Include="Entities\Steam.cs" />
     <Compile Include="Entities\Stream.cs" />
     <Compile Include="Entities\Subscribe.cs" />

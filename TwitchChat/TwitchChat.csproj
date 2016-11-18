@@ -78,13 +78,11 @@
     <Compile Include="Code\Commands\CommandType.cs" />
     <Compile Include="Code\Commands\CustomCommandHandler.cs" />
     <Compile Include="Code\Commands\DelayType.cs" />
-    <Compile Include="Code\Commands\Eba.cs" />
     <Compile Include="Code\Commands\Duel.cs" />
     <Compile Include="Code\Commands\Subscribe.cs" />
     <Compile Include="Code\Commands\Roulette.cs" />
     <Compile Include="Code\Commands\SendMessage.cs" />
     <Compile Include="Code\Commands\Stream.cs" />
-    <Compile Include="Code\Commands\MyBolt.cs" />
     <Compile Include="Code\Commands\Quiz.cs" />
     <Compile Include="Code\DelayDecorator\IDelayDecorator.cs" />
     <Compile Include="Code\Commands\SendType.cs" />
@@ -92,7 +90,6 @@
     <Compile Include="Code\Commands\Command.cs" />
     <Compile Include="Code\Commands\CommandExecution.cs" />
     <Compile Include="Code\Commands\Steam.cs" />
-    <Compile Include="Code\Commands\Sheiker.cs" />
     <Compile Include="Code\Commands\MyTime.cs" />
     <Compile Include="Code\Commands\Help.cs" />
     <Compile Include="Code\Commands\Mmr.cs" />

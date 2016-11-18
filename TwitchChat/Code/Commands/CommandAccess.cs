@@ -23,16 +23,13 @@ namespace TwitchChat.Code.Commands
             { Command.Музыка.ToString(), UserType.Default },
             { Command.МоеВремя.ToString(), UserType.Default },
             { Command.Помощь.ToString(), UserType.Default },
-            { Command.Шейкер.ToString(), UserType.Default },
             { Command.ДобавитьСтим.ToString(), UserType.Broadcaster },
             { Command.УбратьСтим.ToString(), UserType.Broadcaster },
-            { Command.Мойписюн.ToString(), UserType.Default },
             { Command.О.ToString(), UserType.Default },
             { Command.ВикторинаВопрос.ToString(), UserType.Default },
             { Command.МояВикторина.ToString(), UserType.Default },
             { Command.ВикторинаСтарт.ToString(), UserType.Broadcaster | UserType.Moderator },
             { Command.ВикторинаСтоп.ToString(), UserType.Broadcaster | UserType.Moderator },
-            { Command.Эба.ToString(), UserType.Default },
             { Command.Аптайм.ToString(), UserType.Default },
             { Command.Задержка.ToString(), UserType.Default },
             { Command.Игра.ToString(), UserType.Default },
@@ -49,11 +46,8 @@ namespace TwitchChat.Code.Commands
             { Command.ДобавитьСтим.ToString(), DelayType.User},
             { Command.УбратьСтим.ToString(), DelayType.User},
             { Command.МоеВремя.ToString(), DelayType.Hybrid},
-            { Command.Шейкер.ToString(), DelayType.Hybrid},
-            { Command.Эба.ToString(), DelayType.Hybrid},
             { Command.О.ToString(), DelayType.Hybrid},
             { Command.МояВикторина.ToString(), DelayType.User},
-            { Command.Мойписюн.ToString(), DelayType.Hybrid},
             { Command.Рулетка.ToString(), DelayType.Hybrid},
             { Command.МояРулетка.ToString(), DelayType.Hybrid},
             { Command.ТопРулетки.ToString(), DelayType.Global },
@@ -97,16 +91,12 @@ namespace TwitchChat.Code.Commands
                     return HelpCommand.GetHelp;
                 case Command.МоеВремя:
                     return () => MyTimeCommand.GetMyTime(e, userModel);
-                case Command.Шейкер:
-                    return SheikerCommand.GetSheiker;
                 case Command.ДобавитьСтим:
                     return () => SteamCommand.AddSteam(e);
                 case Command.УбратьСтим:
                     return () => SteamCommand.RemoveSteam(e);
                 case Command.Global:
                     return () => SendMessage.None;
-                case Command.Мойписюн:
-                    return () => MyBolt.Bolt(e);
                 case Command.ВикторинаСтарт:
                     return () => QiuzCommand.Start(userModel);
                 case Command.ВикторинаСтоп:
@@ -117,8 +107,6 @@ namespace TwitchChat.Code.Commands
                     return () => QiuzCommand.Answer(e, userModel);
                 case Command.ВикторинаВопрос:
                     return QiuzCommand.Question;
-                case Command.Эба:
-                    return () => Eba.EbaComeOn(userModel);
                 case Command.Аптайм:
                     return () => StreamCommand.GetUpTime(userModel);
                 case Command.Задержка:

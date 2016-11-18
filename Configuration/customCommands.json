@@ -5,7 +5,7 @@
     "access": [ "default" ],
     "cooldownType": "global",
     "cooldownTime": 30,
-    "needPrefix" : true, 
+    "needPrefix": true,
     "texts": [
       {
         "text": "смачно засосяндрил {0} в промежность KappaPride",
@@ -19,34 +19,100 @@
         "text": "смачно засосяндрил {0} в промежность KappaPride KappaPride KappaPride",
         "access": [ "moderator", "subscriber" ]
       }
+    ],
+    "params": [
+      { //0
+        "type": "randomUser"
+      }
+    ]
+  },
+  {
+    "name": "Эба",
+    "type": "write",
+    "access": [ "default" ],
+    "cooldownType": "hybrid",
+    "cooldownTime": 10,
+    "needPrefix" : true, 
+    "texts": [
+      {
+        "text": "делай ЭБА, делай ЭБА, @{0}, делай ЭБА, @{0} ДАВАААААЙ!",
+        "access": [ "default" ]
+      }
     ], 
     "params": [
       { //0
         "type": "randomUser"
       }
     ]
+  },
+  {
+    "name": "Мойписюн",
+    "type": "write",
+    "access": [ "default" ],
+    "cooldownType": "hybrid",
+    "cooldownTime": 15,
+    "needPrefix": true,
+    "texts": [
+      {
+        "text": "твой писюн - {0} см. Kappa",
+        "access": [ "default" ]
+      },
+      {
+        "text": "божечки ты мой! Самый огромный болт, который я видел - {1} см...в диаметре Kappa",
+        "access": [ "broadcaster" ]
+      }
+    ],
+    "params": [
+      { //0
+        "type": "randomNumber",
+        "min": 1,
+        "max": 35
+      },
+      { //1
+        "type": "randomNumber",
+        "min": 40,
+        "max": 50
+      }
+    ]
+  },
+  {
+    "name": "Шейкер",
+    "type": "write",
+    "access": [ "default" ],
+    "cooldownType": "hybrid",
+    "cooldownTime": 5,
+    "needPrefix" : true, 
+    "texts": [
+      {
+        "text": "хей, патимейкер!",
+        "access": [ "default" ]
+      },
+      {
+        "text": "хэй, baby, брекеты, косичка, миниюбка, кепка!",
+        "access": [ "default" ]
+      },
+      {
+        "text": "этот трек не для тверка, да и похрен, дискотека!",
+        "access": [ "default" ]
+      },
+      {
+        "text": "хэй, DJ!",
+        "access": [ "default" ]
+      },
+      {
+        "text": "хэй, битмейкер!",
+        "access": [ "default" ]
+      },
+      {
+        "text": "хэй, уличный дэнсер!",
+        "access": [ "default" ]
+      },
+      {
+        "text": "до свидули",
+        "access": [ "default" ]
+      }
+    ], 
+    "params": []
   }
-  //{
-  //  "name": "timerTest",
-  //  "type": "timer",
-  //  "access": "default",
-  //  "cooldownType": "user",
-  //  "cooldownTime": 20,
-  //  "needPrefix" : true, 
-  //  "text": "timer test {0} message {1} user {2}",
-  //  "params": [
-  //    {//0
-  //      "type": "randomNumber",
-  //      "min": 1,
-  //      "max": 10
-  //    },
-  //    {//1
-  //      "type": "randomUser" 
-  //    },
-  //    {//1
-  //      "type": "username" 
-  //    }
-  //  ] 
-  //}
 ]
 
