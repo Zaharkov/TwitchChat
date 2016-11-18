@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommonHelper;
 using Configuration;
+using Configuration.Entities;
 using Domain.Repositories;
 using TwitchApi;
 using TwitchChat.Code.Commands;
@@ -19,12 +20,13 @@ namespace TwitchChat.Code.Timers
     {
         private static readonly Dictionary<string, int> Configs = DelayConfig.GetDelayConfig(ConfigHolder.Configs.Global.Cooldowns.Timers);
         private static readonly Dictionary<ChannelViewModel, List<CancellationTokenSource>> CancellationTokenSources = new Dictionary<ChannelViewModel, List<CancellationTokenSource>>();
+        private static readonly List<CustomCommand<CommandType, UserType, DelayType>> Commands = CustomCommands<CommandType, UserType, DelayType>.Commands;
         private static readonly object LockObject = new object();
         private static bool _updateWasOneTime;
 
         static TimerFactory()
         {
-            foreach (var customCommand in CustomCommands<CommandType, UserType, DelayType>.Commands)
+            foreach (var customCommand in Commands.Where(t => t.Type == CommandType.Timer))
                 Configs.Add(customCommand.Name, customCommand.CooldownTime);
         }
 
@@ -85,7 +87,7 @@ namespace TwitchChat.Code.Timers
 
         public static void InitTimers(ChannelViewModel channelModel)
         {
-            var timerCustomCommands = CustomCommands<CommandType, UserType, DelayType>.Commands.Where(t => t.Type == CommandType.Timer);
+            var timerCustomCommands = Commands.Where(t => t.Type == CommandType.Timer);
 
             foreach (var timerCustomCommand in timerCustomCommands)
             {

@@ -51,6 +51,11 @@ namespace TwitchChat.Code.Commands
             foreach (var customCommand in CustomCommands.Where(t => t.Type == CommandType.Write))
                 CommandList.Add(new CommandHandler(customCommand));
 
+            var names = CommandList.Select(t => t.Name).ToList();
+
+            if(names.Distinct().Count() != names.Count)
+                throw new ArgumentException("All commands names must be unique. Check names please!");
+
             foreach (var command in CommandList)
             {
                 if (DisabledCommands.Contains(command.Name, StringComparer.InvariantCultureIgnoreCase))
