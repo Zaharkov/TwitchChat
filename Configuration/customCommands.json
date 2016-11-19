@@ -63,15 +63,15 @@
     "needPrefix": true,
     "texts": [
       {
-        "text": "смачно засосяндрил {0} в промежность KappaPride",
+        "text": "смачно засосяндрил @{0} в промежность KappaPride",
         "access": [ "default" ]
       },
       {
-        "text": "смачно засосяндрил {0} в промежность KappaPride KappaPride",
+        "text": "смачно засосяндрил @{0} в промежность KappaPride KappaPride",
         "access": [ "subscriber" ]
       },
       {
-        "text": "смачно засосяндрил {0} в промежность KappaPride KappaPride KappaPride",
+        "text": "смачно засосяндрил @{0} в промежность KappaPride KappaPride KappaPride",
         "access": [ "moderator", "subscriber" ]
       }
     ],
