@@ -31,6 +31,9 @@ namespace Configuration.Entities
         [JsonProperty("music", Required = Required.Always)]
         public Music Music { get; set; }
 
+        [JsonProperty("osu", Required = Required.Always)]
+        public Osu Osu { get; set; }
+
         [JsonProperty("duel", Required = Required.Always)]
         public Duel Duel { get; set; }
 

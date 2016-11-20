@@ -27,8 +27,8 @@ namespace TwitchChat.Code.Commands
                 new CommandHandler(Command.Музыка.ToString(), UserType.Default, DelayType.Global, (e, m) => MusicCommand.GetMusic()),
                 new CommandHandler(Command.МоеВремя.ToString(), UserType.Default, DelayType.Hybrid, MyTimeCommand.GetMyTime),
                 new CommandHandler(Command.Помощь.ToString(), UserType.Default, DelayType.User, (e, m) => HelpCommand.GetHelp()),
-                new CommandHandler(Command.ДобавитьСтим.ToString(), UserType.Broadcaster, DelayType.User, (e, m) => SteamCommand.AddSteam(e)),
-                new CommandHandler(Command.УбратьСтим.ToString(), UserType.Broadcaster, DelayType.User, (e, m) => SteamCommand.RemoveSteam(e)),
+                new CommandHandler(Command.ДобавитьСтим.ToString(), UserType.Broadcaster | UserType.Subscriber, DelayType.User, (e, m) => SteamCommand.AddSteam(e)),
+                new CommandHandler(Command.УбратьСтим.ToString(), UserType.Broadcaster| UserType.Subscriber, DelayType.User, (e, m) => SteamCommand.RemoveSteam(e)),
                 new CommandHandler(Command.О.ToString(), UserType.Default, DelayType.Hybrid, QiuzCommand.Answer),
                 new CommandHandler(Command.ВикторинаВопрос.ToString(), UserType.Default, DelayType.Global, (e, m) => QiuzCommand.Question(m)),
                 new CommandHandler(Command.МояВикторина.ToString(), UserType.Default, DelayType.User, (e, m) => QiuzCommand.Score(m)),
@@ -45,7 +45,8 @@ namespace TwitchChat.Code.Commands
                 new CommandHandler(Command.МояРулетка.ToString(), UserType.Default, DelayType.Hybrid, (e, m) => RouletteCommand.RouletteInfo(e)),
                 new CommandHandler(Command.ТопРулетки.ToString(), UserType.Default, DelayType.Global, (e, m) => RouletteCommand.RouletteGetTop()),
                 new CommandHandler(Command.Дуэль.ToString(), UserType.Default, DelayType.Hybrid, DuelCommand.Duel),
-                new CommandHandler(Command.Принять.ToString(), UserType.Default, DelayType.Hybrid, DuelCommand.DuelStart)
+                new CommandHandler(Command.Принять.ToString(), UserType.Default, DelayType.Hybrid, DuelCommand.DuelStart),
+                new CommandHandler(Command.Осу.ToString(), UserType.Default, DelayType.Global, (e,m) => OsuCommand.GetMusic())
             };
 
             foreach (var customCommand in CustomCommands.Where(t => t.Type == CommandType.Write))

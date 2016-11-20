@@ -48,6 +48,7 @@
     <Compile Include="Entities\Global.cs" />
     <Compile Include="Entities\Help.cs" />
     <Compile Include="Entities\MonthText.cs" />
+    <Compile Include="Entities\Osu.cs" />
     <Compile Include="Entities\Music.cs" />
     <Compile Include="Entities\MyTime.cs" />
     <Compile Include="Entities\Vote.cs" />
@@ -71,7 +72,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties configs_1json__JSONSchema="http://json.schemastore.org/component" customCommands_1json__JSONSchema="http://json.schemastore.org/component" />
+      <UserProperties customCommands_1json__JSONSchema="http://json.schemastore.org/component" configs_1json__JSONSchema="http://json.schemastore.org/component" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

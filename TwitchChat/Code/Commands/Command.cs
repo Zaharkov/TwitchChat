@@ -28,6 +28,7 @@ namespace TwitchChat.Code.Commands
         ТопРулетки,
         Дуэль,
         Принять,
-        Игра
+        Игра,
+        Осу
     }
 }

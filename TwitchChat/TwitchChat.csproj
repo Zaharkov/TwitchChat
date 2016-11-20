@@ -80,6 +80,7 @@
     <Compile Include="Code\Commands\CustomCommandHandler.cs" />
     <Compile Include="Code\Commands\DelayType.cs" />
     <Compile Include="Code\Commands\Duel.cs" />
+    <Compile Include="Code\Commands\Osu.cs" />
     <Compile Include="Code\Commands\Vote.cs" />
     <Compile Include="Code\Commands\Subscribe.cs" />
     <Compile Include="Code\Commands\Roulette.cs" />
