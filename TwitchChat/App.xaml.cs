@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
+using Configuration;
 using Domain.Repositories;
 using Domain.Utils;
 
@@ -40,7 +41,8 @@ namespace TwitchChat
 
             Task.Run(() =>
             {
-                Backup.MakeBackUp();
+                if(ConfigHolder.Configs.Global.Params.BackupDbOnStart)
+                    Backup.MakeBackUp();
             });
 
             var mainWindow = new MainWindow();

@@ -60,7 +60,10 @@ namespace Configuration.Entities
         public int MaxMessages { get; set; }
 
         [JsonProperty("throwOnHandleEventError", Required = Required.Always)]
-        public bool ThrowOnHandleEventError { get; set; } 
+        public bool ThrowOnHandleEventError { get; set; }
+
+        [JsonProperty("backupDbOnStart", Required = Required.Always)]
+        public bool BackupDbOnStart { get; set; }
     }
 
     public class GlobalCooldowns
