@@ -210,7 +210,8 @@
       "imapPort": 993, 
       "imapLogin": "", 
       "imapPass": "",
-      "imapUseSsl": true
+      "imapUseSsl": true,
+      "logsToFile":  false 
     },
     "texts": { // all whispers
       //0 - имя команды добавления в стим

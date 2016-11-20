@@ -47,7 +47,7 @@ namespace DotaClient
         private static readonly SteamGameCoordinator GameCoordinator;
         private static readonly CallbackManager CallbackManager;
         private static string _authCode;
-        private static readonly SteamListener Listener = new SteamListener();
+        private static readonly SteamListener Listener = new SteamListener(Params.LogsToFile);
 
         private static bool _needWaitFriendList = true;
 
@@ -451,33 +451,45 @@ namespace DotaClient
         /// </summary>
         private static void GetLastCodeFromMail()
         {
-            var mailClient = new ImapClient(ImapHost, ImapLogin, ImapPass, AuthMethods.Login, ImapPort, ImapUseSsl);
-
-            MailMessage message = null;
-
-            var sw = Stopwatch.StartNew();
-
-            while (message == null && sw.Elapsed.TotalSeconds < MaxWaitForMail)
+            try
             {
-                var msgs = mailClient.SearchMessages(SearchCondition.From("noreply@steampowered.com"));
+                var mailClient = new ImapClient(ImapHost, ImapLogin, ImapPass, AuthMethods.Login, ImapPort, ImapUseSsl);
 
-                foreach (var msg in msgs)
+                MailMessage message = null;
+
+                var sw = Stopwatch.StartNew();
+
+                while (message == null && sw.Elapsed.TotalSeconds < MaxWaitForMail)
                 {
-                    if (msg.Value.Date > _loginDate)
-                        message = msg.Value;
+                    var msgs = mailClient.SearchMessages(SearchCondition.From("noreply@steampowered.com"));
+
+                    foreach (var msg in msgs)
+                    {
+                        if (msg.Value.Date > _loginDate)
+                            message = msg.Value;
+                    }
                 }
-            }
 
-            if (message == null)
+                if (message == null)
+                {
+                    _state = ClientState.Error;
+                    Listener.WriteLine("Not found email from steam (noreply@steampowered.com)");
+                    return;
+                }
+
+                var match = Regex.Match(message.Body, $"to account {SteamUser}:\r\n\r\n(?<code>\\S+)\r\n", RegexOptions.Singleline);
+
+                if (match.Success)
+                    _authCode = match.Groups["code"].Value;
+                else
+                    Listener.WriteLine("Not found auth code in email");
+            }
+            catch (Exception ex)
             {
-                _state = ClientState.Error;
-                return;
+                Listener.WriteLine($"Error getting email: {ex}");
+                throw;
             }
-
-            var match = Regex.Match(message.Body, $"to account {SteamUser}:\r\n\r\n(?<code>\\S+)\r\n", RegexOptions.Singleline);
-
-            if (match.Success)
-                _authCode = match.Groups["code"].Value;
+            
         }
 
         private static void OnAccountInfo(SteamUser.AccountInfoCallback callback)

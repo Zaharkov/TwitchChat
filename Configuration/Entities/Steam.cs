@@ -42,6 +42,9 @@ namespace Configuration.Entities
 
         [JsonProperty("imapUseSsl", Required = Required.Always)]
         public bool ImapUseSsl { get; set; }
+
+        [JsonProperty("logsToFile", Required = Required.Always)]
+        public bool LogsToFile { get; set; }
     }
 
     public class SteamTexts
