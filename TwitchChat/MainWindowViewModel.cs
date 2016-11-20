@@ -209,9 +209,9 @@ namespace TwitchChat
                 if(_irc.State == IrcState.Closed)
                     _irc.Reconnect();
 
+                var succefull = false;
                 for (var i = 0; i < 5; i++)
                 {
-                    var succefull = false;
                     try
                     {
                         _irc.Login(user.Name, "oauth:" + TwitchApiClient.GetToken());
@@ -219,7 +219,8 @@ namespace TwitchChat
                     }
                     catch(Exception ex)
                     {
-                       LogRepository.Instance.LogException("Login failed", ex); 
+                        LogRepository.Instance.LogException("Login failed", ex);
+                        LoginWindow.Login(LoginType.Twitch);
                     }
 
                     if (succefull)
@@ -228,7 +229,10 @@ namespace TwitchChat
                     Thread.Sleep(2000);
                 }
 
-                
+                if (!succefull)
+                {
+                    MessageBox.Show("Cannot login. Try restart application");
+                }
             }
             catch (ErrorResponseDataException ex)
             {
