@@ -11,7 +11,7 @@ namespace TwitchChat.Code.Quiz
 
         static QuizCollection()
         {
-            var lines = File.ReadAllLines("Code\\Quiz\\questions.txt");
+            var lines = File.ReadAllLines("questions.txt");
 
             foreach (var question in lines)
             {

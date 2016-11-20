@@ -214,7 +214,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Code\Quiz\questions.txt">
+    <None Include="questions.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
