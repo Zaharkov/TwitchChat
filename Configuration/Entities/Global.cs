@@ -58,6 +58,9 @@ namespace Configuration.Entities
 
         [JsonProperty("maxMessages", Required = Required.Always)]
         public int MaxMessages { get; set; }
+
+        [JsonProperty("throwOnHandleEventError", Required = Required.Always)]
+        public bool ThrowOnHandleEventError { get; set; } 
     }
 
     public class GlobalCooldowns

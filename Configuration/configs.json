@@ -6,6 +6,8 @@
       "twitchApiBaseUrl": "https://api.twitch.tv",
       "twitchTmiBaseUrl": "http://tmi.twitch.tv",
       "whisperOn": false, //включить личку
+      "throwOnHandleEventError": true, //вырубать подключение к IRC если при обработке сообщения
+                                       //вылезла необработанная ошибка
       "maxMessages": 150 //максимальное число сообщений в чате программы
     },
     "cooldowns": {

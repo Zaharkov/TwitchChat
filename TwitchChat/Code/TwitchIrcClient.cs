@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Configuration;
 using TwitchApi;
 using Twitchiedll.IRC;
 using Twitchiedll.IRC.Enums;
@@ -86,7 +87,7 @@ namespace TwitchChat.Code
             {
                 try
                 {
-                    Listen();
+                    Listen(ConfigHolder.Configs.Global.Params.ThrowOnHandleEventError);
                 }
                 catch (Exception ex)
                 {

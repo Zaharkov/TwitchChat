@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Domain.Models;
 
@@ -23,6 +24,8 @@ namespace Domain.Repositories
             };
 
             AddOrUpdate(log);
+
+            File.AppendAllText("ErrorLog.txt", $"Mes: {message}, Time: {DateTime.Now.ToString("dd-MM-yyyy HH.mm.ss")}, Ex: {e}");
         }
 
         public List<Log> GetLogs()
