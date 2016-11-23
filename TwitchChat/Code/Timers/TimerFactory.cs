@@ -125,7 +125,8 @@ namespace TwitchChat.Code.Timers
                         action = () =>
                         {
                             List<ChatterInfo> listForUpdate;
-                            var allChatters = channelModel.GetAllChatters();
+                            var allChatters = channelModel.GetAllChatters().GroupBy(t => t.Name).Select(group => group.First()).ToList();
+
                             try
                             {
                                 var chatterInfo = TwitchApiClient.GetUsersList(channelModel.ChannelName);
