@@ -38,6 +38,7 @@ namespace TwitchChat.Code.Commands
                 new CommandHandler(Command.Голос.ToString(), UserType.Default, DelayType.User, VoteCommand.UserVote),
                 new CommandHandler(Command.ОпросСтарт.ToString(), UserType.Broadcaster | UserType.Moderator, DelayType.Global, VoteCommand.Start),
                 new CommandHandler(Command.ОпросСтоп.ToString(), UserType.Broadcaster | UserType.Moderator, DelayType.Global, (e, m) => VoteCommand.Stop(m)),
+                new CommandHandler(Command.Опрос.ToString(), UserType.Broadcaster | UserType.Moderator, DelayType.Global, (e, m) => VoteCommand.LastResults(m)),
                 new CommandHandler(Command.Аптайм.ToString(), UserType.Default, DelayType.Global, (e, m) => StreamCommand.GetUpTime(m)),
                 new CommandHandler(Command.Задержка.ToString(), UserType.Default, DelayType.Global, (e, m) => StreamCommand.GetDelay(m)),
                 new CommandHandler(Command.Игра.ToString(), UserType.Default, DelayType.Global, (e, m) => StreamCommand.GetGame(m)),

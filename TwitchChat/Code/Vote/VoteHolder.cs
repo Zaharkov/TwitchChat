@@ -21,6 +21,8 @@ namespace TwitchChat.Code.Vote
         public List<string> Voted { get; private set; }
         public string Question { get; private set; }
 
+        public string LastResults { get; private set; }
+
         public VoteHolder(ChannelViewModel channelView)
         {
             _channel = channelView;
@@ -71,6 +73,7 @@ namespace TwitchChat.Code.Vote
             {
                 var votes = string.Join(",", Votes.Select(t => $"{t.Key}:{t.Value}"));
                 var text = string.Format(Vote.Result, Question, votes);
+                LastResults = text;
                 _channel.SendMessage(null, SendMessage.GetMessage(text));
             }
 

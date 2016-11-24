@@ -61,5 +61,12 @@ namespace TwitchChat.Code.Commands
 
             return SendMessage.None;
         }
+
+        public static SendMessage LastResults(ChatMemberViewModel userModel)
+        {
+            var vote = userModel.Channel.VoteHolder;
+
+            return SendMessage.GetMessage(string.IsNullOrEmpty(vote.LastResults) ? Vote.NoLast : vote.LastResults);
+        }
     }
 }

@@ -18,5 +18,8 @@ namespace Configuration.Entities
 
         [JsonProperty("delay", Required = Required.Always)]
         public int Delay { get; set; }
+
+        [JsonProperty("noLast", Required = Required.Always)]
+        public string NoLast { get; set; }
     }
 }
