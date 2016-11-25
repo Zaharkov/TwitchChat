@@ -84,6 +84,11 @@ namespace Domain.Repositories
             Context.SaveChanges();
         }
 
+        protected List<TValue> Sql<TValue>(string sql)
+        {
+            return Context.Database.SqlQuery<TValue>(sql).ToList();
+        }
+
         protected void Sql(string sql)
         {
             Context.Database.ExecuteSqlCommand(sql);

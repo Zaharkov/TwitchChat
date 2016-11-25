@@ -98,7 +98,7 @@ namespace TwitchChat.Controls
             _badges = TwitchApiClient.GetBadges(channelName);
 
             TimerFactory.InitTimers(this);
-            RouletteInfoRepository.Instance.ResetAllDuelNames();
+            RouletteInfoRepository.Instance.ResetAllDuelNames(channelName);
         }
 
         private void OnRawMessage(string buffer)

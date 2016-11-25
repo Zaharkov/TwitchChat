@@ -68,9 +68,9 @@ namespace TwitchChat.Code.Commands
             return SendMessage.GetMessage(message);
         }
 
-        public static SendMessage RouletteGetTop()
+        public static SendMessage RouletteGetTop(MessageEventArgs e)
         {
-            var top = RouletteInfoRepository.Instance.GetTop(Roulette.Params.Top);
+            var top = RouletteInfoRepository.Instance.GetTop(Roulette.Params.Top, e.Channel);
 
             var builder = new StringBuilder();
             builder.Append(Roulette.Texts.TopStart);

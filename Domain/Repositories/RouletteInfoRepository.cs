@@ -31,9 +31,10 @@ namespace Domain.Repositories
                 Delete(info);
         }
 
-        public List<RouletteInfo> GetTop(int top)
+        public List<RouletteInfo> GetTop(int top, string chatName)
         {
-            return Table.OrderBy(t => t.MaxPercent).Take(top).ToList();
+            var sql = $"SELECT TOP {top} ri.* FROM [ChatterInfoes] ci JOIN [RouletteInfoes] ri ON ci.RouletteId = ri.Id WHERE ci.ChatName = N'{chatName}' ORDER BY ri.MaxPercent";
+            return Sql<RouletteInfo>(sql);
         }
 
         public void AddTry(long id)
@@ -116,9 +117,10 @@ namespace Domain.Repositories
             AddOrUpdate(info);
         }
 
-        public void ResetAllDuelNames()
+        public void ResetAllDuelNames(string chatName)
         {
-            var exists = Table.Where(t => t.DuelName != null).ToList();
+            var sql = $"SELECT ri.* FROM [ChatterInfoes] ci JOIN [RouletteInfoes] ri ON ci.RouletteId = ri.Id WHERE ci.ChatName = N'{chatName}' AND ri.DuelName IS NOT NULL";
+            var exists = Sql<RouletteInfo>(sql);
 
             foreach (var rouletteInfo in exists)
                 rouletteInfo.DuelName = null;
