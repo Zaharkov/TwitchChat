@@ -33,7 +33,7 @@ namespace Domain.Repositories
 
         public List<RouletteInfo> GetTop(int top)
         {
-            return Table.OrderBy(t => t.MaxPercent).Take(5).ToList();
+            return Table.OrderBy(t => t.MaxPercent).Take(top).ToList();
         }
 
         public void AddTry(long id)
