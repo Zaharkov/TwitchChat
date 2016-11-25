@@ -62,11 +62,6 @@ namespace Domain.Repositories
             return chatter.Seconds;
         }
 
-        public bool IsChatterExist(string name)
-        {
-            return Table.Any(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        }
-
         public bool IsChatterExist(string name, string chatName)
         {
             return Table.Any(t => 
@@ -75,15 +70,18 @@ namespace Domain.Repositories
             );
         }
 
-        public long? GetChatterSteamId(string name)
+        public long? GetChatterSteamId(string name, string chatName)
         {
-            var chatter = Table.FirstOrDefault(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            return chatter?.SteamId;
+            var chatter = GetOrCreate(name, chatName);
+            return chatter.SteamId;
         }
 
-        public bool IsSteamIdAttachedToChatter(long steamId, ref string name)
+        public bool IsSteamIdAttachedToChatter(long steamId, string chatName, ref string name)
         {
-            var chatter = Table.FirstOrDefault(t => t.SteamId.HasValue && t.SteamId.Value == steamId);
+            var chatter = Table.FirstOrDefault(t => 
+                t.SteamId.HasValue && t.SteamId.Value == steamId && 
+                t.ChatName.Equals(chatName, StringComparison.InvariantCultureIgnoreCase)
+            );
 
             if (chatter != null)
                 name = chatter.Name;
@@ -91,24 +89,18 @@ namespace Domain.Repositories
             return chatter != null;
         }
 
-        public void AddChatterSteamId(string name, long steamId)
+        public void AddChatterSteamId(string name, string chatName, long steamId)
         {
-            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            foreach (var chatterInfo in chatters)
-                chatterInfo.SteamId = steamId;
-
-            UpdateRange(chatters);
+            var chatterInfo = GetOrCreate(name, chatName);
+            chatterInfo.SteamId = steamId;
+            AddOrUpdate(chatterInfo);
         }
 
-        public void DeleteChatterSteamId(string name)
+        public void DeleteChatterSteamId(string name, string chatName)
         {
-            var chatters = Table.Where(t => t.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            foreach (var chatterInfo in chatters)
-                chatterInfo.SteamId = null;
-
-            UpdateRange(chatters);
+            var chatterInfo = GetOrCreate(name, chatName);
+            chatterInfo.SteamId = null;
+            AddOrUpdate(chatterInfo);
         }
 
         public List<ChatterInfo> GetChattersInfo()

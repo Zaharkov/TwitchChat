@@ -20,13 +20,13 @@ namespace TwitchChat.Code.Commands
                 return SendMessage.None;
 
             var message =  e.UserType.HasFlag(UserType.Broadcaster) 
-                ? AddSteamBroadcaster(e.Message) 
-                : AddSteamSimple(e.Username, e.Message);
+                ? AddSteamBroadcaster(e.Message, e.Channel) 
+                : AddSteamSimple(e.Username, e.Message, e.Channel);
 
             return SendMessage.GetWhisper(message);
         }
 
-        private static string AddSteamBroadcaster(string message)
+        private static string AddSteamBroadcaster(string message, string chatName)
         {
             var split = message.Split(' ');
 
@@ -38,10 +38,10 @@ namespace TwitchChat.Code.Commands
             if (twitchName.StartsWith(TwitchConstName.UserStartName.ToString()))
                 twitchName = twitchName.TrimStart(TwitchConstName.UserStartName);
 
-            if (!ChatterInfoRepository.Instance.IsChatterExist(twitchName))
+            if (!ChatterInfoRepository.Instance.IsChatterExist(twitchName, chatName))
                 return string.Format(Texts.NotIntoDataBase, twitchName);
 
-            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(twitchName);
+            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(twitchName, chatName);
 
             if (sqlSteamId.HasValue)
                 return string.Format(Texts.UserAlreadyAttached, twitchName, sqlSteamId.Value); 
@@ -51,19 +51,19 @@ namespace TwitchChat.Code.Commands
                 return string.Format(Texts.NotNumber, split[2]);
 
             var name = "";
-            if (ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, ref name))
+            if (ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, chatName, ref name))
                 return string.Format(Texts.SteamAlreadyAttached, msgSteamId);
 
             var result = DotaClientApi.AddFriend(Convert.ToUInt32(msgSteamId));
-            return HandleAddResponse(result, msgSteamId, twitchName);
+            return HandleAddResponse(result, msgSteamId, twitchName, chatName);
         }
 
-        private static string AddSteamSimple(string userName, string message)
+        private static string AddSteamSimple(string userName, string message, string chatName)
         {
-            if(!ChatterInfoRepository.Instance.IsChatterExist(userName))
+            if(!ChatterInfoRepository.Instance.IsChatterExist(userName, chatName))
                 return string.Format(Texts.NotIntoDataBase, userName);
 
-            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName);
+            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName, chatName);
 
             if (sqlSteamId.HasValue)
                 return string.Format(Texts.UserAlreadyAttached, userName, sqlSteamId.Value);
@@ -78,14 +78,14 @@ namespace TwitchChat.Code.Commands
                 return string.Format(Texts.NotNumber, split[1]);
 
             var name = "";
-            if (ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, ref name))
+            if (ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, chatName, ref name))
                 return string.Format(Texts.SteamAlreadyAttached, msgSteamId);
 
             var result = DotaClientApi.AddFriend(Convert.ToUInt32(msgSteamId));
-            return HandleAddResponse(result, msgSteamId, userName);
+            return HandleAddResponse(result, msgSteamId, userName, chatName);
         }
 
-        private static string HandleAddResponse(FriendResponseContainer response, long steamId, string userName)
+        private static string HandleAddResponse(FriendResponseContainer response, long steamId, string userName, string chatName)
         {
             switch (response.Status)
             {
@@ -117,11 +117,11 @@ namespace TwitchChat.Code.Commands
                 case FriendResponseRelationship.Recipient:
                     return string.Format(Texts.AlreadyInRequest, steamId);
                 case FriendResponseRelationship.Friend:
-                    ChatterInfoRepository.Instance.AddChatterSteamId(userName, steamId);
+                    ChatterInfoRepository.Instance.AddChatterSteamId(userName, chatName, steamId);
                     return string.Format(Texts.AlreadyInFriends, steamId);
                 case FriendResponseRelationship.Initiator:
                 {
-                    ChatterInfoRepository.Instance.AddChatterSteamId(userName, steamId);
+                    ChatterInfoRepository.Instance.AddChatterSteamId(userName, chatName, steamId);
                    
                     if (response.Status == FriendResponseStatus.AlreadyAdded)
                         return string.Format(Texts.AlreadyNeedConfirm, steamId);
@@ -139,13 +139,13 @@ namespace TwitchChat.Code.Commands
                 return SendMessage.None;
 
             var message =  e.UserType.HasFlag(UserType.Broadcaster) 
-                ? RemoveSteamBroadcaster(e.Message) 
-                : RemoveSteamSimple(e.Username, e.Message);
+                ? RemoveSteamBroadcaster(e.Message, e.Channel) 
+                : RemoveSteamSimple(e.Username, e.Message, e.Channel);
 
             return SendMessage.GetWhisper(message);
         }
 
-        private static string RemoveSteamBroadcaster(string message)
+        private static string RemoveSteamBroadcaster(string message, string chatName)
         {
             var split = message.Split(' ');
 
@@ -159,11 +159,11 @@ namespace TwitchChat.Code.Commands
             if (long.TryParse(split[1], out msgSteamId))
             {
                 var name = "";
-                if (!ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, ref name))
+                if (!ChatterInfoRepository.Instance.IsSteamIdAttachedToChatter(msgSteamId, chatName, ref name))
                     return string.Format(Texts.NotAttachedSteam, msgSteamId);
 
                 result = DotaClientApi.RemoveFriend(Convert.ToUInt32(msgSteamId), ignoreBug);
-                return HandleRemoveResponse(result, msgSteamId, name);
+                return HandleRemoveResponse(result, msgSteamId, name, chatName);
             }
 
             var userName = split[1];
@@ -171,24 +171,24 @@ namespace TwitchChat.Code.Commands
             if (userName.StartsWith(TwitchConstName.UserStartName.ToString()))
                 userName = userName.TrimStart(TwitchConstName.UserStartName);
 
-            if (!ChatterInfoRepository.Instance.IsChatterExist(userName))
+            if (!ChatterInfoRepository.Instance.IsChatterExist(userName, chatName))
                 return string.Format(Texts.NotIntoDataBase, userName);
 
-            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName);
+            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName, chatName);
 
             if (!sqlSteamId.HasValue)
                 return string.Format(Texts.NotAttachedUser, userName);
 
             result = DotaClientApi.RemoveFriend(Convert.ToUInt32(sqlSteamId.Value), ignoreBug);
-            return HandleRemoveResponse(result, sqlSteamId.Value, userName);
+            return HandleRemoveResponse(result, sqlSteamId.Value, userName, chatName);
         }
 
-        private static string RemoveSteamSimple(string userName, string message)
+        private static string RemoveSteamSimple(string userName, string message, string chatName)
         {
-            if (!ChatterInfoRepository.Instance.IsChatterExist(userName))
+            if (!ChatterInfoRepository.Instance.IsChatterExist(userName, chatName))
                 return string.Format(Texts.NotIntoDataBase, userName);
 
-            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName);
+            var sqlSteamId = ChatterInfoRepository.Instance.GetChatterSteamId(userName, chatName);
             
             if (!sqlSteamId.HasValue)
                 return string.Format(Texts.NotAttachedUser, userName);
@@ -197,10 +197,10 @@ namespace TwitchChat.Code.Commands
             var ignoreBug = split.Length == 2 && split[1] == "true";
 
             var result = DotaClientApi.RemoveFriend(Convert.ToUInt32(sqlSteamId.Value), ignoreBug);
-            return HandleRemoveResponse(result, sqlSteamId.Value, userName);
+            return HandleRemoveResponse(result, sqlSteamId.Value, userName, chatName);
         }
 
-        private static string HandleRemoveResponse(FriendResponseContainer response, long steamId, string userName)
+        private static string HandleRemoveResponse(FriendResponseContainer response, long steamId, string userName, string chatName)
         {
             switch (response.Status)
             {
@@ -221,7 +221,7 @@ namespace TwitchChat.Code.Commands
             switch (response.Relationship)
             {
                 case FriendResponseRelationship.None:
-                    ChatterInfoRepository.Instance.DeleteChatterSteamId(userName);
+                    ChatterInfoRepository.Instance.DeleteChatterSteamId(userName, chatName);
                     return string.Format(Texts.Removed, steamId);
                 case FriendResponseRelationship.Error:
                     return string.Format(Texts.RemoveBug, steamId, response.StatusCode);
