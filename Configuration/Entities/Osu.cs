@@ -12,5 +12,12 @@ namespace Configuration.Entities
 
         [JsonProperty("played", Required = Required.Always)]
         public string Played { get; set; }
+
+        [JsonProperty("playedwithmap", Required = Required.Always)]
+        public string PlayedWithMap { get; set; }
+
+        [JsonProperty("pathtoosu", Required = Required.Always)]
+        public string PathToOsu { get; set; }
+        
     }
 }
