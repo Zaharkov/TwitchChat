@@ -27,5 +27,14 @@ namespace VkApi.Utils
             if (response.Data == null)
                 throw new NullResponseDataException(response, typeof(T));
         }
+
+        public static void ValidateResponse(IRestResponse response)
+        {
+            if (response.ResponseStatus == ResponseStatus.Error)
+                throw new WebException(response.ErrorMessage, response.ErrorException);
+
+            if (response.Content == null)
+                throw new NullResponseDataException(response, typeof(string));
+        }
     }
 }

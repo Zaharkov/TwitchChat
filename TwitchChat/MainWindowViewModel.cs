@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Configuration;
+using Domain.Models;
 using Domain.Repositories;
 using DotaClient;
 using TwitchChat.Controls;
@@ -196,9 +197,6 @@ namespace TwitchChat
         {
             LoginWindow.Login(LoginType.Twitch);
 
-            if(!ConfigHolder.Configs.Music.Params.Disable)
-                LoginWindow.Login(LoginType.Vk);
-
             if (!ConfigHolder.Configs.Steam.Params.Disable)
                 Task.Run(() => DotaClientApi.Init());
 
@@ -231,6 +229,7 @@ namespace TwitchChat
 
                 if (!succefull)
                 {
+                    AccessTokenRepository.Instance.DeleteToken(AccessTokenType.Twitch);
                     MessageBox.Show("Cannot login. Try restart application");
                 }
             }

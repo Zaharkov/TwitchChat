@@ -15,6 +15,7 @@ namespace VkApi
 
         private static readonly IRestClient ApiClient;
         private static readonly IRestClient AuthClient;
+        private static readonly IRestClient WebClient;
         private static string _accessToken;
 
         public static string AuthorizeUrl =
@@ -28,6 +29,10 @@ namespace VkApi
 
             AuthClient = new RestClientBuilder()
                 .BaseUri("https://oauth.vk.com")
+                .Build();
+
+            WebClient = new RestClientBuilder()
+                .BaseUri("https://vk.com")
                 .Build();
         }
 
@@ -69,6 +74,15 @@ namespace VkApi
             return ExecuteApi<List<User>>(request);
         }
 
+        public static string GetHtmlWithSong(string userName)
+        {
+            var request = new RestRequestBuilder(userName)
+                .Method(Method.GET)
+                .Build();
+
+            return ExecuteWeb(request);
+        }
+
         private static T ExecuteApi<T>(IRestRequest request) where T : class, new()
         {
             var result = ApiClient.Execute<Response<T>>(request);
@@ -85,6 +99,15 @@ namespace VkApi
             Utils.ResponseChecker.ValidateResponse(result);
 
             return result.Data;
+        }
+
+        private static string ExecuteWeb(IRestRequest request)
+        {
+            var result = WebClient.Execute(request);
+
+            Utils.ResponseChecker.ValidateResponse(result);
+
+            return result.Content;
         }
     }
 }
