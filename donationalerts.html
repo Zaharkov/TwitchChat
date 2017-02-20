@@ -1,0 +1,122 @@
+﻿<html>
+<head>
+    <meta charset="utf-8">
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <style id="iframestyle">
+		.image {
+			display: inline;
+			position: relative;
+			top: 0px;
+			left: 200px;
+		}
+		.title {
+			display: inline;
+			position: relative;
+			top: -300px;
+			left: -100px;
+		}
+		.message {
+			display: inline;
+			position: relative;
+			top: -300px;
+			left: -100px;
+		}
+    </style>
+</head>
+<body style="display:none">
+    <iframe id="iframe"
+            allowFullScreen
+            webkitAllowFullScreen
+            mozallowfullscreen
+            allowTransparency="true"
+            style="border: 0"
+            scrolling="no"
+            type="text/html"
+            src="http://www.donationalerts.ru/widget/alerts?token=
+            height="700"
+            width="700">
+        <!-- height = 200 -->
+        <!-- height = 600 -->
+        <!-- http://www.donationalerts.ru/widget/alerts?token= -->
+    </iframe>
+    <script>
+        $(document).ready(function () {
+		
+            var iframe = document.getElementById("iframe");
+
+            iframe.onload = function () {
+
+                var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                var ifstyle = document.getElementById('iframestyle');
+                iframeDocument.head.appendChild(ifstyle);
+                initTransform(iframeDocument);
+
+                setTimeout(function () {
+                    document.body.style.display = "inline";
+                });
+            };
+        });
+
+        function initTransform(iframeDocument) {
+            var test = iframeDocument.createElement("script");
+            test.textContent = transform.toString() + "; transform();";
+            iframeDocument.body.appendChild(test);
+        }
+
+        function transform() {
+		
+			socket = io('socket.donationalerts.ru:3001', {
+				reconnection: true,
+				reconnectionDelayMax: 5000,
+				reconnectionDelay: 1000,
+			}) ;
+	
+			socket.on('connect', function(msg){
+				console.log('WS: connected');
+				socket.emit('add-user', { token: token, type: 'alert_widget' });
+			});
+	
+			socket.on('connect_error', function(msg){
+				console.log('WS: connection_error');
+			});
+	
+			socket.on('connect_timeout', function(msg){
+				console.log('WS: connection_timeout');
+			});
+	
+			socket.on('reconnect', function(msg){
+				console.log('WS: reconnected');
+			});
+	
+			socket.on('donation', function(msg){
+				new_donation = $.parseJSON(msg);
+				console.log(new_donation);
+				if (alerts_id_to_show.indexOf(new_donation.id) == -1) {
+					alerts_array[new_donation.alert_type].push(new_donation);
+				};
+				if (dPoll.poll_is_available == true && dPoll.is_displaying == true) {
+					dPoll.getData(false, true);
+				}
+			});
+	
+			socket.on('update-alert_widget', function(msg){
+				alert_data = $.parseJSON(msg);
+				console.log(alert_data);
+				if(typeof alert_data['_additional'] !== 'undefined'){
+					if(typeof alert_data['_additional'].reload !== 'undefined'){
+						if (alert_data['_additional'].reload == 1) {
+							location.reload();
+						}
+					}
+				}
+				initWidget(alert_data);
+				updateData();
+			});
+	
+			socket.on('update-user_general_widget_settings', function(msg){
+				handleGeneralWidgetSettings(msg);
+			});
+        }
+    </script>
+</body>
+</html>
