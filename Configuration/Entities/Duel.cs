@@ -40,6 +40,9 @@ namespace Configuration.Entities
         [JsonProperty("targetAlreadyInDuel", Required = Required.Always)]
         public string TargetAlreadyInDuel { get; set; }
 
+        [JsonProperty("noDuel", Required = Required.Always)]
+        public string NoDuel { get; set; }
+
         [JsonProperty("noConfirm", Required = Required.Always)]
         public string NoConfirm { get; set; }
 

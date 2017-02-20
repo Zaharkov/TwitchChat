@@ -109,7 +109,10 @@ namespace TwitchChat.Code.Commands
             var targetRouletteId = ChatterInfoRepository.Instance.GetRouletteId(nameForDuel, e.Channel);
             var targetduelName = RouletteInfoRepository.Instance.Get(targetRouletteId).DuelName;
 
-            if (!string.IsNullOrEmpty(targetduelName) && !e.Username.Equals(targetduelName, StringComparison.InvariantCultureIgnoreCase))
+            if (string.IsNullOrEmpty(targetduelName))
+                return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.NoDuel, nameForDuel));
+
+            if (!e.Username.Equals(targetduelName, StringComparison.InvariantCultureIgnoreCase))
                 return SendMessage.GetWhisper(string.Format(DuelConfig.Texts.TargetAlreadyInDuel, nameForDuel, targetduelName));
 
             RouletteInfoRepository.Instance.SetDuelName(sourceRouletteId, nameForDuel);
