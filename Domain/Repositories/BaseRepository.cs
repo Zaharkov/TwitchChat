@@ -93,5 +93,41 @@ namespace Domain.Repositories
         {
             Context.Database.ExecuteSqlCommand(sql);
         }
+
+        protected List<Dictionary<string, string>> SqlGet(string sql)
+        {
+            var table = new List<Dictionary<string, string>>();
+            using (var conn = Context.Database.Connection)
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = sql;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var row = new Dictionary<string, string>();
+                        for (var i = 0; i < reader.FieldCount; i++)
+                            row[reader.GetName(i)] = reader[i].ToString();
+                        table.Add(row);
+                    }
+                }
+            }
+            return table;
+        }
+
+        protected int SqlChange(string sql)
+        {
+            using (var conn = Context.Database.Connection)
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = sql;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    return reader.RecordsAffected;
+                }
+            }
+        }
     }
 }

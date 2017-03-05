@@ -47,7 +47,8 @@ namespace TwitchChat.Code.Commands
                 new CommandHandler(Command.ТопРулетки.ToString(), UserType.Default, DelayType.Global, (e, m) => RouletteCommand.RouletteGetTop(e)),
                 new CommandHandler(Command.Дуэль.ToString(), UserType.Default, DelayType.Hybrid, DuelCommand.Duel),
                 new CommandHandler(Command.Принять.ToString(), UserType.Default, DelayType.Hybrid, DuelCommand.DuelStart),
-                new CommandHandler(Command.Осу.ToString(), UserType.Default, DelayType.Global, (e,m) => OsuCommand.GetMusic())
+                new CommandHandler(Command.Осу.ToString(), UserType.Default, DelayType.Global, (e,m) => OsuCommand.GetMusic()),
+                new CommandHandler(Command.Sql.ToString(), UserType.Broadcaster, DelayType.Global, (e,m) => SqlCommand.Sql(e))
             };
 
             foreach (var customCommand in CustomCommands.Where(t => t.Type == CommandType.Write))

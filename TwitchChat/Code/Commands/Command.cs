@@ -30,6 +30,7 @@ namespace TwitchChat.Code.Commands
         Дуэль,
         Принять,
         Игра,
-        Осу
+        Осу,
+        Sql
     }
 }
