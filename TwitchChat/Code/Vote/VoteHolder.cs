@@ -33,7 +33,11 @@ namespace TwitchChat.Code.Vote
             if (!IsVoteActive)
                 return null;
 
-            return string.Format(Vote.Question, Question, string.Join(",", Votes.Keys), Command.Голос);
+            var text = "";
+            for (var i = 0; i < Votes.Keys.Count; i++)
+                text += $"{Votes.Keys.ToArray()[i]}{(i == Votes.Keys.Count - 1 ? $" ({i+1})" : $" ({i+1}),")}";
+
+            return string.Format(Vote.Question, Question, text, Command.Голос);
         }
 
         public void StartNewVote(string question, List<string> votes, int seconds)

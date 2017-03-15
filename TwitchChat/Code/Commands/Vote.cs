@@ -52,10 +52,18 @@ namespace TwitchChat.Code.Commands
                 return SendMessage.None;
 
             var userVote = e.Message.ToLower().Replace($"{TwitchConstName.Command}{Command.Голос}".ToLower(), "").Trim();
+            var keys = vote.Votes.Keys.ToList();
+            int voteNumber;
 
             if (vote.Votes.ContainsKey(userVote))
             {
                 vote.Votes[userVote]++;
+                vote.Voted.Add(e.Username);
+            }
+            else if(int.TryParse(userVote, out voteNumber) && voteNumber > 0 && voteNumber <= keys.Count)
+            {
+                var voteString = keys[voteNumber-1];
+                vote.Votes[voteString]++;
                 vote.Voted.Add(e.Username);
             }
 
